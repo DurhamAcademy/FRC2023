@@ -17,8 +17,16 @@ import frc.robot.Constants.FLTurnMotorId
 import frc.robot.Constants.FRDriveMotorId
 import frc.robot.Constants.FRTurnEncoderId
 import frc.robot.Constants.FRTurnMotorId
+import frc.robot.commands.DriveCommand
+import frc.robot.controls.ControlScheme
 
-class Drivetrain : SubsystemBase() {
+class Drivetrain(
+    controlScheme: ControlScheme,
+) : SubsystemBase() {
+    init {
+        defaultCommand = DriveCommand(this, controlScheme)
+    }
+
     val FL = SwerveModule(FLDriveMotorId, FLTurnMotorId, FLTurnEncoderId, Translation2d()) // FIXME: add actual positon
     val FR = SwerveModule(FRDriveMotorId, FRTurnMotorId, FRTurnEncoderId, Translation2d()) // FIXME: add actual positon
     val BL = SwerveModule(BLDriveMotorId, BLTurnMotorId, BLTurnEncoderId, Translation2d()) // FIXME: add actual positon
@@ -27,6 +35,7 @@ class Drivetrain : SubsystemBase() {
     val kinematics = SwerveDriveKinematics(
         *modules.map { it.position }.toTypedArray()
     )
+
     fun drive(chassisSpeeds: ChassisSpeeds) {
         val goals: Array<SwerveModuleState> = kinematics.toSwerveModuleStates(chassisSpeeds)
         modules[0].setpoint = goals[0]
