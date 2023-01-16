@@ -19,7 +19,8 @@ class DriveCommand(
                 controlScheme.forward,
                 controlScheme.strafe,
                 controlScheme.rotation
-            )
+            ),
+            false
         )
     }
 }

@@ -1,18 +1,19 @@
 package frc.robot
 
 object Constants {
-    const val FLDriveMotorId = 0
-    const val FRDriveMotorId = 0
-    const val BLDriveMotorId = 0
-    const val BRDriveMotorId = 0
+    const val gyroReversed = false
+    const val FLDriveMotorId = 10
+    const val FRDriveMotorId = 11
+    const val BLDriveMotorId = 12
+    const val BRDriveMotorId = 13
 
-    const val FLTurnMotorId = 0
-    const val FRTurnMotorId = 0
-    const val BLTurnMotorId = 0
-    const val BRTurnMotorId = 0
+    const val FLTurnMotorId = 14
+    const val FRTurnMotorId = 15
+    const val BLTurnMotorId = 16
+    const val BRTurnMotorId = 17
 
-    const val FLTurnEncoderId = 0
-    const val FRTurnEncoderId = 0
-    const val BLTurnEncoderId = 0
-    const val BRTurnEncoderId = 0
+    const val FLTurnEncoderId = 6
+    const val FRTurnEncoderId = 7
+    const val BLTurnEncoderId = 8
+    const val BRTurnEncoderId = 9
 }
