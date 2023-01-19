@@ -87,7 +87,7 @@ class SwerveModule(
     @Suppress("RedundantSetter")
     var currentPosition = SwerveModuleState(
         driveMotor.selectedSensorVelocity,
-        Rotation2d(turnEncoder.position)
+        Rotation2d(-turnEncoder.position)
     )
         private set(value) {
             field = value
