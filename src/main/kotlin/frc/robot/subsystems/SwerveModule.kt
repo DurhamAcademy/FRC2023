@@ -31,9 +31,9 @@ class SwerveModule(
         .entry
     private val driveMotor = TalonFX(driveMotorId).apply {
         configFactoryDefault()
-        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.0)) // why 0.5?
+//        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.5)) // why 0.5?
         //driveMotor.configClosedloopRamp(0.25);
-        configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
+//        configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
 
         // Configure the encoders for both motors
@@ -41,9 +41,9 @@ class SwerveModule(
     }
     private val turnMotor = TalonFX(turnMotorId).apply {
         configFactoryDefault()
-        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
-        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
-        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
+//        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 100)
+//        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 100)
+//        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 100)
         setNeutralMode(NeutralMode.Brake)
     }
     private val turnEncoder = CANCoder(encoderId).apply {
@@ -78,8 +78,8 @@ class SwerveModule(
         DRIVE_D,
         TrapezoidProfile.Constraints(2.0, 2.0)// TODO: Fix these
     )
-    val ANGLE_P = 0.1
-    val ANGLE_I = 0.0
+    val ANGLE_P = 0.01
+    val ANGLE_I = 0.1
     val ANGLE_D = 0.0
     val anglePid = ProfiledPIDController(
         ANGLE_P,
@@ -105,6 +105,9 @@ class SwerveModule(
     }
 
     var setpoint = SwerveModuleSetpoint()
+//        set(value) {
+//            value.angleSetpoint
+//        }
 
     @Suppress("RedundantSetter")
     var currentPosition = SwerveModuleState(
