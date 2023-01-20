@@ -1,5 +1,7 @@
 package frc.robot
 
+import kotlin.math.PI
+
 object Constants {
     const val gyroReversed = false
     const val FLDriveMotorId = 10
@@ -16,4 +18,8 @@ object Constants {
     const val FRTurnEncoderId = 7
     const val BLTurnEncoderId = 8
     const val BRTurnEncoderId = 9
+
+    const val WHEEL_RADIUS = .0508
+    val WHEEL_CIRCUMFRENCE = WHEEL_RADIUS * 2 * PI
+    const val DRIVE_GEAR_RATIO = 6.75
 }
