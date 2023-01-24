@@ -1,28 +1,28 @@
-package frc.robot.subsystems
+package frc.robot6502.subsystems
 
+import com.ctre.phoenix.sensors.WPI_PigeonIMU
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.*
-import edu.wpi.first.wpilibj.ADXRS450_Gyro
 import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants
-import frc.robot.Constants.BLDriveMotorId
-import frc.robot.Constants.BLTurnEncoderId
-import frc.robot.Constants.BLTurnMotorId
-import frc.robot.Constants.BRDriveMotorId
-import frc.robot.Constants.BRTurnEncoderId
-import frc.robot.Constants.BRTurnMotorId
-import frc.robot.Constants.FLDriveMotorId
-import frc.robot.Constants.FLTurnEncoderId
-import frc.robot.Constants.FLTurnMotorId
-import frc.robot.Constants.FRDriveMotorId
-import frc.robot.Constants.FRTurnEncoderId
-import frc.robot.Constants.FRTurnMotorId
-import frc.robot.commands.DriveCommand
-import frc.robot.controls.ControlScheme
-import frc.robot.subsystems.SwerveModule.SwerveModuleSetpoint
+import frc.robot6502.Constants
+import frc.robot6502.Constants.BLDriveMotorId
+import frc.robot6502.Constants.BLTurnEncoderId
+import frc.robot6502.Constants.BLTurnMotorId
+import frc.robot6502.Constants.BRDriveMotorId
+import frc.robot6502.Constants.BRTurnEncoderId
+import frc.robot6502.Constants.BRTurnMotorId
+import frc.robot6502.Constants.FLDriveMotorId
+import frc.robot6502.Constants.FLTurnEncoderId
+import frc.robot6502.Constants.FLTurnMotorId
+import frc.robot6502.Constants.FRDriveMotorId
+import frc.robot6502.Constants.FRTurnEncoderId
+import frc.robot6502.Constants.FRTurnMotorId
+import frc.robot6502.commands.DriveCommand
+import frc.robot6502.controls.ControlScheme
 
 class Drivetrain(
     controlScheme: ControlScheme,
@@ -47,36 +47,35 @@ class Drivetrain(
         FLTurnMotorId,
         FLTurnEncoderId,
         "frontLeft",
-        Translation2d()
-    ) // FIXME: add actual positon
+        Translation2d(0.33, 0.33),
+    ) // FIXME: change postion to new drivebase measurements
     val frontRight = SwerveModule(
         FRDriveMotorId,
         FRTurnMotorId,
         FRTurnEncoderId,
         "frontRight",
-        Translation2d()
-    ) // FIXME: add actual positon
+        Translation2d(0.33, -0.33),
+    ) // FIXME: change postion to new drivebase measurements
     val backLeft = SwerveModule(
         BLDriveMotorId,
         BLTurnMotorId,
         BLTurnEncoderId,
         "backLeft",
-        Translation2d()
-    ) // FIXME: add actual positon
+        Translation2d(-0.33, 0.33),
+    ) // FIXME: change postion to new drivebase measurements
     val backRight = SwerveModule(
         BRDriveMotorId,
         BRTurnMotorId,
         BRTurnEncoderId,
         "backRight",
-        Translation2d()
-    ) // FIXME: add actual positon
+        Translation2d(-0.33, -0.33),
+    ) // FIXME: change postion to new drivebase measurements
     val modules = listOf(frontLeft, frontRight, backLeft, backRight)
     val kinematics = SwerveDriveKinematics(
         *modules.map { it.position }.toTypedArray()
     )
 
-    // Initializing the gyro sensor
-    private val gyro: Gyro = ADXRS450_Gyro()
+    private val gyro: Gyro = WPI_PigeonIMU(0)
 
     // Odometry class for tracking robot pose
     var odometry = SwerveDriveOdometry(
@@ -122,7 +121,7 @@ class Drivetrain(
 //            swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond
 //        )
         swerveModuleStates.forEachIndexed { i, swerveModuleState ->
-            modules[i].setpoint = SwerveModuleSetpoint(swerveModuleState)
+            modules[i].setpoint = swerveModuleState
         }
         // Telemetry
         xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
@@ -144,10 +143,12 @@ class Drivetrain(
 //        SwerveDriveKinematics.desaturateWheelSpeeds(
 //            desiredStates, DriveConstants.kMaxSpeedMetersPerSecond
 //        )
+        // fixme: find max speed
+
         modules.forEachIndexed { i, module ->
-            module.setpoint = SwerveModuleSetpoint(
-                desiredStates[i]?.speedMetersPerSecond,
-                desiredStates[i]?.angle
+            module.setpoint = SwerveModuleState(
+                desiredStates[i]?.speedMetersPerSecond ?: 0.0,
+                desiredStates[i]?.angle ?: Rotation2d()
             )
         }
     }
@@ -180,6 +181,7 @@ class Drivetrain(
      */
     val turnRate: Double
         get() = gyro.rate * if (Constants.gyroReversed) -1.0 else 1.0
+    //fixme: add gyro stuff
 }
 
 private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)

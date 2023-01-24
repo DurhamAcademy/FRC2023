@@ -1,9 +1,9 @@
-package frc.robot.commands
+package frc.robot6502.commands
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.controls.ControlScheme
-import frc.robot.subsystems.Drivetrain
+import frc.robot6502.controls.ControlScheme
+import frc.robot6502.subsystems.Drivetrain
 
 class DriveCommand(
     var drivetrain: Drivetrain,

@@ -1,163 +1,223 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems
 
-import com.ctre.phoenix.motorcontrol.*
+import com.ctre.phoenix.motorcontrol.ControlMode
+import com.ctre.phoenix.motorcontrol.DemandType
+import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice
 import com.ctre.phoenix.motorcontrol.can.TalonFX
-import com.ctre.phoenix.sensors.AbsoluteSensorRange
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import com.ctre.phoenix.sensors.CANCoder
-import com.ctre.phoenix.sensors.CANCoderStatusFrame
-import edu.wpi.first.math.MathUtil
-import edu.wpi.first.math.controller.ProfiledPIDController
+import com.ctre.phoenix.sensors.SensorInitializationStrategy
+import com.ctre.phoenix.sensors.WPI_CANCoder
+import edu.wpi.first.math.controller.SimpleMotorFeedforward
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
-import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.math.util.Units
-import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.DutyCycleEncoder
+import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.DRIVE_GEAR_RATIO
-import frc.robot.Constants.WHEEL_CIRCUMFRENCE
+import frc.robot.Constants.chassisConstants
 
 class SwerveModule(
-    driveMotorId: Int,
-    turnMotorId: Int,
-    encoderId: Int,
-    name: String,
-    val position: Translation2d,
-    angleZero: Double = 0.0,
+    driveMotorID: Int,
+    driveMotorReversed: Boolean,
+    turnMotorID: Int,
+    turnMotorReversed: Boolean,
+    absoluteEncoderID: Int,
+    offset: Double,
+    kP: Double,
+    kI: Double,
+    kD: Double,
 ) : SubsystemBase() {
-    val stateEntry = getTab("Swerve Diagnostics")
-        .add("$name State v", 0)
-        .entry
-    private val driveMotor = TalonFX(driveMotorId).apply {
-        configFactoryDefault()
-//        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.5)) // why 0.5?
-        //driveMotor.configClosedloopRamp(0.25);
-//        configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
+    private val driveMotor: WPI_TalonFX = WPI_TalonFX(driveMotorID).apply{
+        configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
         setNeutralMode(NeutralMode.Brake)
-
-        // Configure the encoders for both motors
-//        configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0)
+        inverted = driveMotorReversed
     }
-    private val turnMotor = TalonFX(turnMotorId).apply {
-        configFactoryDefault()
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 100)
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 100)
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 100)
+    init {
+
+    }
+    private val turnMotor: WPI_TalonFX = WPI_TalonFX(turnMotorID).apply {
+        configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 20)
+        configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero)
+        inverted = turnMotorReversed
         setNeutralMode(NeutralMode.Brake)
+        config_kP(0, kP)
+        config_kI(0, kI)
+        config_kD(0, kD)
     }
-    private val turnEncoder = CANCoder(encoderId).apply {
-        configMagnetOffset(-1 * angleZero)
-        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 100)
 
+    // private final TalonFXSensorCollection driveMotorEnc;
+    // private final TalonFXSensorCollection turnMotorEnc
+    //private DigitalInput absoluteEnc;
+    private val absoluteEncoderOffset: Double = offset
+    private val absoluteEncoder: WPI_CANCoder = WPI_CANCoder(absoluteEncoderID).apply {
         configSensorDirection(false)
+        configSensorDirection(false)
+        configMagnetOffset(absoluteEncoderOffset)
+    }
+    var feedforward =
+        SimpleMotorFeedforward(chassisConstants.kS, chassisConstants.kV, chassisConstants.kA) //Revise and
+
+    val turnAngle: Rotation2d
+        // public void resetEncoder(){
+        get() = Rotation2d(2 * Math.PI / (2048 * chassisConstants.turnMotorGearRat) * (turnMotor.selectedSensorPosition % (2048 * chassisConstants.turnMotorGearRat)))
+
+    fun falconToDegrees(counts: Double, gearRatio: Double): Double {
+        return counts * (360.0 / (gearRatio * 2048.0))
     }
 
-    // smartdashboard
-    // motors
-    val tab = getTab("$name Swerve Diagnostics")
-    val driveMotorEntry = tab.add("$name Drive Motor", 0.0).entry
-    val turnMotorEntry = tab.add("$name Turn Motor", 0.0).entry
-    val turnEncoderEntry = tab.add("$name Turn Encoder", 0.0).entry
-
-    // motor sets
-    val driveMotorSetEntry = tab.add("$name Drive Motor Set", 0.0).entry
-    val turnMotorSetEntry = tab.add("$name Turn Motor Set", 0.0).entry
-
-    // position/angle
-    val positionEntry = tab.add("$name Position", 0.0).entry
-    val angleEntry = tab.add("$name Angle", 0.0).entry
-
-    val DRIVE_P = 0.1
-    val DRIVE_I = 0.0
-    val DRIVE_D = 0.0
-    val drivePid = ProfiledPIDController(
-        DRIVE_P,
-        DRIVE_I,
-        DRIVE_D,
-        TrapezoidProfile.Constraints(2.0, 2.0)// TODO: Fix these
-    )
-    val ANGLE_P = 0.01
-    val ANGLE_I = 0.1
-    val ANGLE_D = 0.0
-    val anglePid = ProfiledPIDController(
-        ANGLE_P,
-        ANGLE_I,
-        ANGLE_D,
-        TrapezoidProfile.Constraints(
-            3.0,
-            3.0
-        )// TODO: Fix these
-    ).apply {
-        enableContinuousInput(-Math.PI, Math.PI)
+    fun degreesToFalcons(degrees: Double, gearRatio: Double): Double {
+        return degrees / (360.0 / (gearRatio * 2048.0))
     }
 
-    class SwerveModuleSetpoint(
-        var driveSetpoint: Double?,
-        var angleSetpoint: Rotation2d?,
-    ) : SwerveModuleState(
-        driveSetpoint ?: 0.0,
-        angleSetpoint ?: Rotation2d()
-    ) {
-        constructor(state: SwerveModuleState) : this(state.speedMetersPerSecond, state.angle)
-        constructor() : this(null, null)
+    fun falconToRPM(velocityCounts: Double, gearRatio: Double): Double {
+        val motorRPM = velocityCounts * (600.0 / 2048.0)
+        return motorRPM / gearRatio
     }
 
-    var setpoint = SwerveModuleSetpoint()
-//        set(value) {
-//            value.angleSetpoint
-//        }
+    fun RPMToFalcon(RPM: Double, gearRatio: Double): Double {
+        val motorRPM = RPM * gearRatio
+        return motorRPM * (2048.0 / 600.0)
+    }
 
-    @Suppress("RedundantSetter")
-    var currentPosition = SwerveModuleState(
-        (driveMotor.selectedSensorVelocity / 2048.0) * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
-        Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.position)))
-    )
-        private set(value) {
-            field = value
+    fun falconToMPS(
+        velocitycounts: Double,
+        circumference: Double,
+        gearRatio: Double,
+    ): Double {
+        val wheelRPM = falconToRPM(velocitycounts, gearRatio)
+        return wheelRPM * circumference / 60
+    }
+
+    fun MPSToFalcons(
+        velocity: Double,
+        circumference: Double,
+        gearRatio: Double,
+    ): Double {
+        val wheelRPM = velocity * 60 / circumference
+        return RPMToFalcon(wheelRPM, gearRatio)
+    }
+
+    fun falconToMeters(count: Double, wheelCircumference: Double, gearRat: Double): Double {
+        return count * (wheelCircumference / (gearRat * 2048))
+    }
+
+    val state: SwerveModuleState
+        get() {
+            val velocity = falconToMPS(
+                driveMotor.selectedSensorVelocity,
+                chassisConstants.circumference,
+                chassisConstants.turnMotorGearRat
+            )
+            val angle = turnAngle
+            return SwerveModuleState(velocity, angle)
         }
+    val position: SwerveModulePosition
+        get() = SwerveModulePosition(
+            falconToMeters(
+                driveMotor.selectedSensorPosition,
+                chassisConstants.circumference,
+                chassisConstants.driveMotorGearRat
+            ), turnAngle
+        )
 
-    private fun setMotorSpeed(drive: Double, angle: Double) {
-        driveMotor.set(ControlMode.PercentOutput, drive)
-        turnMotor.set(ControlMode.PercentOutput, angle)
-        // SmartDashboard
-        driveMotorSetEntry.setDouble(drive)
-        turnMotorSetEntry.setDouble(angle)
+    fun setDesiredState(desiredState: SwerveModuleState) {
+        var kDesiredState = desiredState
+        kDesiredState = SwerveModuleState.optimize(kDesiredState, turnAngle)
+        val velocity = MPSToFalcons(
+            kDesiredState.speedMetersPerSecond,
+            chassisConstants.circumference,
+            chassisConstants.driveMotorGearRat
+        )
+        //double turnOutput = turnPIDController.calculate(turnAngleRadians(), desiredState.angle.getRadians());
+        driveMotor[ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward] =
+            feedforward.calculate(kDesiredState.speedMetersPerSecond)
+        val nearestDegree = Math.round(kDesiredState.angle.degrees)
+        val setTurnValue = (2048 / 360 * nearestDegree).toDouble()
+        val inputAngle = nearestDegree.toDouble()
+        val setPoint = setTurnValue * chassisConstants.turnMotorGearRat
+        turnMotor[ControlMode.Position] = setPoint
     }
 
-    private fun move() {
-        anglePid.setGoal((setpoint.angleSetpoint ?: currentPosition.angle).radians)
-        drivePid.setGoal(setpoint.driveSetpoint ?: currentPosition.speedMetersPerSecond)
-        val anglePower = anglePid.calculate(currentPosition.angle.radians)
-        val drivePower = drivePid.calculate(currentPosition.speedMetersPerSecond)
-        setMotorSpeed(drivePower, anglePower)
+    fun stop() {
+        driveMotor[ControlMode.Velocity] = 0.0
+        turnMotor[ControlMode.Position] = state.angle.degrees * chassisConstants.turnMotorGearRat
     }
-    val lastPeriodicTime = Timer.getFPGATimestamp()
 
     override fun periodic() {
-        // simulate motor velocity based on motor percent output
-        val dt = Timer.getFPGATimestamp() - lastPeriodicTime
-        val vel = (driveMotor.selectedSensorVelocity + (driveMotor.motorOutputVoltage * 2048.0 / 12.0) * 0.02).toInt()
-        driveMotor.simCollection.setIntegratedSensorVelocity(vel)
-        driveMotor.simCollection.setIntegratedSensorRawPosition((vel * 2048.0 * dt).toInt())
-        move()
-        currentPosition = SwerveModuleState(
-            (driveMotor.selectedSensorVelocity / 2048.0) * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
-            Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.position)))
-        )
-        // SmartDashboard
-        driveMotorEntry.setDouble(driveMotor.selectedSensorVelocity)
-        turnMotorEntry.setDouble(turnMotor.selectedSensorVelocity)
-        turnEncoderEntry.setDouble(turnEncoder.position)
-        positionEntry.setDouble(currentPosition.speedMetersPerSecond)
-        angleEntry.setDouble(currentPosition.angle.radians)
-
-        stateEntry.setDouble(currentPosition.speedMetersPerSecond)
     }
+    /**
+     * simulate motors and sensors
+     * the turn encoder should be the same as the turn motor's encoder but with it's gear ratio and offset applied
+     */
+    override fun simulationPeriodic() {
+        // formula for torque in electrical motors: T = Kt * I
+        // where Kt is the motor's torque constant and I is the current
+        // to calculate Kt, we need to know the motor's resistance and back-EMF (voltage at no load)
+        // emf formula: emf = Kv * rpm
+        // given:
+        /// Free Speed (RPM) - 6380
+        /// Free Current (A) - 1.5
+        /// Maximum Power (W) - 783
+        /// Stall Torque (N · m) - 4.69
+        /// Stall Current (A) - 257
+        // we can calculate the motor's resistance and back-EMF
+        // the back emf is = 6380 * 0.1047 = 668.66
+        // the resistance is = 12 / 1.5 = 8
+        // Kt = 4.69 / 257 = 0.0183
+        // so the falcon 500's torque constant is 0.0183
 
-    fun resetEncoders() {
-        driveMotor.selectedSensorPosition = 0.0
-        turnEncoder.position = 0.0
+        // simulate the drive motor
+        driveMotor.run {
+            val motorTorque = statorCurrent * 0.0183
+            // get rps from the encoder
+            val radiansPerSecond = (selectedSensorVelocity / 2048.0) * 2 * Math.PI
+
+            // calculate acceleration of the rotor from torque and mass (wheel is 0.5 kg, gears are 0.1 kg)
+            val acceleration = motorTorque / (0.5 + 0.1)
+            // calculate the new velocity of the rotor
+            val newVelocity = radiansPerSecond + acceleration * 0.02
+            // calculate the new position of the rotor
+            val newPosition = selectedSensorPosition + newVelocity * 0.02 * 2048.0 / (2 * Math.PI)
+
+            // convert to falcons
+            simCollection.setIntegratedSensorRawPosition(newPosition.toInt())
+            simCollection.setIntegratedSensorVelocity(newVelocity.toInt())
+        }
+
+        // simulate the turn motor
+        turnMotor.run {
+            val motorTorque = statorCurrent * 0.0183
+            // get rps from the encoder
+            val radiansPerSecond = (selectedSensorVelocity / 2048.0) * 2 * Math.PI
+
+            // calculate acceleration of the rotor from torque and mass (wheel is 0.5 kg, gears are 0.1 kg)
+            val acceleration = motorTorque / (0.5 + 0.1)
+            // calculate the new velocity of the rotor
+            val newVelocity = radiansPerSecond + acceleration * 0.02
+            // calculate the new position of the rotor
+            val newPosition = selectedSensorPosition + newVelocity * 0.02 * 2048.0 / (2 * Math.PI)
+
+            // convert to falcons
+            simCollection.setIntegratedSensorRawPosition(newPosition.toInt())
+            simCollection.setIntegratedSensorVelocity(newVelocity.toInt())
+        }
+        // take the turn motor's encoder and apply the gear ratio and offset, then set the turn encoder to that value
+        absoluteEncoder.run {
+            val turnMotorPosition = turnMotor.selectedSensorPosition
+            val turnMotorVelocity = turnMotor.selectedSensorVelocity
+            val turnMotorRPS = turnMotorVelocity / 2048.0 * 2 * Math.PI
+            val turnMotorRPM = turnMotorRPS * 60.0 / 2.0 / Math.PI
+            val turnMotorGearRPM = turnMotorRPM * chassisConstants.turnMotorGearRat
+            val turnMotorGearRPS = turnMotorGearRPM / 60.0 * 2.0 * Math.PI
+            val turnMotorGearVelocity = turnMotorGearRPS * 2048.0 / (2.0 * Math.PI)
+            val turnMotorGearPosition = turnMotorPosition * chassisConstants.turnMotorGearRat
+            simCollection.setRawPosition(turnMotorGearPosition.toInt())
+            simCollection.setVelocity(turnMotorGearVelocity.toInt())
+        }
     }
 }
