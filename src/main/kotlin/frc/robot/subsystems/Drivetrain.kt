@@ -1,4 +1,4 @@
-package frc.robot6502.subsystems
+package frc.robot.subsystems
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU
 import edu.wpi.first.math.geometry.Pose2d
@@ -8,21 +8,21 @@ import edu.wpi.first.math.kinematics.*
 import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot6502.Constants
-import frc.robot6502.Constants.BLDriveMotorId
-import frc.robot6502.Constants.BLTurnEncoderId
-import frc.robot6502.Constants.BLTurnMotorId
-import frc.robot6502.Constants.BRDriveMotorId
-import frc.robot6502.Constants.BRTurnEncoderId
-import frc.robot6502.Constants.BRTurnMotorId
-import frc.robot6502.Constants.FLDriveMotorId
-import frc.robot6502.Constants.FLTurnEncoderId
-import frc.robot6502.Constants.FLTurnMotorId
-import frc.robot6502.Constants.FRDriveMotorId
-import frc.robot6502.Constants.FRTurnEncoderId
-import frc.robot6502.Constants.FRTurnMotorId
-import frc.robot6502.commands.DriveCommand
-import frc.robot6502.controls.ControlScheme
+import frc.robot.Constants
+import frc.robot.Constants.BLDriveMotorId
+import frc.robot.Constants.BLTurnEncoderId
+import frc.robot.Constants.BLTurnMotorId
+import frc.robot.Constants.BRDriveMotorId
+import frc.robot.Constants.BRTurnEncoderId
+import frc.robot.Constants.BRTurnMotorId
+import frc.robot.Constants.FLDriveMotorId
+import frc.robot.Constants.FLTurnEncoderId
+import frc.robot.Constants.FLTurnMotorId
+import frc.robot.Constants.FRDriveMotorId
+import frc.robot.Constants.FRTurnEncoderId
+import frc.robot.Constants.FRTurnMotorId
+import frc.robot.commands.DriveCommand
+import frc.robot.controls.ControlScheme
 
 class Drivetrain(
     controlScheme: ControlScheme,
