@@ -1,9 +1,9 @@
-package frc.robot6502.commands
+package frc.robot.commands
 
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot6502.subsystems.SwerveModule
-import frc.robot6502.subsystems.Drivetrain
+import frc.robot.subsystems.SwerveModule
+import frc.robot.subsystems.Drivetrain
 
 class TurnMotorTest(
     private val drivetrain: Drivetrain,
