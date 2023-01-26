@@ -2,6 +2,7 @@ package frc.robot.commands
 
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj2.command.CommandBase
+import frc.robot.controls.DefaultControlScheme
 import frc.robot.subsystems.SwerveModule
 import frc.robot.subsystems.Drivetrain
 
@@ -9,6 +10,7 @@ class TurnMotorTest(
     private val drivetrain: Drivetrain,
     private var module: SwerveModule?,
     private var speed: Double,
+    private var controlScheme: DefaultControlScheme
 ) : CommandBase() {
     val modules: List<SwerveModule>
         get() {

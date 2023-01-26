@@ -17,17 +17,19 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants.DRIVE_GEAR_RATIO
 import frc.robot.Constants.WHEEL_CIRCUMFRENCE
+import frc.robot.controls.ControlScheme
 
 class SwerveModule(
     driveMotorId: Int,
     turnMotorId: Int,
     encoderId: Int,
-    name: String,
+    val mname: String,
     val position: Translation2d,
     angleZero: Double = 0.0,
+    val controlScheme: ControlScheme
 ) : SubsystemBase() {
     val stateEntry = getTab("Swerve Diagnostics")
-        .add("$name State v", 0)
+        .add("$mname State v", 0)
         .entry
     val driveMotor = WPI_TalonFX(driveMotorId).apply {
         configFactoryDefault()
@@ -56,20 +58,20 @@ class SwerveModule(
 
     // smartdashboard
     // motors
-    val tab = getTab("$name Swerve Diagnostics")
-    val driveMotorEntry = tab.add("$name Drive Motor", 0.0).entry
-    val turnMotorEntry = tab.add("$name Turn Motor", 0.0).entry
-    val turnEncoderEntry = tab.add("$name Turn Encoder", 0.0).entry
+    val tab = getTab("$mname Swerve Diagnostics")
+    val driveMotorEntry = tab.add("$mname Drive Motor", 0.0).entry
+    val turnMotorEntry = tab.add("$mname Turn Motor", 0.0).entry
+    val turnEncoderEntry = tab.add("$mname Turn Encoder", 0.0).entry
 
     // motor sets
-    val driveMotorSetEntry = tab.add("$name Drive Motor Set", 0.0).entry
-    val turnMotorSetEntry = tab.add("$name Turn Motor Set", 0.0).entry
+    val driveMotorSetEntry = tab.add("$mname Drive Motor Set", 0.0).entry
+    val turnMotorSetEntry = tab.add("$mname Turn Motor Set", 0.0).entry
 
     // position/angle
-    val positionEntry = tab.add("$name Position", 0.0).entry
-    val angleEntry = tab.add("$name Angle", 0.0).entry
+    val positionEntry = tab.add("$mname Position", 0.0).entry
+    val angleEntry = tab.add("$mname Angle", 0.0).entry
 
-    val DRIVE_P = 0.1*12
+    val DRIVE_P = 2.0*12
     val DRIVE_I = 0.0
     val DRIVE_D = 0.0
     val drivePid = ProfiledPIDController(
@@ -78,7 +80,7 @@ class SwerveModule(
         DRIVE_D,
         TrapezoidProfile.Constraints(2.0, 2.0)// TODO: Fix these
     )
-    val ANGLE_P = 0.1 *12
+    val ANGLE_P = 0.5 *12
     val ANGLE_I = 0.0
     val ANGLE_D = 0.0
     val anglePid = ProfiledPIDController(
@@ -86,8 +88,8 @@ class SwerveModule(
         ANGLE_I,
         ANGLE_D,
         TrapezoidProfile.Constraints(
-            3.0,
-            3.0
+            32.0,
+            64.0
         )// TODO: Fix these
     ).apply {
         enableContinuousInput(-Math.PI, Math.PI)
@@ -122,32 +124,46 @@ class SwerveModule(
         turnMotorSetEntry.setDouble(angle)
     }
 
-    private fun move() {
-        anglePid.setGoal((setpoint.angle ?: currentPosition.angle).radians)
-        drivePid.setGoal(setpoint.angle.radians)
-        val anglePower = anglePid.calculate(currentPosition.angle.radians)
-        val drivePower = drivePid.calculate(currentPosition.speedMetersPerSecond)
-        setMotorSpeed(drivePower, anglePower)
-    }
+//    private fun move() {
+//        anglePid.setGoal((setpoint.angle ?: currentPosition.angle).radians)
+//        drivePid.setGoal(setpoint.angle.radians)
+//        val anglePower = anglePid.calculate(currentPosition.angle.radians)
+//        val drivePower = drivePid.calculate(currentPosition.speedMetersPerSecond)
+//        setMotorSpeed(drivePower, anglePower)
+//    }
 
     val lastPeriodicTime = Timer.getFPGATimestamp()
 
     override fun periodic() {
+//        move()
+        var goal = 0.0
+        this.controlScheme.xbox!!.run {
+             goal = Translation2d(leftX.deadband(0.1),leftY.deadband(0.1)).angle.radians
+        }
+//        println(goal)
+        val rads = Units.degreesToRadians(this.turnEncoder.absolutePosition)
+        anglePid.calculate(rads)
+        if (this.mname == "frontLeft") {
+            val power = anglePid.calculate(rads,goal)
+            turnMotor.setVoltage(-power)
+            println(power)
+
+        }
 
         // simulate motor velocity based on motor percent output
-        val dt = Timer.getFPGATimestamp() - lastPeriodicTime
-        val vel = (driveMotor.selectedSensorVelocity + (driveMotor.motorOutputVoltage * 2048.0 / 12.0) * 0.02).toInt()
-        driveMotor.simCollection.setIntegratedSensorVelocity(vel)
-        driveMotor.simCollection.setIntegratedSensorRawPosition((vel * 2048.0 * dt).toInt())
-        move()
-        // SmartDashboard
-        driveMotorEntry.setDouble(driveMotor.selectedSensorVelocity)
-        turnMotorEntry.setDouble(turnMotor.selectedSensorVelocity)
-        turnEncoderEntry.setDouble(turnEncoder.position)
-        positionEntry.setDouble(currentPosition.speedMetersPerSecond)
-        angleEntry.setDouble(currentPosition.angle.radians)
-
-        stateEntry.setDouble(currentPosition.speedMetersPerSecond)
+//        val dt = Timer.getFPGATimestamp() - lastPeriodicTime
+//        val vel = (driveMotor.selectedSensorVelocity + (driveMotor.motorOutputVoltage * 2048.0 / 12.0) * 0.02).toInt()
+//        driveMotor.simCollection.setIntegratedSensorVelocity(vel)
+//        driveMotor.simCollection.setIntegratedSensorRawPosition((vel * 2048.0 * dt).toInt())
+//        move()
+//        // SmartDashboard
+//        driveMotorEntry.setDouble(driveMotor.selectedSensorVelocity)
+//        turnMotorEntry.setDouble(turnMotor.selectedSensorVelocity)
+//        turnEncoderEntry.setDouble(turnEncoder.position)
+//        positionEntry.setDouble(currentPosition.speedMetersPerSecond)
+//        angleEntry.setDouble(currentPosition.angle.radians)
+//
+//        stateEntry.setDouble(currentPosition.speedMetersPerSecond)
     }
 
     fun resetEncoders() {
@@ -155,3 +171,4 @@ class SwerveModule(
         turnEncoder.position = 0.0
     }
 }
+fun Double.deadband(min: Double) = if ((this < min) && (this > -min)) 0.0 else this

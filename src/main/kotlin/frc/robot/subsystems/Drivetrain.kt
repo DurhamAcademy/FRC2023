@@ -5,8 +5,11 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.*
+import edu.wpi.first.wpilibj.ADXRS450_Gyro
 import edu.wpi.first.wpilibj.interfaces.Gyro
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import frc.robot.Constants.BLDriveMotorId
@@ -22,10 +25,12 @@ import frc.robot.Constants.FRDriveMotorId
 import frc.robot.Constants.FRTurnEncoderId
 import frc.robot.Constants.FRTurnMotorId
 import frc.robot.commands.DriveCommand
+import frc.robot.commands.DriveMotorTest
 import frc.robot.controls.ControlScheme
+import java.util.function.DoubleSupplier
 
 class Drivetrain(
-    controlScheme: ControlScheme,
+    val controlScheme: ControlScheme,
 ) : SubsystemBase() {
     init {
         defaultCommand = DriveCommand(this, controlScheme)
@@ -48,6 +53,7 @@ class Drivetrain(
         FLTurnEncoderId,
         "frontLeft",
         Translation2d(0.33, 0.33),
+        controlScheme = controlScheme
     ) // FIXME: change postion to new drivebase measurements
     val frontRight = SwerveModule(
         FRDriveMotorId,
@@ -55,6 +61,8 @@ class Drivetrain(
         FRTurnEncoderId,
         "frontRight",
         Translation2d(0.33, -0.33),
+        controlScheme = controlScheme
+
     ) // FIXME: change postion to new drivebase measurements
     val backLeft = SwerveModule(
         BLDriveMotorId,
@@ -62,6 +70,8 @@ class Drivetrain(
         BLTurnEncoderId,
         "backLeft",
         Translation2d(-0.33, 0.33),
+        controlScheme = controlScheme
+
     ) // FIXME: change postion to new drivebase measurements
     val backRight = SwerveModule(
         BRDriveMotorId,
@@ -69,31 +79,39 @@ class Drivetrain(
         BRTurnEncoderId,
         "backRight",
         Translation2d(-0.33, -0.33),
+        controlScheme = controlScheme
+
     ) // FIXME: change postion to new drivebase measurements
     val modules = listOf(frontLeft, frontRight, backLeft, backRight)
     val kinematics = SwerveDriveKinematics(
         *modules.map { it.position }.toTypedArray()
     )
 
-    private val gyro: Gyro = WPI_PigeonIMU(0)
+//    private val gyro: Gyro = ADXRS450_Gyro()
 
     // Odometry class for tracking robot pose
     var odometry = SwerveDriveOdometry(
         kinematics,
-        gyro.rotation2d,
+        Rotation2d(),//gyro.rotation2d,
         modules
             .map { it.position.toSwerveModulePosition() }
             .toTypedArray()
     )
+    val Idrc = Shuffleboard.getTab("drivetrain")
+    val power = Idrc.add("power", 0.0)
 
     override fun periodic() {
         // This method will be called once per scheduler run
         // Update the odometry in the periodic block
-        gyroEntry.setDouble(gyro.angle)
+        gyroEntry.setDouble(0.0)
         odometry.update(
-            gyro.rotation2d,
+//            gyro.rotation2d,
+            Rotation2d(),
             modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
         )
+        modules.forEach {
+            it.driveMotor.setVoltage(controlScheme.forward*12.0)
+        }
     }
 
     val pose: Pose2d
@@ -103,7 +121,7 @@ class Drivetrain(
     // Resets the odometry to the specified pose
     fun resetOdometry(pose: Pose2d?) {
         odometry.resetPosition(
-            gyro.rotation2d,
+            Rotation2d(),//gyro.rotation2d,
             modules.map { it.position.toSwerveModulePosition() }.toTypedArray(),
             pose
         )
@@ -114,7 +132,7 @@ class Drivetrain(
      */
     fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
         val swerveModuleStates = kinematics.toSwerveModuleStates(
-            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, gyro.rotation2d)
+            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d())//gyro.rotation2d)
             else chassisSpeeds
         )
 //        SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -166,21 +184,21 @@ class Drivetrain(
     /**
      * Zeroes the heading of the robot
      */
-    fun zeroHeading() = gyro.reset()
+//    fun zeroHeading() = gyro.reset()
 
     /**
      * the heading of the robot.
      */
-    val heading: Double
-        get() = gyro.rotation2d.degrees
+//    val heading: Double
+//        get() = gyro.rotation2d.degrees
 
     /**
      * Returns the turn rate of the robot.
      *
      * @return The turn rate of the robot, in degrees per second
      */
-    val turnRate: Double
-        get() = gyro.rate * if (Constants.gyroReversed) -1.0 else 1.0
+//    val turnRate: Double
+//        get() = gyro.rate * if (Constants.gyroReversed) -1.0 else 1.0
     //fixme: add gyro stuff
 }
 

@@ -1,9 +1,12 @@
 package frc.robot.controls
 
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.XboxController
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import edu.wpi.first.wpilibj2.command.button.Trigger
 
 abstract class ControlScheme {
+    abstract val xbox: CommandXboxController?
     abstract val rotation: Double
     abstract val strafe: Double
     abstract val forward: Double
