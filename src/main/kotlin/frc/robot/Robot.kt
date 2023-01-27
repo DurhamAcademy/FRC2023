@@ -17,4 +17,13 @@ class Robot : TimedRobot() {
         CommandScheduler.getInstance().run()
     }
 
+    // schedule test commands during test mode
+    override fun testInit() {
+
+    }
+
+    override fun testPeriodic() {
+        robotContainer.drivetrain.frontLeft.driveMotor.setVoltage(6.0)
+
+    }
 }
