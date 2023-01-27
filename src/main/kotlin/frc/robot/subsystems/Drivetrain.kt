@@ -1,15 +1,11 @@
 package frc.robot.subsystems
 
-import com.ctre.phoenix.sensors.WPI_PigeonIMU
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.*
-import edu.wpi.first.wpilibj.ADXRS450_Gyro
-import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
-import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import frc.robot.Constants.BLDriveMotorId
@@ -18,16 +14,12 @@ import frc.robot.Constants.BLTurnMotorId
 import frc.robot.Constants.BRDriveMotorId
 import frc.robot.Constants.BRTurnEncoderId
 import frc.robot.Constants.BRTurnMotorId
-import frc.robot.Constants.FLDriveMotorId
 import frc.robot.Constants.FLTurnEncoderId
 import frc.robot.Constants.FLTurnMotorId
-import frc.robot.Constants.FRDriveMotorId
 import frc.robot.Constants.FRTurnEncoderId
 import frc.robot.Constants.FRTurnMotorId
 import frc.robot.commands.DriveCommand
-import frc.robot.commands.DriveMotorTest
 import frc.robot.controls.ControlScheme
-import java.util.function.DoubleSupplier
 
 class Drivetrain(
     val controlScheme: ControlScheme,
@@ -47,20 +39,22 @@ class Drivetrain(
         .entry
     private val gyroEntry = swerveTab.add("Gyro Heading", 0)
         .entry
-    val frontLeft = SwerveModule(
-        FLDriveMotorId,
+    val frontLeft = SwerveModule( // front right
+        Constants.FLDriveMotorId,
         FLTurnMotorId,
         FLTurnEncoderId,
         "frontLeft",
-        Translation2d(0.33, 0.33),
+        angleZero = 122.0,
+        position = Translation2d(0.33, 0.33),
         controlScheme = controlScheme
     ) // FIXME: change postion to new drivebase measurements
-    val frontRight = SwerveModule(
-        FRDriveMotorId,
+    val frontRight = SwerveModule( // backleft
+        Constants.FRDriveMotorId,
         FRTurnMotorId,
         FRTurnEncoderId,
         "frontRight",
         Translation2d(0.33, -0.33),
+        angleZero = 73.0,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -70,6 +64,7 @@ class Drivetrain(
         BLTurnEncoderId,
         "backLeft",
         Translation2d(-0.33, 0.33),
+        angleZero = 65.75,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -79,6 +74,7 @@ class Drivetrain(
         BRTurnEncoderId,
         "backRight",
         Translation2d(-0.33, -0.33),
+        angleZero = 154.5,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -97,7 +93,7 @@ class Drivetrain(
             .map { it.position.toSwerveModulePosition() }
             .toTypedArray()
     )
-    val Idrc = Shuffleboard.getTab("drivetrain")
+    val Idrc = getTab("drivetrain")
     val power = Idrc.add("power", 0.0)
 
     override fun periodic() {
@@ -109,9 +105,6 @@ class Drivetrain(
             Rotation2d(),
             modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
         )
-        modules.forEach {
-            it.driveMotor.setVoltage(controlScheme.forward*12.0)
-        }
     }
 
     val pose: Pose2d
@@ -175,9 +168,9 @@ class Drivetrain(
      *  Resets the drive encoders to currently read a position of 0
      */
     fun resetEncoders() {
-        frontLeft.resetEncoders()
+        this.frontLeft.resetEncoders()
+        this.frontLeft.resetEncoders()
         backLeft.resetEncoders()
-        frontRight.resetEncoders()
         backRight.resetEncoders()
     }
 

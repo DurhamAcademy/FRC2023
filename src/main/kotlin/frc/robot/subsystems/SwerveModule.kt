@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants.DRIVE_GEAR_RATIO
 import frc.robot.Constants.WHEEL_CIRCUMFRENCE
@@ -48,8 +49,8 @@ class SwerveModule(
         setNeutralMode(NeutralMode.Brake)
     }
     private val turnEncoder = CANCoder(encoderId).apply {
-        configMagnetOffset(-1 * angleZero)
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
+        configMagnetOffset(-1 * angleZero)
         setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 100)
 
         configSensorDirection(false)
@@ -71,14 +72,14 @@ class SwerveModule(
     val positionEntry = tab.add("$mname Position", 0.0).entry
     val angleEntry = tab.add("$mname Angle", 0.0).entry
 
-    val DRIVE_P = 2.0*12
+    val DRIVE_P = 0.2 * 12
     val DRIVE_I = 0.0
     val DRIVE_D = 0.0
     val drivePid = ProfiledPIDController(
         DRIVE_P,
         DRIVE_I,
         DRIVE_D,
-        TrapezoidProfile.Constraints(2.0, 2.0)// TODO: Fix these
+        TrapezoidProfile.Constraints(2.0, .0)// TODO: Fix these
     )
     val ANGLE_P = 0.5 *12
     val ANGLE_I = 0.0
@@ -124,31 +125,34 @@ class SwerveModule(
         turnMotorSetEntry.setDouble(angle)
     }
 
-//    private fun move() {
-//        anglePid.setGoal((setpoint.angle ?: currentPosition.angle).radians)
-//        drivePid.setGoal(setpoint.angle.radians)
-//        val anglePower = anglePid.calculate(currentPosition.angle.radians)
-//        val drivePower = drivePid.calculate(currentPosition.speedMetersPerSecond)
-//        setMotorSpeed(drivePower, anglePower)
-//    }
-
-    val lastPeriodicTime = Timer.getFPGATimestamp()
-
-    override fun periodic() {
-//        move()
-        var goal = 0.0
+    private fun calculateAnglePower(): Double {
         this.controlScheme.xbox!!.run {
-             goal = Translation2d(leftX.deadband(0.1),leftY.deadband(0.1)).angle.radians
+            this@SwerveModule.setpoint.angle = Translation2d(leftX.deadband(0.1), leftY.deadband(0.1)).angle
         }
 //        println(goal)
         val rads = Units.degreesToRadians(this.turnEncoder.absolutePosition)
         anglePid.calculate(rads)
+        val anglePower = -anglePid.calculate(rads, setpoint.angle.radians)
         if (this.mname == "frontLeft") {
-            val power = anglePid.calculate(rads,goal)
-            turnMotor.setVoltage(-power)
-            println(power)
-
+            println(anglePower)
         }
+        return anglePower
+    }
+
+    private fun calculateDrivePower(): Double =
+        drivePid.calculate(currentPosition.speedMetersPerSecond, setpoint.speedMetersPerSecond)
+
+    private fun move() {
+        val drivePower = calculateDrivePower()
+        val anglePower = calculateAnglePower()
+        setMotorSpeed(drivePower, anglePower)
+    }
+
+    val lastPeriodicTime = Timer.getFPGATimestamp()
+
+    override fun periodic() {
+        move()
+        SmartDashboard.putNumber("$mname Encoder", turnEncoder.absolutePosition)
 
         // simulate motor velocity based on motor percent output
 //        val dt = Timer.getFPGATimestamp() - lastPeriodicTime

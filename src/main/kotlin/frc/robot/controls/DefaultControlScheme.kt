@@ -12,11 +12,11 @@ class DefaultControlScheme(
      val xboxCon: CommandXboxController
         get() = xbox!!
     override val rotation: Double // added deadband
-        get() = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
+        get() = xboxCon.rightX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
     override val strafe: Double
         get() = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
     override val forward: Double
-        get() = xboxCon.rightY.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
+        get() = xboxCon.leftY.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
     override val driveTest : Trigger // left bumper and is in test mode
         get() = xboxCon.leftBumper().and( testMode )
     override val turnTest : Trigger
