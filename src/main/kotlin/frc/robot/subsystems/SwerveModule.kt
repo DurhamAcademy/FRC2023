@@ -7,6 +7,7 @@ import com.ctre.phoenix.sensors.CANCoder
 import com.ctre.phoenix.sensors.CANCoderStatusFrame
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.controller.SimpleMotorFeedforward
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.SwerveModuleState
@@ -51,7 +52,7 @@ class SwerveModule(
     private val turnEncoder = CANCoder(encoderId).apply {
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
         configMagnetOffset(-1 * angleZero)
-        setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 100)
+//        setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 100)
 
         configSensorDirection(false)
 
@@ -72,7 +73,7 @@ class SwerveModule(
     val positionEntry = tab.add("$mname Position", 0.0).entry
     val angleEntry = tab.add("$mname Angle", 0.0).entry
 
-    val DRIVE_P = 0.2 * 12
+    val DRIVE_P = 2.37
     val DRIVE_I = 0.0
     val DRIVE_D = 0.0
     val drivePid = ProfiledPIDController(
@@ -81,6 +82,9 @@ class SwerveModule(
         DRIVE_D,
         TrapezoidProfile.Constraints(2.0, .0)// TODO: Fix these
     )
+    private val driveFF = SimpleMotorFeedforward(0.21862, 2.2997, 0.26242)
+
+
     val ANGLE_P = 0.5 *12
     val ANGLE_I = 0.0
     val ANGLE_D = 0.0
@@ -110,7 +114,7 @@ class SwerveModule(
     val currentPosition: SwerveModuleState
         get() = SwerveModuleState(
                 (driveMotor.selectedSensorVelocity / 2048.0) * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
-                Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.position)))
+                Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
         )
     var setpoint = SwerveModuleState()
         set(value) {
@@ -133,14 +137,14 @@ class SwerveModule(
         val rads = Units.degreesToRadians(this.turnEncoder.absolutePosition)
 //        anglePid.calculate(rads)
         val anglePower = -anglePid.calculate(rads, setpoint.angle.radians)
-        if (this.mname == "frontLeft") {
-            println(anglePower)
-        }
+//        if (this.mname == "frontLeft") {
+//            println(anglePower)
+//        }
         return anglePower
     }
 
     private fun calculateDrivePower(): Double =
-        drivePid.calculate(currentPosition.speedMetersPerSecond, setpoint.speedMetersPerSecond)
+        drivePid.calculate(currentPosition.speedMetersPerSecond, setpoint.speedMetersPerSecond) + driveFF.calculate(drivePid.setpoint.position, drivePid.setpoint.velocity)
 
     private fun move() {
         val drivePower = calculateDrivePower()
@@ -161,13 +165,13 @@ class SwerveModule(
 //        driveMotor.simCollection.setIntegratedSensorRawPosition((vel * 2048.0 * dt).toInt())
 //        move()
 //        // SmartDashboard
-//        driveMotorEntry.setDouble(driveMotor.selectedSensorVelocity)
-//        turnMotorEntry.setDouble(turnMotor.selectedSensorVelocity)
-//        turnEncoderEntry.setDouble(turnEncoder.position)
-//        positionEntry.setDouble(currentPosition.speedMetersPerSecond)
-//        angleEntry.setDouble(currentPosition.angle.radians)
+        driveMotorEntry.setDouble(driveMotor.selectedSensorVelocity)
+        turnMotorEntry.setDouble(turnMotor.selectedSensorVelocity)
+        turnEncoderEntry.setDouble(turnEncoder.absolutePosition)
+        positionEntry.setDouble(currentPosition.speedMetersPerSecond)
+        angleEntry.setDouble(currentPosition.angle.degrees)
 //
-//        stateEntry.setDouble(currentPosition.speedMetersPerSecond)
+        stateEntry.setDouble(currentPosition.speedMetersPerSecond)
     }
 
     fun resetEncoders() {

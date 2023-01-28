@@ -16,8 +16,8 @@ class DriveCommand(
     override fun execute() {
         drivetrain.drive(
             ChassisSpeeds(
-                controlScheme.forward,
-                controlScheme.strafe,
+                controlScheme.forward * 2.0,
+                controlScheme.strafe * 2.0,
                 controlScheme.rotation * 2 * Math.PI
             ),
             false
