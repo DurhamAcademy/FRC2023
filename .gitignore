@@ -166,3 +166,6 @@ bin/
 /.idea/kotlinc.xml
 /.idea/misc.xml
 /.idea/compiler.xml
+/.idea/
+/.sysid/
+/.vscode/
