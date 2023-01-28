@@ -85,7 +85,7 @@ class SwerveModule(
     private val driveFF = SimpleMotorFeedforward(0.21862, 2.2997, 0.26242)
 
 
-    val ANGLE_P = 0.5 *12
+    val ANGLE_P = 0.5
     val ANGLE_I = 0.0
     val ANGLE_D = 0.0
     val anglePid = ProfiledPIDController(
@@ -99,6 +99,8 @@ class SwerveModule(
     ).apply {
         enableContinuousInput(-Math.PI, Math.PI)
     }
+    private val angleFF = SimpleMotorFeedforward(0.24233, 0.28267, 0.0144)
+
 
 //    class SwerveModuleSetpoint(
 //        var driveSetpoint: Double?,
@@ -135,12 +137,11 @@ class SwerveModule(
 //        }
 //        println(goal)
         val rads = Units.degreesToRadians(this.turnEncoder.absolutePosition)
-//        anglePid.calculate(rads)
-        val anglePower = -anglePid.calculate(rads, setpoint.angle.radians)
+//        anglePid.calculate(rad)
 //        if (this.mname == "frontLeft") {
 //            println(anglePower)
 //        }
-        return anglePower
+        return -(anglePid.calculate(rads, setpoint.angle.radians) + angleFF.calculate(anglePid.setpoint.velocity))
     }
 
     private fun calculateDrivePower(): Double =
