@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.*
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
@@ -44,8 +43,8 @@ class Drivetrain(
         FLTurnMotorId,
         FLTurnEncoderId,
         "frontLeft",
-        angleZero = 122.0,
-        position = Translation2d(0.33, 0.33),
+        angleZero = 122.0 + 10.5,
+        position = Translation2d(Constants.MODULE_DISTANCE_X / 2, Constants.MODULE_DISTANCE_Y / 2),
         controlScheme = controlScheme
     ) // FIXME: change postion to new drivebase measurements
     val frontRight = SwerveModule( // backleft
@@ -53,8 +52,8 @@ class Drivetrain(
         FRTurnMotorId,
         FRTurnEncoderId,
         "frontRight",
-        Translation2d(0.33, -0.33),
-        angleZero = 73.0,
+        Translation2d(Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
+        angleZero = 73.0 + 3.1,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -63,8 +62,8 @@ class Drivetrain(
         BLTurnMotorId,
         BLTurnEncoderId,
         "backLeft",
-        Translation2d(-0.33, 0.33),
-        angleZero = 65.75,
+        Translation2d(-Constants.MODULE_DISTANCE_X / 2, Constants.MODULE_DISTANCE_Y / 2),
+        angleZero = 65.75 + 4.5,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -73,8 +72,8 @@ class Drivetrain(
         BRTurnMotorId,
         BRTurnEncoderId,
         "backRight",
-        Translation2d(-0.33, -0.33),
-        angleZero = 154.5,
+        Translation2d(-Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
+        angleZero = 154.5 + 17.25,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements

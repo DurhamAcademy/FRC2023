@@ -18,7 +18,7 @@ class DriveCommand(
             ChassisSpeeds(
                 controlScheme.forward,
                 controlScheme.strafe,
-                controlScheme.rotation
+                controlScheme.rotation * 2 * Math.PI
             ),
             false
         )

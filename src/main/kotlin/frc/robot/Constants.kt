@@ -22,4 +22,7 @@ object Constants {
     const val WHEEL_RADIUS = .0508
     val WHEEL_CIRCUMFRENCE = WHEEL_RADIUS * 2 * PI
     const val DRIVE_GEAR_RATIO = 6.75
+
+    const val MODULE_DISTANCE_X = 0.641
+    const val MODULE_DISTANCE_Y = 0.539750
 }

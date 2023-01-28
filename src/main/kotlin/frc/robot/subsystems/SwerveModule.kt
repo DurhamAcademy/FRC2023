@@ -126,12 +126,12 @@ class SwerveModule(
     }
 
     private fun calculateAnglePower(): Double {
-        this.controlScheme.xbox!!.run {
-            this@SwerveModule.setpoint.angle = Translation2d(leftX.deadband(0.1), leftY.deadband(0.1)).angle
-        }
+//        this.controlScheme.xbox!!.run {
+//            this@SwerveModule.setpoint.angle = Translation2d(leftX.deadband(0.1), leftY.deadband(0.1)).angle
+//        }
 //        println(goal)
         val rads = Units.degreesToRadians(this.turnEncoder.absolutePosition)
-        anglePid.calculate(rads)
+//        anglePid.calculate(rads)
         val anglePower = -anglePid.calculate(rads, setpoint.angle.radians)
         if (this.mname == "frontLeft") {
             println(anglePower)
