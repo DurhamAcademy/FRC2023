@@ -164,16 +164,6 @@ class Drivetrain(
     }
 
     /**
-     *  Resets the drive encoders to currently read a position of 0
-     */
-    fun resetEncoders() {
-        this.frontLeft.resetEncoders()
-        this.frontLeft.resetEncoders()
-        backLeft.resetEncoders()
-        backRight.resetEncoders()
-    }
-
-    /**
      * Zeroes the heading of the robot
      */
 //    fun zeroHeading() = gyro.reset()
