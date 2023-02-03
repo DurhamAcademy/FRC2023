@@ -43,7 +43,7 @@ class Drivetrain(
         FLTurnMotorId,
         FLTurnEncoderId,
         "frontLeft",
-        angleZero = 122.0 + 10.5,
+        angleZero = Constants.FLZeroAngle,
         position = Translation2d(Constants.MODULE_DISTANCE_X / 2, Constants.MODULE_DISTANCE_Y / 2),
         controlScheme = controlScheme
     ) // FIXME: change postion to new drivebase measurements
@@ -53,7 +53,7 @@ class Drivetrain(
         FRTurnEncoderId,
         "frontRight",
         Translation2d(Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
-        angleZero = 73.0 + 3.1,
+        angleZero = Constants.FRZeroAngle,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -63,7 +63,7 @@ class Drivetrain(
         BLTurnEncoderId,
         "backLeft",
         Translation2d(-Constants.MODULE_DISTANCE_X / 2, Constants.MODULE_DISTANCE_Y / 2),
-        angleZero = 65.75 + 4.5,
+        angleZero = Constants.BLZeroAngle,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
@@ -73,7 +73,7 @@ class Drivetrain(
         BRTurnEncoderId,
         "backRight",
         Translation2d(-Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
-        angleZero = 154.5 + 17.25,
+        angleZero = Constants.BRZeroAngle,
         controlScheme = controlScheme
 
     ) // FIXME: change postion to new drivebase measurements
