@@ -1,10 +1,12 @@
 package frc.robot.subsystems
 
+import com.ctre.phoenix.sensors.Pigeon2
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.*
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import frc.robot.Constants.BLDriveMotorId
@@ -82,12 +84,15 @@ class Drivetrain(
         *modules.map { it.position }.toTypedArray()
     )
 
-//    private val gyro: Gyro = ADXRS450_Gyro()
+    private val gyro = Pigeon2(54, "rio").apply {
+        configFactoryDefault()
+    }
+
 
     // Odometry class for tracking robot pose
     var odometry = SwerveDriveOdometry(
         kinematics,
-        Rotation2d(),//gyro.rotation2d,
+        Rotation2d.fromDegrees(gyro.yaw),
         modules
             .map { it.position.toSwerveModulePosition() }
             .toTypedArray()
@@ -98,12 +103,14 @@ class Drivetrain(
     override fun periodic() {
         // This method will be called once per scheduler run
         // Update the odometry in the periodic block
-        gyroEntry.setDouble(0.0)
-        odometry.update(
-//            gyro.rotation2d,
-            Rotation2d(),
-            modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
-        )
+
+        SmartDashboard.putNumber("gyroangle", gyro.yaw)
+        SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
+//        gyroEntry.setDouble(gyro.yaw)
+//        odometry.update(
+//            Rotation2d.fromDegrees(gyro.yaw),
+//            modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
+//        )
     }
 
     val pose: Pose2d
@@ -113,7 +120,7 @@ class Drivetrain(
     // Resets the odometry to the specified pose
     fun resetOdometry(pose: Pose2d?) {
         odometry.resetPosition(
-            Rotation2d(),//gyro.rotation2d,
+            Rotation2d.fromDegrees(gyro.yaw),
             modules.map { it.position.toSwerveModulePosition() }.toTypedArray(),
             pose
         )
@@ -124,12 +131,12 @@ class Drivetrain(
      */
     fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
         val swerveModuleStates = kinematics.toSwerveModuleStates(
-            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d())//gyro.rotation2d)
+            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d.fromDegrees(gyro.yaw))
             else chassisSpeeds
         )
-//        SwerveDriveKinematics.desaturateWheelSpeeds(
-//            swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond
-//        )
+        SwerveDriveKinematics.desaturateWheelSpeeds(
+            swerveModuleStates, 5.0
+        )
         swerveModuleStates.forEachIndexed { i, swerveModuleState ->
             modules[i].setpoint = swerveModuleState
         }
@@ -167,8 +174,8 @@ class Drivetrain(
      *  Resets the drive encoders to currently read a position of 0
      */
     fun resetEncoders() {
-        this.frontLeft.resetEncoders()
-        this.frontLeft.resetEncoders()
+        frontLeft.resetEncoders()
+        backRight.resetEncoders()
         backLeft.resetEncoders()
         backRight.resetEncoders()
     }
@@ -176,21 +183,23 @@ class Drivetrain(
     /**
      * Zeroes the heading of the robot
      */
-//    fun zeroHeading() = gyro.reset()
+    fun zeroHeading() {
+        gyro.yaw = 0.0
+    }
 
     /**
      * the heading of the robot.
      */
-//    val heading: Double
-//        get() = gyro.rotation2d.degrees
+    val heading: Double
+        get() = Rotation2d.fromDegrees(gyro.yaw).degrees
 
     /**
      * Returns the turn rate of the robot.
      *
      * @return The turn rate of the robot, in degrees per second
      */
-//    val turnRate: Double
-//        get() = gyro.rate * if (Constants.gyroReversed) -1.0 else 1.0
+    val turnRate: Double
+        get() = gyro.yaw * if (Constants.gyroReversed) -1.0 else 1.0
     //fixme: add gyro stuff
 }
 

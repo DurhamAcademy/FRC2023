@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.*
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import com.ctre.phoenix.sensors.AbsoluteSensorRange
 import com.ctre.phoenix.sensors.CANCoder
-import com.ctre.phoenix.sensors.CANCoderStatusFrame
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.controller.SimpleMotorFeedforward
@@ -80,12 +79,12 @@ class SwerveModule(
         DRIVE_P,
         DRIVE_I,
         DRIVE_D,
-        TrapezoidProfile.Constraints(2.0, .0)// TODO: Fix these
+        TrapezoidProfile.Constraints(3.0, .0)// TODO: Fix these
     )
     private val driveFF = SimpleMotorFeedforward(0.21862, 2.2997, 0.26242)
 
 
-    val ANGLE_P = 0.5
+    val ANGLE_P = 3.0
     val ANGLE_I = 0.0
     val ANGLE_D = 0.0
     val anglePid = ProfiledPIDController(

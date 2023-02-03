@@ -9,8 +9,11 @@ class RobotContainer {
     val xbox = CommandXboxController(0)
     val controlScheme: ControlScheme = DefaultControlScheme(xbox)
 
+    var cameraWrapper = PhotonCameraWrapper()
+
     @Suppress("unused")
     val drivetrain = Drivetrain(controlScheme)
+
     init {
         controlScheme.run {
 

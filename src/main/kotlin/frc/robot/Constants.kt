@@ -1,5 +1,8 @@
 package frc.robot
 
+import edu.wpi.first.math.geometry.Rotation3d
+import edu.wpi.first.math.geometry.Transform3d
+import edu.wpi.first.math.geometry.Translation3d
 import kotlin.math.PI
 
 object Constants {
@@ -25,4 +28,14 @@ object Constants {
 
     const val MODULE_DISTANCE_X = 0.641
     const val MODULE_DISTANCE_Y = 0.539750
+
+    object VisionConstants {
+        val robotToCam: Transform3d = Transform3d(Translation3d(), Rotation3d())
+        const val cameraName: String = "photonvision"
+    }
+
+    object FieldConstants {
+        const val width = 3.048
+        const val length = 5.486
+    }
 }

@@ -12,7 +12,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
  */
 class Robot : TimedRobot() {
     @Suppress("unused")
-    val robotContainer = RobotContainer()
+    lateinit var robotContainer: RobotContainer
+
+    override fun robotInit() {
+        robotContainer = RobotContainer()
+        robotContainer.drivetrain.zeroHeading()
+    }
+
     override fun robotPeriodic() {
         CommandScheduler.getInstance().run()
     }

@@ -1,5 +1,6 @@
 package frc.robot.commands
 
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.controls.ControlScheme
@@ -14,13 +15,15 @@ class DriveCommand(
     }
 
     override fun execute() {
+        val vec = Translation2d(controlScheme.forward, controlScheme.strafe)
+        val normalized = if (vec.norm == 0.0) Translation2d() else vec.div(vec.norm).times(2.0)
         drivetrain.drive(
             ChassisSpeeds(
-                controlScheme.forward * 2.0,
-                controlScheme.strafe * 2.0,
+                normalized.x,
+                normalized.y,
                 controlScheme.rotation * 2 * Math.PI
             ),
-            false
+            true
         )
     }
 }
