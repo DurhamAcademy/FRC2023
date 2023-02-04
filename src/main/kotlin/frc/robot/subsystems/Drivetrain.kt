@@ -1,6 +1,7 @@
 package frc.robot.subsystems
 
 import com.ctre.phoenix.sensors.Pigeon2
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -97,111 +98,117 @@ class Drivetrain(
             .map { it.position.toSwerveModulePosition() }
             .toTypedArray()
     )
-    val Idrc = getTab("drivetrain")
-    val power = Idrc.add("power", 0.0)
+    val poseEstimator = SwerveDrivePoseEstimator(
+        kinematics,
+        Rotation2d.fromDegrees(gyro.yaw),
+        modules.map {
+            it.currentPosition
+            )
+            val Idrc = getTab("drivetrain")
+            val power = Idrc.add("power", 0.0)
 
-    override fun periodic() {
-        // This method will be called once per scheduler run
-        // Update the odometry in the periodic block
+            override fun periodic() {
+                // This method will be called once per scheduler run
+                // Update the odometry in the periodic block
 
-        SmartDashboard.putNumber("gyroangle", gyro.yaw)
-        SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
+                SmartDashboard.putNumber("gyroangle", gyro.yaw)
+                SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
 //        gyroEntry.setDouble(gyro.yaw)
 //        odometry.update(
 //            Rotation2d.fromDegrees(gyro.yaw),
 //            modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
 //        )
-    }
+            }
 
-    val pose: Pose2d
-        // Returns the currently-estimated pose of the robot
-        get() = odometry.poseMeters
+            val pose: Pose2d
+            // Returns the currently-estimated pose of the robot
+            get() = odometry.poseMeters
 
-    // Resets the odometry to the specified pose
-    fun resetOdometry(pose: Pose2d?) {
-        odometry.resetPosition(
-            Rotation2d.fromDegrees(gyro.yaw),
-            modules.map { it.position.toSwerveModulePosition() }.toTypedArray(),
-            pose
-        )
-    }
+            // Resets the odometry to the specified pose
+            fun resetOdometry(pose: Pose2d?) {
+                odometry.resetPosition(
+                    Rotation2d.fromDegrees(gyro.yaw),
+                    modules.map { it.position.toSwerveModulePosition() }.toTypedArray(),
+                    pose
+                )
+            }
 
-    /**
-     * Method to drive the robot using joystick info
-     */
-    fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
-        val swerveModuleStates = kinematics.toSwerveModuleStates(
-            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d.fromDegrees(gyro.yaw))
-            else chassisSpeeds
-        )
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 5.0
-        )
-        swerveModuleStates.forEachIndexed { i, swerveModuleState ->
-            modules[i].setpoint = swerveModuleState
-        }
-        // Telemetry
-        xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
-        ySpeedEntry.setDouble(chassisSpeeds.vyMetersPerSecond)
-        rotEntry.setDouble(chassisSpeeds.omegaRadiansPerSecond)
-        //fixme: move the following to swerve module periodic
-        modules.forEachIndexed { i, module ->
-            module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
-        }
-    }
+            /**
+             * Method to drive the robot using joystick info
+             */
+            fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
+                val swerveModuleStates = kinematics.toSwerveModuleStates(
+                    if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d.fromDegrees(gyro.yaw))
+                    else chassisSpeeds
+                )
+                SwerveDriveKinematics.desaturateWheelSpeeds(
+                    swerveModuleStates, 5.0
+                )
+                swerveModuleStates.forEachIndexed { i, swerveModuleState ->
+                    modules[i].setpoint = swerveModuleState
+                }
+                // Telemetry
+                xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
+                ySpeedEntry.setDouble(chassisSpeeds.vyMetersPerSecond)
+                rotEntry.setDouble(chassisSpeeds.omegaRadiansPerSecond)
+                //fixme: move the following to swerve module periodic
+                modules.forEachIndexed { i, module ->
+                    module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
+                }
+            }
 
-    /**
-     *
-     * Sets the swerve ModuleStates.
-     *
-     * @param desiredStates The desired SwerveModule states.
-     */
-    fun setModuleStates(desiredStates: Array<SwerveModuleState?>) {
+            /**
+             *
+             * Sets the swerve ModuleStates.
+             *
+             * @param desiredStates The desired SwerveModule states.
+             */
+            fun setModuleStates(desiredStates: Array<SwerveModuleState?>) {
 //        SwerveDriveKinematics.desaturateWheelSpeeds(
 //            desiredStates, DriveConstants.kMaxSpeedMetersPerSecond
 //        )
-        // fixme: find max speed
+                // fixme: find max speed
 
-        modules.forEachIndexed { i, module ->
-            module.setpoint = SwerveModuleState(
-                desiredStates[i]?.speedMetersPerSecond ?: 0.0,
-                desiredStates[i]?.angle ?: Rotation2d()
-            )
-        }
-    }
+                modules.forEachIndexed { i, module ->
+                    module.setpoint = SwerveModuleState(
+                        desiredStates[i]?.speedMetersPerSecond ?: 0.0,
+                        desiredStates[i]?.angle ?: Rotation2d()
+                    )
+                }
+            }
 
-    /**
-     *  Resets the drive encoders to currently read a position of 0
-     */
-    fun resetEncoders() {
-        frontLeft.resetEncoders()
-        backRight.resetEncoders()
-        backLeft.resetEncoders()
-        backRight.resetEncoders()
-    }
+            /**
+             *  Resets the drive encoders to currently read a position of 0
+             */
+            fun resetEncoders() {
+                frontLeft.resetEncoders()
+                backRight.resetEncoders()
+                backLeft.resetEncoders()
+                backRight.resetEncoders()
+            }
 
-    /**
-     * Zeroes the heading of the robot
-     */
-    fun zeroHeading() {
-        gyro.yaw = 0.0
-    }
+            /**
+             * Zeroes the heading of the robot
+             */
+            fun zeroHeading() {
+                gyro.yaw = 0.0
+            }
 
-    /**
-     * the heading of the robot.
-     */
-    val heading: Double
-        get() = Rotation2d.fromDegrees(gyro.yaw).degrees
+            /**
+             * the heading of the robot.
+             */
+            val heading: Double
+            get() = Rotation2d.fromDegrees(gyro.yaw).degrees
 
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    val turnRate: Double
-        get() = gyro.yaw * if (Constants.gyroReversed) -1.0 else 1.0
-    //fixme: add gyro stuff
+            /**
+             * Returns the turn rate of the robot.
+             *
+             * @return The turn rate of the robot, in degrees per second
+             */
+            val turnRate: Double
+            get() = gyro.yaw * if (Constants.gyroReversed) -1.0 else 1.0
+            //fixme: add gyro stuff
 }
 
-private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)
+                private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)
 

@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.controller.SimpleMotorFeedforward
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units
@@ -101,7 +102,7 @@ class SwerveModule(
     private val angleFF = SimpleMotorFeedforward(0.24233, 0.28267, 0.0144)
 
 
-//    class SwerveModuleSetpoint(
+    //    class SwerveModuleSetpoint(
 //        var driveSetpoint: Double?,
 //        var angleSetpoint: Rotation2d?,
 //    ) : SwerveModuleState(
@@ -111,11 +112,17 @@ class SwerveModule(
 //        constructor(state: SwerveModuleState) : this(state.speedMetersPerSecond, state.angle)
 //        constructor() : this(null, null)
 //    }
+    val swerveModulePosition: SwerveModulePosition
+        get() = SwerveModulePosition(
+            ,
+            Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
+        )
+
     @Suppress("RedundantSetter")
     val currentPosition: SwerveModuleState
         get() = SwerveModuleState(
-                (driveMotor.selectedSensorVelocity / 2048.0) * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
-                Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
+            (driveMotor.selectedSensorVelocity / 2048.0) * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
+            Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
         )
     var setpoint = SwerveModuleState()
         set(value) {
