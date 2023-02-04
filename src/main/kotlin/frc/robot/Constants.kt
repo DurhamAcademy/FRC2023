@@ -31,7 +31,7 @@ object Constants {
 
     object VisionConstants {
         val robotToCam: Transform3d = Transform3d(Translation3d(), Rotation3d())
-        const val cameraName: String = "photonvision"
+        const val cameraName: String = "OV9281"
     }
 
     object FieldConstants {
