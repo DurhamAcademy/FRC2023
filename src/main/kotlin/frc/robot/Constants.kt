@@ -6,7 +6,10 @@ import edu.wpi.first.math.geometry.Translation3d
 import kotlin.math.PI
 
 object Constants {
-    const val gyroReversed = false
+    const val BRZeroAngle = 171.75
+    const val BLZeroAngle = 70.25
+    const val FRZeroAngle = 76.1
+    const val FLZeroAngle = 132.5,
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl
@@ -38,4 +41,20 @@ object Constants {
         const val width = 3.048
         const val length = 5.486
     }
+
+    const val DRIVE_P = 2.37
+    const val DRIVE_I = 0.0
+    const val DRIVE_D = 0.0
+
+    const val driveKS = 0.21862
+    const val driveKV = 2.2997
+    const val driveKA = 0.26242
+
+    const val ANGLE_P = 0.5
+    const val ANGLE_I = 0.0
+    const val ANGLE_D = 0.0
+
+    const val angleKS = 0.24233
+    const val angleKV = 0.28267
+    const val angleKA = 0.0144
 }

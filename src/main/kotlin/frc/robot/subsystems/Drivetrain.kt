@@ -48,7 +48,7 @@ class Drivetrain(
         FLTurnMotorId,
         FLTurnEncoderId,
         "frontLeft",
-        angleZero = 132.5,
+        angleZero = Constants.FLZeroAngle,
         location = Translation2d(
             Constants.MODULE_DISTANCE_X / 2,
             Constants.MODULE_DISTANCE_Y / 2
@@ -59,11 +59,11 @@ class Drivetrain(
         FRTurnMotorId,
         FRTurnEncoderId,
         "frontRight",
-        Translation2d(
+        location = Translation2d(
             Constants.MODULE_DISTANCE_X / 2,
             -Constants.MODULE_DISTANCE_Y / 2
-        ),
-        angleZero = 76.1
+        )
+        angleZero = Constants.FRZeroAngle,
     )
     val backLeft = SwerveModule(
         BLDriveMotorId,
@@ -74,19 +74,16 @@ class Drivetrain(
             -Constants.MODULE_DISTANCE_X / 2,
             Constants.MODULE_DISTANCE_Y / 2
         ),
-        angleZero = 65.75 + 4.5
-    )
+        angleZero = Constants.BLZeroAngle,
+    ) // FIXME: change postion to new drivebase measurements
     val backRight = SwerveModule(
         BRDriveMotorId,
         BRTurnMotorId,
         BRTurnEncoderId,
         "backRight",
-        Translation2d(
-            -Constants.MODULE_DISTANCE_X / 2,
-            -Constants.MODULE_DISTANCE_Y / 2
-        ),
-        angleZero = 154.5 + 17.25
 
+        Translation2d(-Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
+        angleZero = Constants.BRZeroAngle,
     )
     val modules = listOf(frontLeft, frontRight, backLeft, backRight)
     val kinematics = SwerveDriveKinematics(
@@ -261,7 +258,6 @@ class Drivetrain(
      */
     val turnRate: Double
         get() = gyro.yaw * if (Constants.gyroReversed) -1.0 else 1.0
-    //fixme: add gyro stuff
 }
 
 private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.robot.Constants
 import frc.robot.Constants.DRIVE_GEAR_RATIO
 import frc.robot.Constants.WHEEL_CIRCUMFRENCE
 
@@ -71,25 +72,20 @@ class SwerveModule(
     val positionEntry = tab.add("$mname Position", 0.0).entry
     val angleEntry = tab.add("$mname Angle", 0.0).entry
 
-    val DRIVE_P = 2.37
-    val DRIVE_I = 0.0
-    val DRIVE_D = 0.0
+
     val drivePid = ProfiledPIDController(
-        DRIVE_P,
-        DRIVE_I,
-        DRIVE_D,
+        Constants.DRIVE_P,
+        Constants.DRIVE_I,
+        Constants.DRIVE_D,
         TrapezoidProfile.Constraints(3.0, .0)// TODO: Fix these
     )
     private val driveFF = SimpleMotorFeedforward(0.21862, 2.2997, 0.26242)
 
 
-    val ANGLE_P = 3.0
-    val ANGLE_I = 0.0
-    val ANGLE_D = 0.0
     val anglePid = ProfiledPIDController(
-        ANGLE_P,
-        ANGLE_I,
-        ANGLE_D,
+        Constants.ANGLE_P,
+        Constants.ANGLE_I,
+        Constants.ANGLE_D,
         TrapezoidProfile.Constraints(
             32.0,
             64.0
@@ -97,10 +93,10 @@ class SwerveModule(
     ).apply {
         enableContinuousInput(-Math.PI, Math.PI)
     }
-    private val angleFF = SimpleMotorFeedforward(0.24233, 0.28267, 0.0144)
+    private val angleFF = SimpleMotorFeedforward(Constants.angleKS, Constants.angleKV, Constants.angleKA)
 
 
-    //    class SwerveModuleSetpoint(
+//    class SwerveModuleSetpoint(
 //        var driveSetpoint: Double?,
 //        var angleSetpoint: Rotation2d?,
 //    ) : SwerveModuleState(
