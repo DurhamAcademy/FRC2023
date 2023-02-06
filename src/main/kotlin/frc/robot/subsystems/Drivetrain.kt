@@ -23,6 +23,7 @@ import frc.robot.Constants.FRTurnMotorId
 import frc.robot.PhotonCameraWrapper
 import frc.robot.commands.DriveCommand
 import frc.robot.controls.ControlScheme
+import java.lang.Math.PI
 
 class Drivetrain(
     val controlScheme: ControlScheme,
@@ -59,11 +60,11 @@ class Drivetrain(
         FRTurnMotorId,
         FRTurnEncoderId,
         "frontRight",
+        angleZero = Constants.FRZeroAngle,
         location = Translation2d(
             Constants.MODULE_DISTANCE_X / 2,
             -Constants.MODULE_DISTANCE_Y / 2
         )
-        angleZero = Constants.FRZeroAngle,
     )
     val backLeft = SwerveModule(
         BLDriveMotorId,
@@ -199,13 +200,22 @@ class Drivetrain(
      * @param fieldRelative whether the chassis speeds are field-relative
      */
     fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
-        val swerveModuleStates = kinematics.toSwerveModuleStates(
+        val chassisSpeedsField =
             if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d.fromDegrees(gyro.yaw))
             else chassisSpeeds
+        val swerveModuleStates = kinematics.toSwerveModuleStates(
+            chassisSpeedsField
         )
         SwerveDriveKinematics.desaturateWheelSpeeds(
-            swerveModuleStates, 5.0
+            swerveModuleStates,
+            chassisSpeedsField,
+            4.0,
+            2.0,
+            2 * PI
         )
+
+//        SwerveDriveKinematics.desaturateWheelSpeeds()
+
         swerveModuleStates.forEachIndexed { i, swerveModuleState ->
             modules[i].setpoint = swerveModuleState
         }
@@ -257,7 +267,7 @@ class Drivetrain(
      * @return The turn rate of the robot, in degrees per second
      */
     val turnRate: Double
-        get() = gyro.yaw * if (Constants.gyroReversed) -1.0 else 1.0
+        get() = gyro.yaw
 }
 
 private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)

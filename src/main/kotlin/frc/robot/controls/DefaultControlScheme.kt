@@ -12,6 +12,8 @@ class DefaultControlScheme(
         get() = xbox!!
     override val rotation: Double // added deadband
         get() = xboxCon.rightX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
+
+    // todo: add correct deadband from mathutils or kyberlib
     override val strafe: Double
         get() = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
     override val forward: Double

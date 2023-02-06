@@ -6,10 +6,10 @@ import edu.wpi.first.math.geometry.Translation3d
 import kotlin.math.PI
 
 object Constants {
-    const val BRZeroAngle = 171.75
-    const val BLZeroAngle = 70.25
-    const val FRZeroAngle = 76.1
-    const val FLZeroAngle = 132.5,
+    const val BRZeroAngle = -10.0
+    const val BLZeroAngle = -29.7
+    const val FRZeroAngle = -102.2
+    const val FLZeroAngle = -47.9
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl

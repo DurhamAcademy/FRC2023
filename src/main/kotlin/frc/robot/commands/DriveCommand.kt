@@ -15,12 +15,12 @@ class DriveCommand(
     }
 
     override fun execute() {
-        val vec = Translation2d(controlScheme.forward, controlScheme.strafe)
-        val normalized = if (vec.norm == 0.0) Translation2d() else vec.div(vec.norm).times(2.0)
+        val vec = Translation2d(controlScheme.forward, controlScheme.strafe).times(2.0)
+//        val normalized = if (vec.norm == 0.0) Translation2d() else vec.div(vec.norm).times(2.0)
         drivetrain.drive(
             ChassisSpeeds(
-                normalized.x,
-                normalized.y,
+                vec.x,
+                vec.y,
                 controlScheme.rotation * 2 * Math.PI
             ),
             true
