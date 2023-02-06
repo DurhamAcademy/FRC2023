@@ -23,7 +23,7 @@ object Constants {
     const val BRTurnEncoderId = 9
 
     const val WHEEL_RADIUS = .0508
-    val WHEEL_CIRCUMFRENCE = WHEEL_RADIUS * 2 * PI
+    const val WHEEL_CIRCUMFRENCE = WHEEL_RADIUS * 2 * PI
     const val DRIVE_GEAR_RATIO = 6.75
 
     const val MODULE_DISTANCE_X = 0.641

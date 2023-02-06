@@ -27,6 +27,11 @@ class Robot : TimedRobot() {
             SmartDashboard.putNumber("tagX", it.estimatedPose.x)
         }
 //        SmartDashboard.
+        robotContainer.drivetrain.poseEstimator.estimatedPosition.run {
+            SmartDashboard.putNumber("poseRotation", rotation.rotations)
+            SmartDashboard.putNumber("poseX", x)
+            SmartDashboard.putNumber("tagX", y)
+        }
     }
 
     // schedule test commands during test mode

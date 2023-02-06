@@ -12,7 +12,7 @@ class RobotContainer {
     var cameraWrapper = PhotonCameraWrapper()
 
     @Suppress("unused")
-    val drivetrain = Drivetrain(controlScheme)
+    val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(cameraWrapper))
 
     init {
         controlScheme.run {
