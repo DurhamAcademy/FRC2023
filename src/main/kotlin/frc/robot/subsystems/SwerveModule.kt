@@ -79,7 +79,7 @@ class SwerveModule(
         Constants.DRIVE_D,
         TrapezoidProfile.Constraints(3.0, .0)// TODO: Fix these
     )
-    private val driveFF = SimpleMotorFeedforward(0.21862, 2.2997, 0.26242)
+    private val driveFF = SimpleMotorFeedforward(Constants.driveKS, Constants.driveKV, Constants.driveKA)
 
 
     val anglePid = ProfiledPIDController(
@@ -115,7 +115,7 @@ class SwerveModule(
     @Suppress("RedundantSetter")
     val currentPosition: SwerveModuleState
         get() = SwerveModuleState(
-            (driveMotor.selectedSensorPosition / 2048.0 * WHEEL_CIRCUMFRENCE / DRIVE_GEAR_RATIO),
+            (driveMotor.selectedSensorVelocity / 2048.0 * WHEEL_CIRCUMFRENCE / DRIVE_GEAR_RATIO),
             Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
         )
     var setpoint = SwerveModuleState()

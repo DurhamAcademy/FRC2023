@@ -10,16 +10,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
-import frc.robot.Constants.BLDriveMotorId
-import frc.robot.Constants.BLTurnEncoderId
-import frc.robot.Constants.BLTurnMotorId
-import frc.robot.Constants.BRDriveMotorId
-import frc.robot.Constants.BRTurnEncoderId
-import frc.robot.Constants.BRTurnMotorId
-import frc.robot.Constants.FLTurnEncoderId
-import frc.robot.Constants.FLTurnMotorId
-import frc.robot.Constants.FRTurnEncoderId
-import frc.robot.Constants.FRTurnMotorId
 import frc.robot.PhotonCameraWrapper
 import frc.robot.commands.DriveCommand
 import frc.robot.controls.ControlScheme
@@ -46,8 +36,8 @@ class Drivetrain(
         .entry
     val frontLeft = SwerveModule( // front right
         Constants.FLDriveMotorId,
-        FLTurnMotorId,
-        FLTurnEncoderId,
+        Constants.FLTurnMotorId,
+        Constants.FLTurnEncoderId,
         "frontLeft",
         angleZero = Constants.FLZeroAngle,
         location = Translation2d(
@@ -57,8 +47,8 @@ class Drivetrain(
     )
     val frontRight = SwerveModule( // backleft
         Constants.FRDriveMotorId,
-        FRTurnMotorId,
-        FRTurnEncoderId,
+        Constants.FRTurnMotorId,
+        Constants.FRTurnEncoderId,
         "frontRight",
         angleZero = Constants.FRZeroAngle,
         location = Translation2d(
@@ -67,20 +57,20 @@ class Drivetrain(
         )
     )
     val backLeft = SwerveModule(
-        BLDriveMotorId,
-        BLTurnMotorId,
-        BLTurnEncoderId,
+        Constants.BLDriveMotorId,
+        Constants.BLTurnMotorId,
+        Constants.BLTurnEncoderId,
         "backLeft",
         Translation2d(
             -Constants.MODULE_DISTANCE_X / 2,
             Constants.MODULE_DISTANCE_Y / 2
         ),
         angleZero = Constants.BLZeroAngle,
-    ) // FIXME: change postion to new drivebase measurements
+    )
     val backRight = SwerveModule(
-        BRDriveMotorId,
-        BRTurnMotorId,
-        BRTurnEncoderId,
+        Constants.BRDriveMotorId,
+        Constants.BRTurnMotorId,
+        Constants.BRTurnEncoderId,
         "backRight",
 
         Translation2d(-Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
