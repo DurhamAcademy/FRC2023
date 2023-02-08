@@ -1,8 +1,48 @@
 package frc.robot
 
+import edu.wpi.first.math.geometry.Translation3d
 import kotlin.math.PI
 
 object Constants {
+    object Elevator {
+        val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+
+        object elevatorMotor {
+            val encoderDistancePerPulse: Double = TODO()
+            val gearRatio: Double = TODO()
+
+            object PID {
+                val kP: Double = TODO()
+                val kI: Double = TODO()
+                val kD: Double = TODO()
+
+                object TrapezoidProfile {
+                    val maxVelocity: Double = TODO()
+                    val maxAcceleration: Double = TODO()
+                }
+            }
+
+            object FeedForeward {
+                val kS: Double = TODO()
+                val kV: Double = TODO()
+                val kA: Double = TODO()
+            }
+
+            val ElevatorMotorId: Int = TODO("ElevatorMotorId")
+        }
+
+        object positions {
+            val bottomElevatorTranslation: Translation3d = TODO()
+            val topElevatorTranslation: Translation3d = TODO()
+        }
+
+        object limits {
+            val bottomLimit: Double = 0.0
+            val topLimit: Double = TODO()
+        }
+
+    }
+
     const val BRZeroAngle = 171.75
     const val BLZeroAngle = 70.25
     const val FRZeroAngle = 76.1
