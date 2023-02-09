@@ -1,8 +1,11 @@
 package frc.robot
 
+import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
+import edu.wpi.first.math.util.Units.degreesToRadians
+import edu.wpi.first.math.util.Units.inchesToMeters
 import kotlin.math.PI
 
 object Constants {
@@ -35,9 +38,21 @@ object Constants {
     const val MODULE_DISTANCE_X = 0.641
     const val MODULE_DISTANCE_Y = 0.539750
 
+    val cadToCode = Transform3d(
+        Translation3d(0.0, 0.029, 0.0),
+        Rotation3d(0.0, 0.0, PI / 2)
+    )
+
     object VisionConstants {
-        val robotToCam: Transform3d = Transform3d(Translation3d(), Rotation3d())
         const val cameraName: String = "OV9281"
+        val robotToCam: Pose3d = Pose3d(
+            Translation3d(0.0, inchesToMeters(10.188), inchesToMeters(5.433)),
+            Rotation3d(
+                0.0,
+                degreesToRadians(100.0),
+                degreesToRadians(90.0)
+            )
+        ).transformBy(cadToCode)
     }
 
     object FieldConstants {

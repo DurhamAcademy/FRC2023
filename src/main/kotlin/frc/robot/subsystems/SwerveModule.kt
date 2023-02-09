@@ -12,8 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.math.util.Units
-import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -109,14 +108,14 @@ class SwerveModule(
     val swerveModulePosition: SwerveModulePosition
         get() = SwerveModulePosition(
             driveMotor.selectedSensorPosition / 2048.0 * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
-            Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
+            Rotation2d(MathUtil.angleModulus(degreesToRadians(turnEncoder.absolutePosition)))
         )
 
     @Suppress("RedundantSetter")
     val currentPosition: SwerveModuleState
         get() = SwerveModuleState(
             (driveMotor.selectedSensorVelocity / 2048.0 * WHEEL_CIRCUMFRENCE / DRIVE_GEAR_RATIO),
-            Rotation2d(MathUtil.angleModulus(Units.degreesToRadians(turnEncoder.absolutePosition)))
+            Rotation2d(MathUtil.angleModulus(degreesToRadians(turnEncoder.absolutePosition)))
         )
     var setpoint = SwerveModuleState()
         set(value) {
@@ -131,29 +130,18 @@ class SwerveModule(
         turnMotorSetEntry.setDouble(angle)
     }
 
-    private fun calculateAnglePower(): Double {
-//        this.controlScheme.xbox!!.run {
-//            this@SwerveModule.setpoint.angle = Translation2d(leftX.deadband(0.1), leftY.deadband(0.1)).angle
-//        }
-//        println(goal)
-        val rads = Units.degreesToRadians(this.turnEncoder.absolutePosition)
-//        anglePid.calculate(rad)
-//        if (this.mname == "frontLeft") {
-//            println(anglePower)
-//        }
-        return -(anglePid.calculate(rads, setpoint.angle.radians) + angleFF.calculate(anglePid.setpoint.velocity))
-    }
-
-    private fun calculateDrivePower(): Double =
-        drivePid.calculate(currentPosition.speedMetersPerSecond, setpoint.speedMetersPerSecond) + driveFF.calculate(drivePid.setpoint.position, drivePid.setpoint.velocity)
-
-    private fun move() {
-        val drivePower = calculateDrivePower()
-        val anglePower = calculateAnglePower()
+    fun move() {
+        val drivePower =
+            drivePid.calculate(currentPosition.speedMetersPerSecond, setpoint.speedMetersPerSecond) + driveFF.calculate(
+                drivePid.setpoint.position,
+                drivePid.setpoint.velocity
+            )
+        val anglePower = -(anglePid.calculate(
+            degreesToRadians(this.turnEncoder.absolutePosition),
+            setpoint.angle.radians
+        ) + angleFF.calculate(anglePid.setpoint.velocity))
         setMotorSpeed(drivePower, anglePower)
     }
-
-    val lastPeriodicTime = Timer.getFPGATimestamp()
 
     override fun periodic() {
         move()
@@ -175,9 +163,4 @@ class SwerveModule(
         stateEntry.setDouble(currentPosition.speedMetersPerSecond)
     }
 
-    fun resetEncoders() {
-        driveMotor.selectedSensorPosition = 0.0
-        turnEncoder.position = 0.0
-    }
 }
-fun Double.deadband(min: Double) = if ((this < min) && (this > -min)) 0.0 else this

@@ -26,6 +26,7 @@ package frc.robot
 import edu.wpi.first.apriltag.AprilTag
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Pose3d
 import frc.robot.Constants.VisionConstants
 import org.photonvision.EstimatedRobotPose
 import org.photonvision.PhotonCamera
@@ -39,12 +40,11 @@ class PhotonCameraWrapper {
     val atList = ArrayList<AprilTag>().apply {
 
     }
-    val atfl = AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json")
     var photonPoseEstimator = PhotonPoseEstimator(
-        atfl,
+        AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json"),
         PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
         photonCamera,
-        VisionConstants.robotToCam
+        VisionConstants.robotToCam.minus(Pose3d())
     )
 
     /**

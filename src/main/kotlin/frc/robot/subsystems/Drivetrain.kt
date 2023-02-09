@@ -83,6 +83,7 @@ class Drivetrain(
 
     private val gyro = Pigeon2(54, "rio").apply {
         configFactoryDefault()
+        // fixme: add set axis position
     }
 
 
@@ -116,10 +117,6 @@ class Drivetrain(
         }.toTypedArray(),
         Pose2d()
     )
-
-    val Idrc = getTab("drivetrain")
-    val power = Idrc.add("power", 0.0)
-
     /**
      * The periodic method is run roughly every 20ms. This is where we update
      * any values that are constantly changing, such as the robot's position,
@@ -162,13 +159,6 @@ class Drivetrain(
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
         gyroEntry.setDouble(gyro.yaw)
     }
-
-    /**
-     * The pose of the robot
-     */
-    val pose: Pose2d
-        // Returns the currently-estimated pose of the robot
-        get() = poseEstimator.estimatedPosition
 
     /**
      * Resets the odometry to the specified pose
@@ -245,19 +235,6 @@ class Drivetrain(
         gyro.yaw = 0.0
     }
 
-    /**
-     * the heading of the robot.
-     */
-    val heading: Double
-        get() = poseEstimator.estimatedPosition.rotation.degrees
-
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    val turnRate: Double
-        get() = gyro.yaw
 }
 
 private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)
