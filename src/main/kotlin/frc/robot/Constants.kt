@@ -1,34 +1,77 @@
 package frc.robot
 
 import edu.wpi.first.math.geometry.Translation3d
+import edu.wpi.first.math.util.Units
 import kotlin.math.PI
 
 object Constants {
-    object Elevator {
+    object Arm {
+        val carriageMass = 10.0
         val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+        val gearRatio: Double = 1.0
+        val sproketRadius = Units.inchesToMeters(1.0)
 
-        object elevatorMotor {
-            val encoderDistancePerPulse: Double = TODO()
-            val gearRatio: Double = TODO()
+        object armMotor {
+            val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+            val gearRatio: Double = 1.0
 
             object PID {
-                val kP: Double = TODO()
-                val kI: Double = TODO()
-                val kD: Double = TODO()
+                val kP = 48.0
+                val kI = 0.0
+                val kD: Double = 0.0
 
                 object TrapezoidProfile {
-                    val maxVelocity: Double = TODO()
-                    val maxAcceleration: Double = TODO()
+                    val maxVelocity: Double = 1.0
+                    val maxAcceleration: Double = 1.0
                 }
             }
 
             object FeedForeward {
-                val kS: Double = TODO()
-                val kV: Double = TODO()
-                val kA: Double = TODO()
+                // a good starting point for kS is 1 / max voltage
+                val kS = 1.0 / 12.0
+                val kV = 0.0
+                val kA = 0.0
             }
 
-            val ElevatorMotorId: Int = TODO("ElevatorMotorId")
+            val ArmMotorId: Int = 39
+        }
+
+        object limits {
+            val bottomLimit: Double = 0.0
+            val topLimit: Double = 8.0
+        }
+
+    }
+
+    object Elevator {
+        val carriageMass = 10.0
+        val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+        val gearRatio: Double = 1.0
+        val sproketRadius = Units.inchesToMeters(1.0)
+
+        object elevatorMotor {
+            val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+            val gearRatio: Double = 1.0
+
+            object PID {
+                val kP = 48.0
+                val kI = 0.0
+                val kD: Double = 0.0
+
+                object TrapezoidProfile {
+                    val maxVelocity: Double = 1.0
+                    val maxAcceleration: Double = 1.0
+                }
+            }
+
+            object FeedForeward {
+                // a good starting point for kS is 1 / max voltage
+                val kS = 1.0 / 12.0
+                val kV = 0.0
+                val kA = 0.0
+            }
+
+            val ElevatorMotorId: Int = 39
         }
 
         object positions {
@@ -38,7 +81,7 @@ object Constants {
 
         object limits {
             val bottomLimit: Double = 0.0
-            val topLimit: Double = TODO()
+            val topLimit: Double = 8.0
         }
 
     }
@@ -46,7 +89,7 @@ object Constants {
     const val BRZeroAngle = 171.75
     const val BLZeroAngle = 70.25
     const val FRZeroAngle = 76.1
-    const val FLZeroAngle = 132.5,
+    const val FLZeroAngle = 132.5
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl

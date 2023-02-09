@@ -36,12 +36,27 @@
           "open": true
         }
       },
-      "Talon FX[10]": {
+      "Talon FX[10]/Integrated Sensor": {
         "header": {
           "open": true
         }
       },
-      "Talon FX[10]/Integrated Sensor": {
+      "Talon FX[39]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[39]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[39]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[39]/Rev Limit": {
         "header": {
           "open": true
         }
@@ -56,7 +71,16 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/SwerveModule": "Subsystem",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon 2 [0]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/Talon FX [10]": "Motor Controller",
@@ -66,7 +90,8 @@
       "/LiveWindow/Ungrouped/Talon FX [14]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [15]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
-      "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller"
+      "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [39]": "Motor Controller"
     },
     "windows": {
       "/FMSInfo": {
@@ -77,6 +102,9 @@
     }
   },
   "NetworkTables": {
+    "SmartDashboard": {
+      "open": true
+    },
     "combined": true,
     "createNonCanonical": true,
     "precision": 4,
@@ -171,12 +199,12 @@
           "series": [
             {
               "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
                 1.0
               ],
-              "id": "CANMotor:Talon FX[10]-percentOutput"
+              "id": "Joystick[0] Axis[0]"
             },
             {
               "color": [
@@ -185,7 +213,7 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "CANMotor:Talon FX[10]-motorOutputLeadVoltage"
+              "id": "CANMotor:Talon FX[39]-percentOutput"
             },
             {
               "color": [
@@ -194,7 +222,16 @@
                 0.4078431725502014,
                 1.0
               ],
-              "id": "Joystick[0] Axis[0]"
+              "id": "NT:/SmartDashboard/Elevator Height"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "Joystick[0] Button[1]"
             }
           ]
         }
