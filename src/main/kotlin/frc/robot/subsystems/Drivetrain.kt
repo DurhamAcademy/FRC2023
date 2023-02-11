@@ -5,7 +5,9 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.kinematics.*
+import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -16,7 +18,7 @@ import frc.robot.controls.ControlScheme
 import java.lang.Math.PI
 
 class Drivetrain(
-    val controlScheme: ControlScheme,
+    controlScheme: ControlScheme,
     val cameraWrappers: List<PhotonCameraWrapper>,
 ) : SubsystemBase() {
     init {
@@ -31,8 +33,6 @@ class Drivetrain(
     private val ySpeedEntry = swerveTab.add("xBox ySpeed", 0)
         .entry
     private val rotEntry = swerveTab.add("xBox rot", 0)
-        .entry
-    private val gyroEntry = swerveTab.add("Gyro Heading", 0)
         .entry
     val frontLeft = SwerveModule( // front right
         Constants.FLDriveMotorId,
@@ -83,9 +83,7 @@ class Drivetrain(
 
     private val gyro = Pigeon2(54, "rio").apply {
         configFactoryDefault()
-        // fixme: add set axis position
     }
-
 
     /**
      * The odometry object for tracking robot pose
@@ -108,7 +106,9 @@ class Drivetrain(
             .map { it.swerveModulePosition }
             .toTypedArray()
     )
+    val Idrc = getTab("drivetrain")
 
+    // pose shuffleboard stuff (using the field 2d widget)
     val poseEstimator = SwerveDrivePoseEstimator(
         kinematics,
         Rotation2d.fromDegrees(gyro.yaw),
@@ -117,6 +117,13 @@ class Drivetrain(
         }.toTypedArray(),
         Pose2d()
     )
+    val poseEntryX = Idrc.add("posex", 0.0)
+        .withProperties(mapOf("min" to -10.0, "max" to 10.0))
+        .entry
+    val poseEntryY = Idrc.add("posey", 0.0)
+        .withProperties(mapOf("min" to -10.0, "max" to 10.0))
+        .entry
+
     /**
      * The periodic method is run roughly every 20ms. This is where we update
      * any values that are constantly changing, such as the robot's position,
@@ -139,7 +146,6 @@ class Drivetrain(
             modules.map { it.swerveModulePosition }.toTypedArray()
         )
 
-//        poseEstimator
         // we want to get the estimated position from each camera's pose
         // estimator and add it to the drivetrain's pose estimator. This helps
         // us get a more accurate position estimate
@@ -157,20 +163,23 @@ class Drivetrain(
 
         SmartDashboard.putNumber("gyroangle", gyro.yaw)
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
-        gyroEntry.setDouble(gyro.yaw)
-    }
+        SmartDashboard.putNumber("posex", poseEstimator.estimatedPosition.translation.x)
+        SmartDashboard.putNumber("posey", poseEstimator.estimatedPosition.translation.y)
+        cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
+            SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
+            SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
+        }
 
-    /**
-     * Resets the odometry to the specified pose
-     *
-     * @param pose the pose to reset the odometry to
-     */
-    fun resetOdometry(pose: Pose2d?) {
-        odometry.resetPosition(
-            Rotation2d.fromDegrees(gyro.yaw),
-            modules.map { it.location.toSwerveModulePosition() }.toTypedArray(),
-            pose
-        )
+//        gyroEntry.setDouble(gyro.yaw)
+//        odometry.update(
+//            Rotation2d.fromDegrees(gyro.yaw),
+//            modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
+//        )
+
+        // push to shuffleboard
+        poseEntryX.setDouble(poseEstimator.estimatedPosition.translation.x)
+        poseEntryY.setDouble(poseEstimator.estimatedPosition.translation.y)
+
     }
 
     /**
@@ -210,25 +219,6 @@ class Drivetrain(
     }
 
     /**
-     *
-     * Sets the swerve ModuleStates.
-     *
-     * @param desiredStates The desired SwerveModule states.
-     */
-    fun setModuleStates(desiredStates: Array<SwerveModuleState?>) {
-//        SwerveDriveKinematics.desaturateWheelSpeeds(
-//            desiredStates, DriveConstants.kMaxSpeedMetersPerSecond
-//        )
-
-        modules.forEachIndexed { i, module ->
-            module.setpoint = SwerveModuleState(
-                desiredStates[i]?.speedMetersPerSecond ?: 0.0,
-                desiredStates[i]?.angle ?: Rotation2d()
-            )
-        }
-    }
-
-    /**
      * Zeroes the heading of the robot
      */
     fun zeroHeading() {
@@ -236,6 +226,4 @@ class Drivetrain(
     }
 
 }
-
-private fun Translation2d.toSwerveModulePosition(): SwerveModulePosition = SwerveModulePosition(this.norm, this.angle)
 

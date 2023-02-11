@@ -6,10 +6,11 @@ import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.math.util.Units.inchesToMeters
+import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
-    val maxDriveAcceleration = 3.0
+    const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
     const val BRZeroAngle = -10.0
@@ -33,7 +34,7 @@ object Constants {
 
     const val WHEEL_RADIUS = .0508
     const val WHEEL_CIRCUMFRENCE = WHEEL_RADIUS * 2 * PI
-    const val DRIVE_GEAR_RATIO = 6.75
+    const val DRIVE_GEAR_RATIO = 6.75 * 10
 
     const val MODULE_DISTANCE_X = 0.641
     const val MODULE_DISTANCE_Y = 0.539750
@@ -55,6 +56,7 @@ object Constants {
         ).transformBy(cadToCode)
     }
 
+    @Suppress("unused") //TODO: Remove this suppression
     object FieldConstants {
         const val width = 3.048
         const val length = 5.486
@@ -76,6 +78,7 @@ object Constants {
     const val angleKV = 0.28267
     const val angleKA = 0.0144
 
+    @Suppress("unused") //TODO: Remove this suppression
     object Field2dLayout {
         val bounds = listOf(
             // judge side red -> judge side blue -> far side blue -> far side red

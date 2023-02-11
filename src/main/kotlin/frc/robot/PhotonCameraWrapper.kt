@@ -23,10 +23,10 @@
  */
 package frc.robot
 
-import edu.wpi.first.apriltag.AprilTag
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.wpilibj.RobotBase
 import frc.robot.Constants.VisionConstants
 import org.photonvision.EstimatedRobotPose
 import org.photonvision.PhotonCamera
@@ -37,23 +37,36 @@ class PhotonCameraWrapper {
     var photonCamera = PhotonCamera(
         VisionConstants.cameraName
     )
-    val atList = ArrayList<AprilTag>().apply {
 
-    }
-    var photonPoseEstimator = PhotonPoseEstimator(
-        AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json"),
-        PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
-        photonCamera,
-        VisionConstants.robotToCam.minus(Pose3d())
-    )
+    //if is simulation, don't use photon camera
+    /**
+     * The pose estimator for the camera. This is null if the robot is in
+     * simulation. This is because the PhotonVision library is not supported in
+     * simulation.
+     * @see PhotonPoseEstimator
+     * @see PhotonCamera
+     * @author
+     */
+    var photonPoseEstimator = if (RobotBase.isSimulation())
+        null
+    else
+        PhotonPoseEstimator(
+            AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json"),
+            PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
+            photonCamera,
+            VisionConstants.robotToCam.minus(Pose3d())
+        )
 
     /**
-     * @param estimatedRobotPose The current best guess at robot pose
-     * @return A pair of the fused camera observations to a single Pose2d on the field, and the time
-     * of the observation. Assumes a planar field and the robot is always firmly on the ground
+     * @param prevEstimatedRobotPose The previous estimated robot pose, or null
+     * if there is no previous pose.
+     * @return A pair of the fused camera observations to a single Pose2d on the
+     * field, and the time of the observation. Assumes a planar field and the
+     * robot is always firmly on the ground
      */
     fun getEstimatedGlobalPose(prevEstimatedRobotPose: Pose2d?): Optional<EstimatedRobotPose> {
-        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose)
-        return photonPoseEstimator.update()
+        if (photonPoseEstimator == null) return Optional.empty()
+        photonPoseEstimator!!.setReferencePose(prevEstimatedRobotPose)
+        return photonPoseEstimator!!.update()
     }
 }
