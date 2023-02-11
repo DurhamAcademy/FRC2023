@@ -19,6 +19,8 @@ class MoveToPosition(
         addRequirements(drivetrain)
     }
 
+    // these entries are used to debug how fast the robot wants to move to get
+    // to the desired position
     val speedx = drivetrain.Idrc.add("speedx1$x.$y.$angle", 0.0)
         .entry
     val speedy = drivetrain.Idrc.add("speedy1$x.$y.$angle", 0.0)
@@ -32,30 +34,32 @@ class MoveToPosition(
         val desired = Pose2d(x, y, Rotation2d(angle))
         var offset = current.minus(desired)
 
-        // calculate the desired speed of the robot
-        // max speed is 0.2 meters per second
-        // speed is proportional to the distance from the desired position
-        // tries to move at the difference between the current location and the desired location
-        // in 0.2 seconds
+        // if the robot is within 0.1 radians of the desired angle, set the
+        // rotation movement to 0 so that there isnt any overshoot or oscillation
         if (offset.rotation.radians.absoluteValue < 0.1) {
             offset = Transform2d(offset.translation, Rotation2d())
         }
+        // same as above but for movement in the x and y directions
         if (offset.translation.norm.absoluteValue < 0.1) {
             offset = Transform2d(Translation2d(), offset.rotation)
         }
 
+        // convert the offset to chassis speeds and clamp the values to be between
+        // reasonable values
         val speeds = ChassisSpeeds(
             (offset.translation.x * 10.0).coerceIn(-0.5, 0.5),
-            (offset.translation.y * 10.0).coerceIn(-1.0, 1.0),
+            (offset.translation.y * 10.0).coerceIn(-0.5, 0.5),
             (offset.rotation.radians * 1.0).coerceIn(-1.0, 1.0)
         )
 
+        // set the debug entries to the speeds so we can see values in the
+        // smartdashboard
         speedx.setDouble(speeds.vxMetersPerSecond)
         speedy.setDouble(speeds.vyMetersPerSecond)
         speedr.setDouble(speeds.omegaRadiansPerSecond)
 
 
-        // drive the robot
+        // tell the drivetrain to drive at the calculated speeds
         drivetrain.drive(speeds, true)
     }
 

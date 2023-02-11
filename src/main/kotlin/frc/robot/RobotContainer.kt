@@ -17,24 +17,18 @@ class RobotContainer {
 
     init {
         controlScheme.run {
-            xbox!!.y()
+            // assign the go to april tag 1 trigger to the command that
+            // moves the robot to the april tag
+            testGoToAprilTag1
                 .whileTrue(
                     MoveToPosition(drivetrain, 14.5, 1.0, 0.0)
                 )
 
-            xbox!!.x()
+            // assign the go-to zero zero trigger to the command that
+            // moves the robot to (0, 0)
+            testGoToZeroZero
                 .whileTrue(
                     MoveToPosition(drivetrain, 0.0, 0.0, 0.0)
-                )
-
-            xbox!!.b()
-                .whileTrue(
-                    MoveToPosition(drivetrain, 14.5, 1.25, 90.0)
-                )
-
-            xbox!!.a()
-                .whileTrue(
-                    MoveToPosition(drivetrain, 1.0, 0.0, 180.0)
                 )
         }
     }
