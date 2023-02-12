@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
@@ -17,7 +18,7 @@ import frc.robot.commands.DriveCommand
 import frc.robot.controls.ControlScheme
 import java.lang.Math.PI
 
-class Drivetrain(
+open class Drivetrain(
     controlScheme: ControlScheme,
     val cameraWrappers: List<PhotonCameraWrapper>,
 ) : SubsystemBase() {
@@ -117,12 +118,13 @@ class Drivetrain(
         }.toTypedArray(),
         Pose2d()
     )
-    val poseEntryX = Idrc.add("posex", 0.0)
-        .withProperties(mapOf("min" to -10.0, "max" to 10.0))
-        .entry
-    val poseEntryY = Idrc.add("posey", 0.0)
-        .withProperties(mapOf("min" to -10.0, "max" to 10.0))
-        .entry
+
+    open val estimatedPose2d: Pose2d
+        get() = poseEstimator.estimatedPosition
+
+    val field2d = Field2d().apply {
+        this.robotPose = estimatedPose2d
+    }
 
     /**
      * The periodic method is run roughly every 20ms. This is where we update
@@ -163,24 +165,22 @@ class Drivetrain(
 
         SmartDashboard.putNumber("gyroangle", gyro.yaw)
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
-        SmartDashboard.putNumber("posex", poseEstimator.estimatedPosition.translation.x)
-        SmartDashboard.putNumber("posey", poseEstimator.estimatedPosition.translation.y)
         cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
             SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
             SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
         }
-
 //        gyroEntry.setDouble(gyro.yaw)
 //        odometry.update(
 //            Rotation2d.fromDegrees(gyro.yaw),
 //            modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
 //        )
 
+        // update the field 2d widget with the current robot position
+        field2d.robotPose = poseEstimator.estimatedPosition
         // push to shuffleboard
-        poseEntryX.setDouble(poseEstimator.estimatedPosition.translation.x)
-        poseEntryY.setDouble(poseEstimator.estimatedPosition.translation.y)
-
+        SmartDashboard.putData(field2d)
     }
+
 
     /**
      * drive the robot using the specified chassis speeds
@@ -188,9 +188,12 @@ class Drivetrain(
      * @param chassisSpeeds the chassis speeds to drive at
      * @param fieldRelative whether the chassis speeds are field-relative
      */
-    fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
+    open fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
         val chassisSpeedsField =
-            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d.fromDegrees(gyro.yaw))
+            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
+                chassisSpeeds,
+                poseEstimator.estimatedPosition.rotation
+            )
             else chassisSpeeds
         val swerveModuleStates = kinematics.toSwerveModuleStates(
             chassisSpeedsField

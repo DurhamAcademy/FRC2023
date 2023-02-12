@@ -1,6 +1,5 @@
 package frc.robot
 
-import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
@@ -46,14 +45,14 @@ object Constants {
 
     object VisionConstants {
         const val cameraName: String = "OV9281"
-        val robotToCam: Pose3d = Pose3d(
-            Translation3d(0.0, inchesToMeters(10.188), inchesToMeters(5.433)),
+        val robotToCam: Transform3d = Transform3d(
+            Translation3d(inchesToMeters(-10.188) + 0.029, 0.0, inchesToMeters(5.433)),
             Rotation3d(
-                0.0,
-                degreesToRadians(100.0),
-                degreesToRadians(90.0)
+                /* roll = */ 0.0,
+                /* pitch = */ degreesToRadians(10.0),
+                /* yaw = */ degreesToRadians(180.0)
             )
-        ).transformBy(cadToCode)
+        )
     }
 
     @Suppress("unused") //TODO: Remove this suppression

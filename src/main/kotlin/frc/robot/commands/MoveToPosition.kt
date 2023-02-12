@@ -1,13 +1,14 @@
 package frc.robot.commands
 
+import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.geometry.Transform2d
-import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Drivetrain
-import kotlin.math.absoluteValue
+import kotlin.math.PI
 
 class MoveToPosition(
     private val drivetrain: Drivetrain,
@@ -28,29 +29,61 @@ class MoveToPosition(
     val speedr = drivetrain.Idrc.add("speedr1$x.$y.$angle", 0.0)
         .entry
 
+
+    val xPIDController = ProfiledPIDController(
+        1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
+            3.0,
+            3.0
+        )
+    )
+    val yPIDController = ProfiledPIDController(
+        1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
+            3.0,
+            3.0
+        )
+    )
+    val rPIDController = ProfiledPIDController(
+        1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
+            PI * 2,
+            PI
+        )
+    ).also {
+        it.enableContinuousInput(-PI, PI)
+    }
+
     override fun execute() {
-        // get the current position of the robot and offset it by the desired position
         val current = drivetrain.poseEstimator.estimatedPosition
         val desired = Pose2d(x, y, Rotation2d(angle))
-        var offset = current.minus(desired)
 
-        // if the robot is within 0.1 radians of the desired angle, set the
-        // rotation movement to 0 so that there isnt any overshoot or oscillation
-        if (offset.rotation.radians.absoluteValue < 0.1) {
-            offset = Transform2d(offset.translation, Rotation2d())
-        }
-        // same as above but for movement in the x and y directions
-        if (offset.translation.norm.absoluteValue < 0.1) {
-            offset = Transform2d(Translation2d(), offset.rotation)
-        }
+        // log the current position and the desired position
+        SmartDashboard.putNumber("curr-x", current.translation.x)
+        SmartDashboard.putNumber("curr-y", current.translation.y)
+        SmartDashboard.putNumber("curr-r", current.rotation.radians)
+        SmartDashboard.putNumber("des-x", desired.translation.x)
+        SmartDashboard.putNumber("des-y", desired.translation.y)
+        SmartDashboard.putNumber("des-r", desired.rotation.radians)
 
-        // convert the offset to chassis speeds and clamp the values to be between
-        // reasonable values
+        // calculate the speeds needed to get to the desired position
         val speeds = ChassisSpeeds(
-            (offset.translation.x * 10.0).coerceIn(-0.5, 0.5),
-            (offset.translation.y * 10.0).coerceIn(-0.5, 0.5),
-            (offset.rotation.radians * 1.0).coerceIn(-1.0, 1.0)
+            xPIDController.calculate(
+                current.translation.x,
+                desired.translation.x,
+            ),
+            yPIDController.calculate(
+                current.translation.y,
+                desired.translation.y,
+            ),
+            rPIDController.calculate(
+                current.rotation.radians,
+                desired.rotation.radians,
+            )
         )
+        SmartDashboard.putNumber("xpiderr", xPIDController.positionError)
+        SmartDashboard.putNumber("ypiderr", yPIDController.positionError)
+        SmartDashboard.putNumber("rpiderr", rPIDController.positionError)
+//        val speeds = ChassisSpeeds(
+//          1.0, 0.0, 0.0
+//        )
 
         // set the debug entries to the speeds so we can see values in the
         // smartdashboard
@@ -65,7 +98,8 @@ class MoveToPosition(
 
     override fun isFinished(): Boolean {
         // stop when the robot is within 0.1 meters of the desired position
-        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(x, y, Rotation2d(angle))).translation.norm < 0.1
+        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(x, y, Rotation2d(angle))).translation.norm < 0.05
+                && drivetrain.poseEstimator.estimatedPosition.rotation.minus(Rotation2d(angle)).radians < 0.05
     }
 
     override fun end(interrupted: Boolean) {

@@ -2,7 +2,6 @@ package frc.robot
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.wpilibj.RobotBase
 import frc.robot.Constants.VisionConstants
 import org.photonvision.EstimatedRobotPose
@@ -29,9 +28,9 @@ class PhotonCameraWrapper {
     else
         PhotonPoseEstimator(
             AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json"),
-            PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
+            PhotonPoseEstimator.PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
             photonCamera,
-            VisionConstants.robotToCam.minus(Pose3d())
+            VisionConstants.robotToCam
         )
 
     /**
