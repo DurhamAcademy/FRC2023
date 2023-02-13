@@ -34,19 +34,19 @@ class MoveToPosition(
 
     val xPIDController = ProfiledPIDController(
         1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
-            0.5,
+            2.0,
             0.1
         )
     ).also {
-        it.reset(0.0, 0.0)
+        it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
     }
     val yPIDController = ProfiledPIDController(
         1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
-            0.5,
+            2.5,
             0.1
         )
     ).also {
-        it.reset(0.0, 0.0)
+        it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
     }
     val rPIDController = ProfiledPIDController(
         1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
@@ -55,9 +55,16 @@ class MoveToPosition(
         )
     ).also {
         it.enableContinuousInput(-PI, PI)
-        it.reset(0.0, 0.0)
+        it.reset(drivetrain.estimatedPose2d.rotation.radians, 0.0)
     }
 
+    override fun initialize() {
+        xPIDController.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
+        yPIDController.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
+        rPIDController.reset(drivetrain.estimatedPose2d.rotation.radians, 0.0)
+    }
+
+    // on command start and every time the command is executed, calculate the
 
     override fun execute() {
         val current = drivetrain.estimatedPose2d
@@ -114,5 +121,9 @@ class MoveToPosition(
 
     override fun end(interrupted: Boolean) {
         drivetrain.drive(ChassisSpeeds(), true)
+        // reset the PID controllers
+        xPIDController.reset(0.0, 0.0)
+        yPIDController.reset(0.0, 0.0)
+        rPIDController.reset(0.0, 0.0)
     }
 }
