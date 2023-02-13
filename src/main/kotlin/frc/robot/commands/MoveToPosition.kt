@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Drivetrain
 import kotlin.math.PI
+import kotlin.math.hypot
+import kotlin.random.Random
 
 class MoveToPosition(
     private val drivetrain: Drivetrain,
@@ -22,38 +24,44 @@ class MoveToPosition(
 
     // these entries are used to debug how fast the robot wants to move to get
     // to the desired position
-    val speedx = drivetrain.Idrc.add("speedx1$x.$y.$angle", 0.0)
+    val speedx = drivetrain.Idrc.add("speedx1$x.$y.$angle${Random.nextDouble()}", 0.0)
         .entry
-    val speedy = drivetrain.Idrc.add("speedy1$x.$y.$angle", 0.0)
+    val speedy = drivetrain.Idrc.add("speedy1$x.$y.$angle${Random.nextDouble()}", 0.0)
         .entry
-    val speedr = drivetrain.Idrc.add("speedr1$x.$y.$angle", 0.0)
+    val speedr = drivetrain.Idrc.add("speedr1$x.$y.$angle${Random.nextDouble()}", 0.0)
         .entry
 
 
     val xPIDController = ProfiledPIDController(
         1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
-            3.0,
-            3.0
+            0.5,
+            0.1
         )
-    )
+    ).also {
+        it.reset(0.0, 0.0)
+    }
     val yPIDController = ProfiledPIDController(
         1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
-            3.0,
-            3.0
+            0.5,
+            0.1
         )
-    )
+    ).also {
+        it.reset(0.0, 0.0)
+    }
     val rPIDController = ProfiledPIDController(
         1.0, 0.0, 0.0, TrapezoidProfile.Constraints(
-            PI * 2,
-            PI
+            PI / 2,
+            0.1
         )
     ).also {
         it.enableContinuousInput(-PI, PI)
+        it.reset(0.0, 0.0)
     }
 
+
     override fun execute() {
-        val current = drivetrain.poseEstimator.estimatedPosition
-        val desired = Pose2d(x, y, Rotation2d(angle))
+        val current = drivetrain.estimatedPose2d
+        val desired = Pose2d(x, y, Rotation2d.fromDegrees(angle))
 
         // log the current position and the desired position
         SmartDashboard.putNumber("curr-x", current.translation.x)
@@ -81,6 +89,8 @@ class MoveToPosition(
         SmartDashboard.putNumber("xpiderr", xPIDController.positionError)
         SmartDashboard.putNumber("ypiderr", yPIDController.positionError)
         SmartDashboard.putNumber("rpiderr", rPIDController.positionError)
+
+        SmartDashboard.putNumber("SPEED", hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond))
 //        val speeds = ChassisSpeeds(
 //          1.0, 0.0, 0.0
 //        )
@@ -98,8 +108,8 @@ class MoveToPosition(
 
     override fun isFinished(): Boolean {
         // stop when the robot is within 0.1 meters of the desired position
-        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(x, y, Rotation2d(angle))).translation.norm < 0.05
-                && drivetrain.poseEstimator.estimatedPosition.rotation.minus(Rotation2d(angle)).radians < 0.05
+        return drivetrain.estimatedPose2d.minus(Pose2d(x, y, Rotation2d(angle))).translation.norm < 0.05
+                && drivetrain.estimatedPose2d.rotation.minus(Rotation2d(angle)).radians < 0.05
     }
 
     override fun end(interrupted: Boolean) {

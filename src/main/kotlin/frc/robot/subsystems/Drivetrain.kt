@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry
+import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -119,8 +120,14 @@ open class Drivetrain(
         Pose2d()
     )
 
+    private var simEstimatedPose2d: Pose2d = Pose2d()
+
     open val estimatedPose2d: Pose2d
-        get() = poseEstimator.estimatedPosition
+        get() = if (RobotBase.isReal()) {
+            poseEstimator.estimatedPosition
+        } else {
+            simEstimatedPose2d
+        }
 
     val field2d = Field2d().apply {
         this.robotPose = estimatedPose2d
@@ -147,13 +154,15 @@ open class Drivetrain(
             Rotation2d.fromDegrees(gyro.yaw),
             modules.map { it.swerveModulePosition }.toTypedArray()
         )
-
         // we want to get the estimated position from each camera's pose
         // estimator and add it to the drivetrain's pose estimator. This helps
         // us get a more accurate position estimate
         cameraWrappers.forEach { cameraWrapper ->
             val pose = cameraWrapper.getEstimatedGlobalPose(poseEstimator.estimatedPosition)
             pose.ifPresent { estimatedRobotPose -> // if the camera sees a target,
+                /*
+                 * we want to add the vision measurement to the drivetrain pose
+                 */
                 // and make sure we aren't adding a measurement that is too new
                 // add the vision measurement to the drivetrain pose estimator
                 poseEstimator.addVisionMeasurement(
@@ -176,7 +185,7 @@ open class Drivetrain(
 //        )
 
         // update the field 2d widget with the current robot position
-        field2d.robotPose = poseEstimator.estimatedPosition
+        field2d.robotPose = estimatedPose2d
         // push to shuffleboard
         SmartDashboard.putData(field2d)
     }
@@ -206,18 +215,26 @@ open class Drivetrain(
             2 * PI
         )
 
-//        SwerveDriveKinematics.desaturateWheelSpeeds()
-
-        swerveModuleStates.forEachIndexed { i, swerveModuleState ->
-            modules[i].setpoint = swerveModuleState
-        }
-        // Telemetry
-        xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
-        ySpeedEntry.setDouble(chassisSpeeds.vyMetersPerSecond)
-        rotEntry.setDouble(chassisSpeeds.omegaRadiansPerSecond)
-        //fixme: move the following to swerve module periodic
-        modules.forEachIndexed { i, module ->
-            module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
+        if (RobotBase.isReal()) {
+            swerveModuleStates.forEachIndexed { i, swerveModuleState ->
+                modules[i].setpoint = swerveModuleState
+            }
+            // Telemetry
+            xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
+            ySpeedEntry.setDouble(chassisSpeeds.vyMetersPerSecond)
+            rotEntry.setDouble(chassisSpeeds.omegaRadiansPerSecond)
+            //fixme: move the following to swerve module periodic
+            modules.forEachIndexed { i, module ->
+                module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
+            }
+        } else {
+            val newChassisSpeeds = kinematics.toChassisSpeeds(*swerveModuleStates)
+            // add the chassis speeds to the sim pose with dt = 0.02
+            simEstimatedPose2d = Pose2d(
+                simEstimatedPose2d.translation.x + newChassisSpeeds.vxMetersPerSecond * 0.02,
+                simEstimatedPose2d.translation.y + newChassisSpeeds.vyMetersPerSecond * 0.02,
+                simEstimatedPose2d.rotation.plus(Rotation2d(newChassisSpeeds.omegaRadiansPerSecond) * 0.02)
+            )
         }
     }
 

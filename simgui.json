@@ -85,10 +85,16 @@
       "/LiveWindow/Ungrouped/Talon FX [14]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [15]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
-      "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller"
+      "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
+      "/SmartDashboard/Field": "Field2d"
     },
     "windows": {
       "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
         "window": {
           "visible": true
         }
@@ -193,37 +199,25 @@
         {
           "axis": [
             {
-              "autoFit": true
+              "autoFit": true,
+              "label": "Speed",
+              "lockMax": true,
+              "max": 3.0
             }
           ],
-          "height": -43,
+          "height": 426,
           "series": [
             {
               "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
+                1.0,
+                1.0,
+                1.0,
                 1.0
               ],
-              "id": "CANMotor:Talon FX[10]-percentOutput"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "CANMotor:Talon FX[10]-motorOutputLeadVoltage"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "Joystick[0] Axis[0]"
+              "id": "NT:/SmartDashboard/SPEED",
+              "marker": "None",
+              "name": "Robot Speed",
+              "weight": 1.0000001192092896
             }
           ]
         }

@@ -22,6 +22,9 @@ class RobotContainer {
             testGoToAprilTag1
                 .whileTrue(
                     MoveToPosition(drivetrain, 14.5, 1.0, 0.0)
+                        .andThen(MoveToPosition(drivetrain, 10.0, 2.0, 90.0))
+                        .andThen(MoveToPosition(drivetrain, 5.0, 5.0, 270.0))
+                        .andThen(MoveToPosition(drivetrain, 0.0, 0.0, 0.0))
                 )
 
             // assign the go-to zero zero trigger to the command that
