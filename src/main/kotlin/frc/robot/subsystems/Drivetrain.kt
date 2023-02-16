@@ -4,6 +4,7 @@ import com.ctre.phoenix.sensors.Pigeon2
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
@@ -129,6 +130,8 @@ open class Drivetrain(
             simEstimatedPose2d
         }
 
+    open var estimatedVelocity = Transform2d()
+
     val field2d = Field2d().apply {
         this.robotPose = estimatedPose2d
     }
@@ -190,6 +193,7 @@ open class Drivetrain(
         SmartDashboard.putData(field2d)
     }
 
+    private var lastPose = Pose2d()
 
     /**
      * drive the robot using the specified chassis speeds
@@ -198,6 +202,7 @@ open class Drivetrain(
      * @param fieldRelative whether the chassis speeds are field-relative
      */
     open fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
+        lastPose = estimatedPose2d
         val chassisSpeedsField =
             if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
                 chassisSpeeds,
@@ -230,14 +235,26 @@ open class Drivetrain(
         } else {
             val newChassisSpeeds = kinematics.toChassisSpeeds(*swerveModuleStates)
             // add the chassis speeds to the sim pose with dt = 0.02
+            // also retain velocity when told to stop
+
             simEstimatedPose2d = Pose2d(
                 simEstimatedPose2d.translation.x + newChassisSpeeds.vxMetersPerSecond * 0.02,
                 simEstimatedPose2d.translation.y + newChassisSpeeds.vyMetersPerSecond * 0.02,
                 simEstimatedPose2d.rotation.plus(Rotation2d(newChassisSpeeds.omegaRadiansPerSecond) * 0.02)
-            )
-        }
-    }
+            ).apply {
+                if (chassisSpeeds.vxMetersPerSecond == 0.0 && chassisSpeeds.vyMetersPerSecond == 0.0) {
+                    simEstimatedPose2d = Pose2d(simEstimatedPose2d.translation, simEstimatedPose2d.rotation)
+                    simEstimatedPose2d.plus(estimatedVelocity * 0.02)
+                }
+            }
 
+        }
+        // use oldPose to calculate the estimated velocity
+        estimatedVelocity = Transform2d(
+            estimatedPose2d.translation.minus(lastPose.translation),
+            Rotation2d.fromDegrees(estimatedPose2d.rotation.degrees - lastPose.rotation.degrees)
+        )
+    }
     /**
      * Zeroes the heading of the robot
      */

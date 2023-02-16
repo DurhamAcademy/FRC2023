@@ -46,7 +46,7 @@ object Constants {
     object VisionConstants {
         const val cameraName: String = "OV9281"
         val robotToCam: Transform3d = Transform3d(
-            Translation3d(inchesToMeters(-10.188) + 0.029, 0.0, inchesToMeters(5.433)),
+            Translation3d(inchesToMeters(10.188) + 0.029, 0.0, inchesToMeters(5.433)),
             Rotation3d(
                 /* roll = */ 0.0,
                 /* pitch = */ degreesToRadians(10.0),
