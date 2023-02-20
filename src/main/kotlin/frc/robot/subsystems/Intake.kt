@@ -9,4 +9,8 @@ class Intake(
 ): SubsystemBase() {
     private val deployMotor = CANSparkMax(0, CANSparkMaxLowLevel.MotorType.kBrushless)
     private val spinningMotor = CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless)
+
+    private fun spinMotor(x: Double) {
+        spinningMotor.set(x)
+    }
 }
