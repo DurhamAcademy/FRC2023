@@ -17,8 +17,8 @@ class RobotContainer {
     val elevator = Elevator(controlScheme)
     init {
         controlScheme.run {
-            xbox!!.a().onTrue(ElevatorTestUp(elevator, controlScheme))
-            xbox!!.b().onTrue(ElevatorTestDown(elevator, controlScheme))
+            xbox!!.a().onTrue(ElevatorTestUp(elevator))
+            xbox!!.b().onTrue(ElevatorTestDown(elevator))
         }
     }
 }

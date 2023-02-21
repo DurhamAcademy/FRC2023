@@ -51,7 +51,7 @@ class DefaultControlScheme(
             val x = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
             val y = xboxCon.leftY.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
             // check if the stick is pointing to the bottom right
-            return Trigger { x > 0.1 && y < 0.1 && sqrt(x*x + y*y) > 0.5 }
+            return Trigger { x > 0.1 && y < 0.1 && sqrt(x * x + y * y) > 0.5 }
         }
     override val testPercent: Double // rocket league style (trigger is throttle, other trigger is brake/reverse)
         get() {
@@ -59,4 +59,6 @@ class DefaultControlScheme(
             val brake = xboxCon.leftTriggerAxis.coerceIn(0.0, 1.0)
             return throttle - brake
         }
+    override val elevatorTest: Trigger
+        get() = xboxCon.rightBumper().and(testMode)
 }
