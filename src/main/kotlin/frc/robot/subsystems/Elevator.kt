@@ -114,7 +114,9 @@ class Elevator(
 
     override fun periodic() {
         // limits
-
+        if(limitSwitch.get()){
+            Constants.Elevator.limits.topLimit
+        }
         // set motor voltage
         setMotorVoltage(
             motorPid.calculate(
