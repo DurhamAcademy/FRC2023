@@ -42,7 +42,7 @@ object Constants {
         object motor {
             const val positionTolerance = 0.01
             const val velocityTolerance = 0.01
-            const val id = 20
+            const val id = 34
             const val currentLimit = 40
             const val inverted = false
             const val gearRatio = 1.0
@@ -58,13 +58,13 @@ object Constants {
         }
 
         object encoder {
-            const val id = 10
+            const val id = 18
             const val offset = 0.0
             const val inverted = false
         }
 
         const val minAngle = -90.0
-        const val maxAngle = 180.0
+        const val maxAngle = 90.0
         const val armMass = 1.0
         const val momentOfInertia = 1.0
         const val armLength = 1.0

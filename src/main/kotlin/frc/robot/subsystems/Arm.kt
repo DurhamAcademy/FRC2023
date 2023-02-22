@@ -9,6 +9,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -76,22 +78,33 @@ class Arm : SubsystemBase() {
         armSetpoint = position
     }
 
-    override fun periodic() {
-        setArmVoltage(
-            armFeedForward.calculate(
-                armPosition,
-                armVelocity,
-                armSetpoint ?: armPosition
-            ) + armPID.calculate(
-                armPosition,
-                armSetpoint ?: armPosition
-            )
+    // shuffleboard
+    val ArmTab = Shuffleboard.getTab("Arm")
+    val ArmMotorVoltage = ArmTab.add("Arm Motor Voltage", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf("min" to -1.0, "max" to 1.0)
         )
+        .getEntry()
+    override fun periodic() {
+//        setArmVoltage(
+//            armFeedForward.calculate(
+//                armPosition,
+//                armVelocity,
+//                armSetpoint ?: armPosition
+//            ) + armPID.calculate(
+//                armPosition,
+//                armSetpoint ?: armPosition
+//            )
+//        )
 
         // SmartDashboard stuff
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
         SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
+
+        // set voltage with shuffleboard
+        setArmVoltage(ArmMotorVoltage.getDouble(0.0))
     }
 
     override fun simulationPeriodic() {
