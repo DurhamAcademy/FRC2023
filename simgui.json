@@ -97,6 +97,9 @@
   },
   "NetworkTables": {
     "SmartDashboard": {
+      "arm": {
+        "open": true
+      },
       "open": true
     },
     "combined": true,
@@ -196,7 +199,7 @@
               "autoFit": true
             }
           ],
-          "height": -43,
+          "height": 446,
           "series": [
             {
               "color": [
@@ -224,6 +227,15 @@
                 1.0
               ],
               "id": "Joystick[0] Axis[0]"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/arm/Position"
             }
           ]
         }

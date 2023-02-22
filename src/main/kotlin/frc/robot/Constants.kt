@@ -10,7 +10,6 @@ import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
-    const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
     const val BRZeroAngle = -10.0
@@ -38,6 +37,38 @@ object Constants {
 
     const val MODULE_DISTANCE_X = 0.641
     const val MODULE_DISTANCE_Y = 0.539750
+
+    object arm {
+        object motor {
+            const val positionTolerance = 0.01
+            const val velocityTolerance = 0.01
+            const val id = 20
+            const val currentLimit = 40
+            const val inverted = false
+            const val gearRatio = 1.0
+            const val maxVelocity = 1.0
+            const val maxAcceleration = 1.0
+            const val kP = 12.0
+            const val kI = 0.0
+            const val kD = 0.0
+            const val kS = 1.0
+            const val kG = 12.0
+            const val kV = 1.0
+            const val kA = 1.0
+        }
+
+        object encoder {
+            const val id = 10
+            const val offset = 0.0
+            const val inverted = false
+        }
+
+        const val minAngle = -90.0
+        const val maxAngle = 180.0
+        const val armMass = 1.0
+        const val momentOfInertia = 1.0
+        const val armLength = 1.0
+    }
 
     val cadToCode = Transform3d(
         Translation3d(0.0, 0.029, 0.0),
