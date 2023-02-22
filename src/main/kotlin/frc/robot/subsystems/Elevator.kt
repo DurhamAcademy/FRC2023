@@ -96,7 +96,6 @@ class Elevator(
             elevatorMotor.setVoltage(voltage)
     }
 
-    private var lastLimitSwitch: Boolean = false
 
     var elevatorTab = Shuffleboard.getTab("Elevator")
     var voltageSetEntry = elevatorTab.add("Voltage Set", 0.0)
@@ -111,11 +110,12 @@ class Elevator(
             // set zero
             this.setDouble(0.0)
         }
+    private var lastLimitSwitch: Boolean = false
 
     override fun periodic() {
         // limits
         if(limitSwitch.get()){
-            Constants.Elevator.limits.topLimit
+            this.height = (Constants.Elevator.limits.topLimit)
         }
         // set motor voltage
         setMotorVoltage(
@@ -130,10 +130,10 @@ class Elevator(
 //        setMotorVoltage(voltageSetEntry.getDouble(0.0))
 
         // check if its in teleop
-//        if (RobotController.getUserButton()) setMotorVoltage(0.0)
+        //if (RobotController.getUserButton()) setMotorVoltage(0.0)
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
-        if (!limitSwitch.get() && lastLimitSwitch) {
-//            this.height = Constants.Elevator.limitSwitch.offset
+        if ((limitSwitch.get() != lastLimitSwitch) && this.height==Constants.Elevator.limits.topLimit) {
+            this.height = Constants.Elevator.limitSwitch.offset
             //fixme: uncomment this
         }
         lastLimitSwitch = limitSwitch.get()
