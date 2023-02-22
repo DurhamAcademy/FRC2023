@@ -36,8 +36,8 @@ class Wrist : SubsystemBase() {
 
     private val encoder = CANCoder(Constants.wrist.encoder.id).apply {
         configFactoryDefault()
-        configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
-        configMagnetOffset(Constants.wrist.encoder.offset)
+        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
+        configMagnetOffset(-Constants.wrist.encoder.offset)
         configSensorDirection(Constants.wrist.encoder.inverted)
     }
     private val pid = ProfiledPIDController(
@@ -83,8 +83,9 @@ class Wrist : SubsystemBase() {
     override fun periodic() {
         if (setpoint != null) {
             val output = pid.calculate(position, setpoint!!)
-            setVoltage(output)
-        }
+            voltage = output
+        } else voltage = 0.0
+
     }
 
     override fun simulationPeriodic() {

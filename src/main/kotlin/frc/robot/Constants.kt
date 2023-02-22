@@ -30,8 +30,8 @@ object Constants {
         }
 
         object encoder {
-            const val id = 11
-            const val offset = 0.0
+            const val id = 19
+            const val offset = 2.14
             const val inverted = false
         }
 
