@@ -1,23 +1,24 @@
-package frc.robot.commands
+package frc.robot.commands.wrist
 
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.subsystems.Arm
+import frc.robot.subsystems.Wrist
 
-class SetArmTo90(
-    private val arm: Arm,
+class SetWristAngle(
+    private val wrist: Wrist,
 ) : CommandBase() {
     init {
-        addRequirements(arm)
+        addRequirements(wrist)
     }
 
     override fun initialize() {
-        arm.setArmPosition(90.0)
+        wrist.setWristPosition(90.0)
     }
 
     override fun execute() {
     }
 
     override fun end(interrupted: Boolean) {
+
     }
 
     override fun isFinished(): Boolean {

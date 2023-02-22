@@ -77,17 +77,6 @@ class Arm : SubsystemBase() {
     }
 
     override fun periodic() {
-        setArmVoltage(
-            armFeedForward.calculate(
-                armPosition,
-                armVelocity,
-                armSetpoint ?: armPosition
-            ) + armPID.calculate(
-                armPosition,
-                armSetpoint ?: armPosition
-            )
-        )
-
         // SmartDashboard stuff
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
