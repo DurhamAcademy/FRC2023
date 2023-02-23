@@ -41,22 +41,41 @@
           "open": true
         }
       },
-      "Talon FX[10]/Integrated Sensor": {
+      "Talon FX[16]": {
         "header": {
           "open": true
         }
       }
     },
     "RoboRIO": {
+      "6V Rail": {
+        "open": true
+      },
+      "RoboRIO Input": {
+        "open": true
+      },
       "window": {
         "visible": true
+      }
+    },
+    "Timing": {
+      "window": {
+        "visible": false
       }
     }
   },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/SwerveModule": "Subsystem",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon 2 [0]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/Talon FX [10]": "Motor Controller",
@@ -77,8 +96,17 @@
     }
   },
   "NetworkTables": {
+    "SmartDashboard": {
+      "open": true
+    },
     "combined": true,
     "createNonCanonical": true,
+    "photonvision": {
+      "OV9281": {
+        "open": true
+      },
+      "open": true
+    },
     "precision": 4,
     "properties": true,
     "retained": {
@@ -156,7 +184,8 @@
         "open": true
       },
       "open": true
-    }
+    },
+    "visible": true
   },
   "Plot": {
     "Plot <0>": {
@@ -167,7 +196,7 @@
               "autoFit": true
             }
           ],
-          "height": 338,
+          "height": -43,
           "series": [
             {
               "color": [
