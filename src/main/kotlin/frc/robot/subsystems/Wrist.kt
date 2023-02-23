@@ -22,6 +22,7 @@ class Wrist : SubsystemBase() {
         restoreFactoryDefaults()
         setSmartCurrentLimit(Constants.wrist.motor.currentLimit)
         inverted = Constants.wrist.motor.inverted
+        idleMode = CANSparkMax.IdleMode.kBrake
     }
     private val simWristSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
