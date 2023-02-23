@@ -10,6 +10,7 @@ import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
+
     const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
@@ -20,6 +21,7 @@ object Constants {
     const val FRDriveMotorId = 10
     const val BLDriveMotorId = 11
     const val FLDriveMotorId = 12
+
     const val BRDriveMotorId = 13
 
     const val FRTurnMotorId = 14
