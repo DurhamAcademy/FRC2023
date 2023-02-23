@@ -15,7 +15,7 @@ import frc.robot.Constants
 import kotlin.math.PI
 
 class Wrist : SubsystemBase() {
-    private val motor = CANSparkMax(
+    private val wristMotor = CANSparkMax(
         Constants.wrist.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
@@ -34,7 +34,7 @@ class Wrist : SubsystemBase() {
         true
     )
 
-    private val encoder = CANCoder(Constants.wrist.encoder.id).apply {
+    private val wristEncoder = CANCoder(Constants.wrist.encoder.id).apply {
         configFactoryDefault()
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
         configMagnetOffset(-Constants.wrist.encoder.offset)
@@ -65,19 +65,26 @@ class Wrist : SubsystemBase() {
     )
     val position: Double
         get() = if (RobotBase.isSimulation()) simWristSystem.angleRads
-        else encoder.absolutePosition * ((2 * PI) / 360.0)
+        else wristEncoder.absolutePosition * ((2 * PI) / 360.0)
     val velocity: Double
-        get() = encoder.velocity
+        get() = wristEncoder.velocity
     var setpoint: Double? = null
     var voltage: Double = 0.0
         set(value) {
             if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
-            else motor.setVoltage(voltage)
+            else wristMotor.setVoltage(voltage)
             field = value
         }
 
     fun setPosition(position: Double) {
         setpoint = position
+    }
+    val armVelocity: Double
+        get() = wristEncoder.velocity
+    var armSetpoint: Double? = null
+    fun setArmVoltage(voltage: Double) {
+        if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
+        else wristMotor.setVoltage(voltage)
     }
 
     override fun periodic() {
@@ -85,7 +92,6 @@ class Wrist : SubsystemBase() {
             val output = pid.calculate(position, setpoint!!)
             voltage = output
         } else voltage = 0.0
-
     }
 
     override fun simulationPeriodic() {
