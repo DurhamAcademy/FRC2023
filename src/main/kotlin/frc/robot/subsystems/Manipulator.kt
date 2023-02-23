@@ -2,16 +2,21 @@ package frc.robot.subsystems
 
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
+import com.revrobotics.ColorSensorV3
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value
+import edu.wpi.first.wpilibj.I2C
 import edu.wpi.first.wpilibj.PneumaticsModuleType
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.ManipulatorConstants.manipulatorVoltage
 import frc.robot.Constants.ManipulatorConstants.leftSolenoidForward
 import frc.robot.Constants.ManipulatorConstants.leftSolenoidReverse
+import frc.robot.Constants.ManipulatorConstants.manipulatorVoltage
 import frc.robot.Constants.ManipulatorConstants.motorId
 import frc.robot.Constants.ManipulatorConstants.rightSolenoidForward
 import frc.robot.Constants.ManipulatorConstants.rightSolenoidReverse
+
 
 class Manipulator: SubsystemBase() {
 
@@ -37,4 +42,21 @@ class Manipulator: SubsystemBase() {
         set(value) {
             motor.set(value)
         }
+
+
+    val i2cPort = I2C.Port.kOnboard
+    val colorSensor = ColorSensorV3(i2cPort)
+
+    override fun periodic() {
+        val detectedColor: Color = colorSensor.color
+        val IR = colorSensor.ir.toDouble()
+
+        SmartDashboard.putNumber("Red", detectedColor.red)
+        SmartDashboard.putNumber("Green", detectedColor.green)
+        SmartDashboard.putNumber("Blue", detectedColor.blue)
+        SmartDashboard.putNumber("IR", IR)
+
+        val proximity = colorSensor.proximity
+        SmartDashboard.putNumber("Proximity", proximity.toDouble())
+    }
 }
