@@ -11,7 +11,7 @@ class SetWristAngle(
     }
 
     override fun initialize() {
-        wrist.setWristPosition(90.0)
+        wrist.setPosition(90.0)
     }
 
     override fun execute() {
