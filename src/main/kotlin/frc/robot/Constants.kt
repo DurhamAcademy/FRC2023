@@ -44,6 +44,15 @@ object Constants {
         Rotation3d(0.0, 0.0, PI / 2)
     )
 
+    object ManipulatorConstants {
+        const val motorId = 0
+        const val leftSolenoidForward = 1
+        const val leftSolenoidReverse = 2
+        const val rightSolenoidForward = 3
+        const val rightSolenoidReverse = 4
+        const val manipulatorVoltage = 20
+    }
+
     object VisionConstants {
         const val cameraName: String = "OV9281"
         val robotToCam: Pose3d = Pose3d(

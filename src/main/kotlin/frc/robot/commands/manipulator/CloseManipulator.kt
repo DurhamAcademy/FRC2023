@@ -9,6 +9,6 @@ class CloseManipulator(private val manipulator: Manipulator):InstantCommand() {
     }
 
     override fun execute() {
-        manipulator.open= false
+        manipulator.isOpen= false
     }
 }
