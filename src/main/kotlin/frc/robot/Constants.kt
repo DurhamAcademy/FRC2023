@@ -6,7 +6,7 @@ object Constants {
     const val BRZeroAngle = 171.75
     const val BLZeroAngle = 70.25
     const val FRZeroAngle = 76.1
-    const val FLZeroAngle = 132.5,
+    const val FLZeroAngle = 132.5
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl
