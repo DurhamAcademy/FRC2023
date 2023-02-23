@@ -1,0 +1,6 @@
+{
+  "sysid": true,
+  "test": "Arm",
+  "units": "Rotations",
+  "unitsPerRotation": 1.0
+}
