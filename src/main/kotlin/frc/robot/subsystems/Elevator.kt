@@ -18,7 +18,14 @@ import frc.robot.controls.ControlScheme
 class Elevator(
     val controlScheme: ControlScheme,
 ) : SubsystemBase() {
-    val elevatorMotor = WPI_TalonFX(Constants.Elevator.elevatorMotor.ElevatorMotorId)
+    val elevatorMotor = WPI_TalonFX(
+        Constants.Elevator.elevatorMotor.ElevatorMotorId
+    ).apply {
+        configFactoryDefault()
+        configSupplyCurrentLimit(Constants.Elevator.elevatorMotor.SupplyCurrentLimitConfiguration)
+        configStatorCurrentLimit(Constants.Elevator.elevatorMotor.StatorCurrentLimitConfiguration)
+        setNeutralMode(Constants.Elevator.elevatorMotor.NeutralMode)
+    }
     val motorPid = ProfiledPIDController(
         Constants.Elevator.elevatorMotor.PID.kP,
         Constants.Elevator.elevatorMotor.PID.kI,
