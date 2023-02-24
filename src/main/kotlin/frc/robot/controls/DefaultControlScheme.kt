@@ -3,7 +3,6 @@ package frc.robot.controls
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import kotlin.math.absoluteValue
-import kotlin.math.pow
 import kotlin.math.sqrt
 
 class DefaultControlScheme(
@@ -12,11 +11,13 @@ class DefaultControlScheme(
      val xboxCon: CommandXboxController
         get() = xbox!!
     override val rotation: Double // added deadband
-        get() = xboxCon.rightX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
+        get() = xboxCon.rightX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
+
+    // todo: add correct deadband from mathutils or kyberlib
     override val strafe: Double
-        get() = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
+        get() = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
     override val forward: Double
-        get() = xboxCon.leftY.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it.pow(3) }
+        get() = xboxCon.leftY.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
     override val driveTest : Trigger // left bumper and is in test mode
         get() = xboxCon.leftBumper().and( testMode )
     override val turnTest : Trigger
@@ -61,4 +62,10 @@ class DefaultControlScheme(
         }
     override val elevatorTest: Trigger
         get() = xboxCon.rightBumper().and(testMode)
+
+    override val testGoToAprilTag1: Trigger
+        get() = xboxCon.y()
+
+    override val testGoToZeroZero: Trigger
+        get() = xboxCon.x()
 }
