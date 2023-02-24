@@ -19,16 +19,16 @@ class SetWristAngle(
 
     override fun execute() {
         if(arm.armPosition < -20){
-            wrist.setPosition((90 + arm.armPosition) * -1)
+            wrist.setPosition((90 + arm.armPosition) * -1) //if arm is in negative direction set wrist level to floor
         }
         else if(arm.armPosition > 20){
-            wrist.setPosition(90 - arm.armPosition)
+            wrist.setPosition(90 - arm.armPosition) //if arm is in positive direction set wrist level to floor
         }
         else if(arm.armPosition > 0){
-            wrist.setPosition(arm.armPosition * -3.5)
+            wrist.setPosition(arm.armPosition * -3.5) //if arm is in the middle flip wrist
         }
         else{
-            wrist.setPosition(arm.armPosition * 3.5)
+            wrist.setPosition(arm.armPosition * 3.5) //if arm is in the middle flip wrist
         }
     }
 
