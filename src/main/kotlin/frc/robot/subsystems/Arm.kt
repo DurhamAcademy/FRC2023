@@ -102,7 +102,7 @@ class Arm : SubsystemBase() {
             armPosition,
             armSetpoint ?: armPosition
         )
-        voltage.coerceIn(-1,1) // Fixme: remove this after testing
+        voltage.coerceIn(-1.0,1.0) // Fixme: remove this after testing
         setArmVoltage(voltage)
 
         // Shuffleboard stuff
