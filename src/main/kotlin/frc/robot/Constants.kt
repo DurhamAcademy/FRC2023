@@ -9,6 +9,38 @@ import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
+    object wrist {
+        object motor {
+            const val positionTolerance = 0.01
+            const val velocityTolerance = 0.01
+            const val id = 21
+            const val currentLimit = 40
+            const val inverted = false
+            const val gearRatio = 1.0
+            const val maxVelocity = 1.0
+            const val maxAcceleration = 1.0
+            const val kP = 12.0
+            const val kI = 0.0
+            const val kD = 0.0
+            const val kS = 1.0
+            const val kG = 12.0
+            const val kV = 1.0
+            const val kA = 1.0
+        }
+
+        object encoder {
+            const val id = 19
+            const val offset = 2.14
+            const val inverted = false
+        }
+
+        val simArmLength = inchesToMeters(10.0)
+        const val minAngle = -90.0
+        const val maxAngle = 180.0
+        const val armMass = 1.0
+        const val momentOfInertia = 1.0
+    }
+
     const val powerPercent = .2
 
     const val BRZeroAngle = -10.0
