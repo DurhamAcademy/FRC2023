@@ -20,7 +20,6 @@ class TurnMotorTest(
                 listOf(module!!)
             }
         }
-
     init {
         addRequirements(drivetrain)
     }
