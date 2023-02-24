@@ -24,7 +24,6 @@ class RobotContainer {
         controlScheme.run {
             xbox!!.a().onTrue(ElevatorTestUp(elevator))
             xbox!!.b().onTrue(ElevatorTestDown(elevator))
-        controlScheme.run {
             // assign the go to april tag 1 trigger to the command that
             // moves the robot to the april tag
             testGoToAprilTag1
