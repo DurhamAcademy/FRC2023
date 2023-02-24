@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import kotlin.math.PI
 
-class Wrist : SubsystemBase() {
+class Wrist() : SubsystemBase() {
+
+
     private val motor = CANSparkMax(
         Constants.wrist.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -83,7 +85,7 @@ class Wrist : SubsystemBase() {
     override fun periodic() {
         if (setpoint != null) {
             val output = pid.calculate(position, setpoint!!)
-            setVoltage(output)
+            voltage = output
         }
     }
 

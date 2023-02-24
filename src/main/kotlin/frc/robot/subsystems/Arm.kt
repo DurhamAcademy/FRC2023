@@ -15,7 +15,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import java.lang.Math.PI
 
-class Arm : SubsystemBase() {
+class Arm(
+    var wrist: Wrist
+) : SubsystemBase() {
+
+    fun ArmWristCheck(position: Double){
+        if(!position.equals(0)){
+            armMotor.setVoltage(0.0)
+        }
+    }
+
     val armMotor = CANSparkMax(
         Constants.arm.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -24,6 +33,7 @@ class Arm : SubsystemBase() {
         setSmartCurrentLimit(Constants.arm.motor.currentLimit)
         inverted = Constants.arm.motor.inverted
     }
+
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
         Constants.arm.motor.gearRatio,
@@ -81,6 +91,7 @@ class Arm : SubsystemBase() {
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
         SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
+        ArmWristCheck(wrist.position)
     }
 
     override fun simulationPeriodic() {
