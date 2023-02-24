@@ -1,51 +1,51 @@
 
 
-    package frc.robot.subsystems
-    import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
-    import com.revrobotics.CANSparkMax
-    import com.revrobotics.CANSparkMaxLowLevel
-    import edu.wpi.first.math.controller.ProfiledPIDController
-    import edu.wpi.first.math.trajectory.TrapezoidProfile
-    import edu.wpi.first.wpilibj2.command.SubsystemBase
-    import frc.robot.Constants
-    import frc.robot.controls.ControlScheme
-    import java.util.ResourceBundle.Control
+package frc.robot.subsystems
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
+import com.revrobotics.CANSparkMax
+import com.revrobotics.CANSparkMaxLowLevel
+import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.robot.Constants
+import frc.robot.controls.ControlScheme
+import java.util.ResourceBundle.Control
 
 
-    class Intake(): SubsystemBase() {
+class Intake(): SubsystemBase() {
 
-        private val pid = ProfiledPIDController(
-                Constants.intake.motor.kP,
-                Constants.intake.motor.kI,
-                Constants.intake.motor.kD,
-                TrapezoidProfile.Constraints(
-                        Constants.intake.motor.maxVelocity,
-                        Constants.intake.motor.maxAcceleration
-                )
-        ).apply {
-            setTolerance(
-                    Constants.intake.motor.positionTolerance,
-                    Constants.intake.motor.velocityTolerance
+    private val pid = ProfiledPIDController(
+            Constants.intake.motor.kP,
+            Constants.intake.motor.kI,
+            Constants.intake.motor.kD,
+            TrapezoidProfile.Constraints(
+                    Constants.intake.motor.maxVelocity,
+                    Constants.intake.motor.maxAcceleration
             )
-        }
-
-        private val spinningMotor = CANSparkMax(
-                Constants.intakeSpinMotorID,
-                CANSparkMaxLowLevel.MotorType.kBrushless
+    ).apply {
+        setTolerance(
+                Constants.intake.motor.positionTolerance,
+                Constants.intake.motor.velocityTolerance
         )
-
-        private val deployMotor = CANSparkMax(
-                Constants.intakeDeployMotorID,
-                CANSparkMaxLowLevel.MotorType.kBrushless
-        )
-        var spinMotorSpeed: Double
-            get() = spinningMotor.get()
-            set(value) {
-                spinningMotor.setVoltage(value)
-            }
-
-        fun spinIntakeMotor(speed: Double) {
-            spinMotorSpeed = speed
-        }
-
     }
+
+    private val spinningMotor = CANSparkMax(
+            Constants.intakeSpinMotorID,
+            CANSparkMaxLowLevel.MotorType.kBrushless
+    )
+
+    private val deployMotor = CANSparkMax(
+            Constants.intakeDeployMotorID,
+            CANSparkMaxLowLevel.MotorType.kBrushless
+    )
+    var spinMotorSpeed: Double
+        get() = spinningMotor.get()
+        set(value) {
+            spinningMotor.setVoltage(value)
+        }
+
+    fun spinIntakeMotor(speed: Double) {
+        spinMotorSpeed = speed
+    }
+
+}
