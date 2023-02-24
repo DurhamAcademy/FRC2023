@@ -44,6 +44,28 @@ object Constants {
         Rotation3d(0.0, 0.0, PI / 2)
     )
 
+    const val intakeSpinMotorID = 0 //TODO: change to something everett likes
+    const val intakeDeployMotorID = 1 // TODO: change to something everett likes
+
+    object intake {
+        object motor {
+            const val positionTolerance = 0.01
+            const val velocityTolerance = 0.01
+            const val id = 20
+            const val currentLimit = 40
+            const val inverted = false
+            const val gearRatio = 1.0
+            const val maxVelocity = 1.0
+            const val maxAcceleration = 1.0
+            const val kP = 12.0
+            const val kI = 0.0
+            const val kD = 0.0
+            const val kS = 1.0
+            const val kG = 12.0
+            const val kV = 1.0
+            const val kA = 1.0
+        }
+    }
     object VisionConstants {
         const val cameraName: String = "OV9281"
         val robotToCam: Pose3d = Pose3d(
