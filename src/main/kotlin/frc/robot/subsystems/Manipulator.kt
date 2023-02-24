@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value
 import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.ManipulatorConstants.manipulatorVoltage
+import frc.robot.Constants.ManipulatorConstants.manipulatorCurrent
 import frc.robot.Constants.ManipulatorConstants.leftSolenoidForward
 import frc.robot.Constants.ManipulatorConstants.leftSolenoidReverse
 import frc.robot.Constants.ManipulatorConstants.motorId
@@ -16,7 +16,7 @@ import frc.robot.Constants.ManipulatorConstants.rightSolenoidReverse
 class Manipulator: SubsystemBase() {
 
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
-        this.setSmartCurrentLimit(manipulatorVoltage)
+        this.setSmartCurrentLimit(manipulatorCurrent)
     }
     private val leftsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, leftSolenoidForward, leftSolenoidReverse)
     private val rightsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, rightSolenoidForward, rightSolenoidReverse)

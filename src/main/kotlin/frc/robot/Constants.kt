@@ -52,7 +52,7 @@ object Constants {
         const val leftSolenoidReverse = 2
         const val rightSolenoidForward = 3
         const val rightSolenoidReverse = 4
-        const val manipulatorVoltage = 20
+        const val manipulatorCurrent = 20
     }
 
     object VisionConstants {
