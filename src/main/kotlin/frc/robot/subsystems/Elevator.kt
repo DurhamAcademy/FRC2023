@@ -1,5 +1,6 @@
 package frc.robot.subsystems
 
+import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import edu.wpi.first.math.controller.ElevatorFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
@@ -22,9 +23,7 @@ class Elevator(
         Constants.Elevator.elevatorMotor.ElevatorMotorId
     ).apply {
         configFactoryDefault()
-        configSupplyCurrentLimit(Constants.Elevator.elevatorMotor.SupplyCurrentLimitConfiguration)
-        configStatorCurrentLimit(Constants.Elevator.elevatorMotor.StatorCurrentLimitConfiguration)
-        setNeutralMode(Constants.Elevator.elevatorMotor.NeutralMode)
+        setNeutralMode(NeutralMode.Brake)
     }
     val motorPid = ProfiledPIDController(
         Constants.Elevator.elevatorMotor.PID.kP,
