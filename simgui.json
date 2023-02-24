@@ -96,6 +96,12 @@
     }
   },
   "NetworkTables": {
+    "Shuffleboard": {
+      "Arm": {
+        "open": true
+      },
+      "open": true
+    },
     "SmartDashboard": {
       "arm": {
         "open": true

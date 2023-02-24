@@ -9,6 +9,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -37,7 +39,7 @@ class Arm : SubsystemBase() {
 
     val armEncoder = CANCoder(Constants.arm.encoder.id).apply {
         configFactoryDefault()
-        configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
+        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
         configMagnetOffset(Constants.arm.encoder.offset)
         configSensorDirection(Constants.arm.encoder.inverted)
     }
@@ -55,7 +57,7 @@ class Arm : SubsystemBase() {
             Constants.arm.motor.velocityTolerance
         )
     }
-    val armFeedForward = ArmFeedforward(
+    var armFeedForward = ArmFeedforward(
         Constants.arm.motor.kS,
         Constants.arm.motor.kG,
         Constants.arm.motor.kV,
@@ -76,7 +78,35 @@ class Arm : SubsystemBase() {
         armSetpoint = position
     }
 
+    // shuffleboard
+    val ArmTab = Shuffleboard.getTab("Arm")
+    val ArmMotorVoltage = ArmTab.add("Arm Motor Voltage", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf("min" to -1.0, "max" to 1.0)
+        )
+        .getEntry()
+    val ArmMotorPosition = ArmTab.add("Arm Motor Setpoint", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf("min" to -1.0, "max" to 1.0)
+        )
+        .entry
     override fun periodic() {
+        val voltage = armFeedForward.calculate(
+            armPosition,
+            armVelocity,
+            armSetpoint ?: armPosition
+        ) + armPID.calculate(
+            armPosition,
+            armSetpoint ?: armPosition
+        )
+        setArmVoltage(voltage)
+
+        // Shuffleboard stuff
+        ArmMotorVoltage.setDouble(voltage)
+
+
         // SmartDashboard stuff
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
