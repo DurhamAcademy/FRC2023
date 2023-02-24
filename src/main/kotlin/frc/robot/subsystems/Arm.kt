@@ -94,13 +94,15 @@ class Arm : SubsystemBase() {
         .entry
     override fun periodic() {
         val voltage = armFeedForward.calculate(
-            armPosition,
+            // convert from 0 being horizontal arm to 0 being upright
+            armPosition - (PI / 2), // FIXME: Test this
             armVelocity,
             armSetpoint ?: armPosition
         ) + armPID.calculate(
             armPosition,
             armSetpoint ?: armPosition
         )
+        voltage.coerceIn(-1,1) // Fixme: remove this after testing
         setArmVoltage(voltage)
 
         // Shuffleboard stuff
