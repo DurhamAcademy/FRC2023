@@ -4,8 +4,7 @@ import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
-import edu.wpi.first.math.util.Units.degreesToRadians
-import edu.wpi.first.math.util.Units.inchesToMeters
+import edu.wpi.first.math.util.Units.*
 import frc.robot.utils.Area
 import kotlin.math.PI
 
@@ -45,12 +44,13 @@ object Constants {
             const val id = 34
             const val currentLimit = 40
             const val inverted = false
-            const val gearRatio = 1.0
+            const val gearRatio = 1/170.67
             const val maxVelocity = 1.0
             const val maxAcceleration = 1.0
             const val kP = 12.0
             const val kI = 0.0
             const val kD = 0.0
+
             const val kS = 1.0
             const val kG = 12.0
             const val kV = 1.0
@@ -65,9 +65,11 @@ object Constants {
 
         const val minAngle = -90.0
         const val maxAngle = 90.0
-        const val armMass = 1.0
-        const val momentOfInertia = 1.0
-        const val armLength = 1.0
+        const val armMass = 4.76//lbsToKilograms(10.5)
+        // 640.1 in^2 lbs
+        const val momentOfInertia = 0.187318642 //kg m^2
+        // 33 in
+        const val armLength = 0.8382
     }
 
     val cadToCode = Transform3d(

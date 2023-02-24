@@ -39,7 +39,7 @@ class Arm : SubsystemBase() {
 
     val armEncoder = CANCoder(Constants.arm.encoder.id).apply {
         configFactoryDefault()
-        configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
+        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
         configMagnetOffset(Constants.arm.encoder.offset)
         configSensorDirection(Constants.arm.encoder.inverted)
     }
@@ -92,34 +92,6 @@ class Arm : SubsystemBase() {
             mapOf("min" to -1.0, "max" to 1.0)
         )
         .entry
-    val feedForwardKs = ArmTab.add("Feedforward Ks", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
-    val feedForwardKg = ArmTab.add("Feedforward Kg", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
-    val feedForwardKv = ArmTab.add("Feedforward Kv", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
-    val feedForwardKa = ArmTab.add("Feedforward Ka", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
-    val pidKp = ArmTab.add("PID Kp", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
-    val pidKi = ArmTab.add("PID Ki", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
-    val pidKd = ArmTab.add("PID Kd", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(mapOf("min" to -20.0, "max" to 20.0))
-        .getEntry()
     override fun periodic() {
         val voltage = armFeedForward.calculate(
             armPosition,
@@ -133,26 +105,12 @@ class Arm : SubsystemBase() {
 
         // Shuffleboard stuff
         ArmMotorVoltage.setDouble(voltage)
-        this.setArmPosition(ArmMotorPosition.getDouble(0.0))
-        armFeedForward = ArmFeedforward(
-            feedForwardKs.getDouble(0.0),
-            feedForwardKg.getDouble(0.0),
-            feedForwardKv.getDouble(0.0),
-            feedForwardKa.getDouble(0.0)
-        )
-        armPID.setPID(
-            pidKp.getDouble(0.0),
-            pidKi.getDouble(0.0),
-            pidKd.getDouble(0.0)
-        )
 
 
         // SmartDashboard stuff
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
         SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
-
-
     }
 
     override fun simulationPeriodic() {
