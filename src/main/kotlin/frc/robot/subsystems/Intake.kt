@@ -45,7 +45,7 @@ class Intake(): SubsystemBase() {
     var spinMotorSpeed: Double
         get() = spinningMotor.get()
         set(value) {
-            spinningMotor.setVoltage(value)
+            spinningMotor.set(value)
         }
 
     var voltage: Double = 0.0
@@ -65,6 +65,8 @@ class Intake(): SubsystemBase() {
     fun setIntakePosition(position: Double) {
         intakeSetpoint = position
     }
+
+    
 
 
     override fun periodic() {

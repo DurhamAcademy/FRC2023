@@ -66,4 +66,9 @@ class DefaultControlScheme(
 
     override val testGoToZeroZero: Trigger
         get() = xboxCon.x()
+    override val intakeTest: Trigger
+        get() = xboxCon.rightBumper()
+
+    override val intakeSpinTest: Trigger
+        get() = xboxCon.leftBumper()
 }

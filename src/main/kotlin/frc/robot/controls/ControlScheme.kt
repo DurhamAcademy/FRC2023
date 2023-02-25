@@ -20,4 +20,7 @@ abstract class ControlScheme {
 
     abstract val testGoToAprilTag1: Trigger
     abstract val testGoToZeroZero: Trigger
+
+    abstract val intakeTest: Trigger
+    abstract val intakeSpinTest: Trigger
 }
