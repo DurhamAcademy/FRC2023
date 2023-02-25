@@ -14,15 +14,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import java.lang.Math.PI
-
 class Arm(
     var wrist: Wrist
 ) : SubsystemBase() {
-
-    fun ArmWristCheck(position: Double){
-        if(!position.equals(0)){
-            armMotor.setVoltage(0.0)
+    fun armWristCheck(position: Double): Boolean {
+        if(position == 0.0){
+            return true
         }
+        return false
     }
 
     val armMotor = CANSparkMax(
@@ -91,7 +90,9 @@ class Arm(
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
         SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
-        ArmWristCheck(wrist.position)
+        if(armWristCheck(wrist.position)){
+            armMotor.setVoltage(0.0)
+        }
     }
 
     override fun simulationPeriodic() {
