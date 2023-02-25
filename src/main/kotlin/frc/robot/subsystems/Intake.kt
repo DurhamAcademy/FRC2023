@@ -38,14 +38,39 @@ class Intake(): SubsystemBase() {
             Constants.intakeDeployMotorID,
             CANSparkMaxLowLevel.MotorType.kBrushless
     )
+
+    var intakeSetpoint: Double? = null
+    var setpoint: Double? = null
+
     var spinMotorSpeed: Double
         get() = spinningMotor.get()
         set(value) {
             spinningMotor.setVoltage(value)
         }
 
+    var voltage: Double = 0.0
+        set(value) {
+            deployMotor.setVoltage(voltage)
+            field = value
+        }
+
     fun spinIntakeMotor(speed: Double) {
         spinMotorSpeed = speed
     }
 
+    fun setIntakeDeployVoltage(voltage: Double) {
+        deployMotor.setVoltage(voltage)
+    }
+
+    fun setIntakePosition(position: Double) {
+        intakeSetpoint = position
+    }
+
+
+    override fun periodic() {
+        if (setpoint != null) {
+            val output = pid.calculate(setpoint!!)
+            voltage = output
+        } else voltage = 0.0
+    }
 }
