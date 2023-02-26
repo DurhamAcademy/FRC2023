@@ -1,13 +1,10 @@
 package frc.robot
 
-import edu.wpi.first.math.util.Units.inchesToMeters
-import edu.wpi.first.math.util.Units.lbsToKilograms
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
-import edu.wpi.first.math.util.Units.degreesToRadians
-import edu.wpi.first.math.util.Units.inchesToMeters
+import edu.wpi.first.math.util.Units.*
 import frc.robot.utils.Area
 import kotlin.math.PI
 
@@ -15,29 +12,27 @@ object Constants {
 
     object Elevator {
         val carriageMass = lbsToKilograms(27.5) // rough estimate (25-30 lbs)
-        val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+        val encoderDistancePerPulse: Double = 1.0 / 2_048.0
         val sproketRadius = inchesToMeters(1.25 / 2.0)
 
         object elevatorMotor {
             object Feedforward {
-                val kG: Double = 1.0
-
-                // a good starting point for kS is 1 / max voltage
-                val kS = 1.0 / 12.0
-                val kV = 1.0 / 12.0
-                val kA = 1.0 // 0.0
+                val kG: Double = .32348
+                val kS = .053817
+                val kV = 10.248
+                val kA = .28817
             }
 
-            val encoderDistancePerPulse: Double = 1.0 / 4_096.0
-            val gearRatio: Double = 170.0
+            val inverted = true
+            val gearRatio: Double = 1 / 10.51
 
             object PID {
-                val kP = 10_000.0
+                val kP = 32.5 / 6
                 val kI = 0.0
-                val kD: Double = 1000.0
+                val kD: Double = 3.429
 
                 object TrapezoidProfile {
-                    val maxVelocity: Double = 1.0
+                    val maxVelocity: Double = 2.0
                     val maxAcceleration: Double = 1.0
                 }
             }

@@ -81,7 +81,7 @@ class Drivetrain(
         *modules.map { it.location }.toTypedArray()
     )
 
-    private val gyro = Pigeon2(54, "rio").apply {
+    private val gyro = Pigeon2(20, "rio").apply {
         configFactoryDefault()
     }
 
