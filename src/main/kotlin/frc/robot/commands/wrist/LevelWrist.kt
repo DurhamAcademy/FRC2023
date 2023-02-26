@@ -12,9 +12,6 @@ class LevelWrist(
     init {
         addRequirements(wrist)
     }
-
-    override fun initialize() {
-    }
     fun calcAngles(): Double {
         if(arm.armPosition < -angleOfFlip){
             return -(90 + arm.armPosition)
@@ -40,11 +37,7 @@ class LevelWrist(
         }
     }
     override fun execute() {
-        wrist.setPosition(calcAngles())
-    }
-
-    override fun end(interrupted: Boolean) {
-
+        wrist.setPosition(Math.toRadians(calcAngles()))
     }
 
     override fun isFinished() = false
