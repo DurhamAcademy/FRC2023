@@ -23,4 +23,6 @@ abstract class ControlScheme {
     abstract val testGoToZeroZero: Trigger
 
     abstract val testArm90: Trigger
+    abstract val testArm0: Trigger
+    abstract val testArmNeg90: Trigger
 }

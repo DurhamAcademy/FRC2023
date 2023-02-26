@@ -3,8 +3,9 @@ package frc.robot.commands.arm
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Arm
 
-class SetArmTo90(
+class SetArmToAngle(
     private val arm: Arm,
+    val angle: Double
 ) : CommandBase() {
     init {
         addRequirements(arm)
@@ -15,7 +16,7 @@ class SetArmTo90(
     }
 
     override fun execute() {
-        arm.setArmPosition(arm.dashSetpoint.getDouble(0.0))
+        arm.setArmPosition(angle)
     }
 
     override fun end(interrupted: Boolean) {
