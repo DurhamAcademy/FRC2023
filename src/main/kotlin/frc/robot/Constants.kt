@@ -40,7 +40,6 @@ object Constants {
         const val armMass = 1.0
         const val momentOfInertia = 1.0
     }
-
     const val powerPercent = .2
 
     const val BRZeroAngle = -10.0
@@ -50,6 +49,7 @@ object Constants {
     const val FRDriveMotorId = 10
     const val BLDriveMotorId = 11
     const val FLDriveMotorId = 12
+
     const val BRDriveMotorId = 13
 
     const val FRTurnMotorId = 14
@@ -108,6 +108,15 @@ object Constants {
         Translation3d(0.0, 0.029, 0.0),
         Rotation3d(0.0, 0.0, PI / 2)
     )
+
+    object ManipulatorConstants {
+        const val motorId = 0
+        const val leftSolenoidForward = 1
+        const val leftSolenoidReverse = 2
+        const val rightSolenoidForward = 3
+        const val rightSolenoidReverse = 4
+        const val manipulatorCurrent = 20
+    }
 
     object VisionConstants {
         const val cameraName: String = "OV9281"
