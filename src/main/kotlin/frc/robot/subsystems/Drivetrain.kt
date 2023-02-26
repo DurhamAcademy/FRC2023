@@ -165,10 +165,10 @@ class Drivetrain(
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
         SmartDashboard.putNumber("posex", poseEstimator.estimatedPosition.translation.x)
         SmartDashboard.putNumber("posey", poseEstimator.estimatedPosition.translation.y)
-        cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
-            SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
-            SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
-        }
+//        cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
+//            SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
+//            SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
+//        }
 
 //        gyroEntry.setDouble(gyro.yaw)
 //        odometry.update(

@@ -68,4 +68,6 @@ class DefaultControlScheme(
 
     override val testGoToZeroZero: Trigger
         get() = xboxCon.x()
+    override val testArm90: Trigger
+        get() = xboxCon.b()
 }
