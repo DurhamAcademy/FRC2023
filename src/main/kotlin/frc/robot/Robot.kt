@@ -18,7 +18,6 @@ class Robot : TimedRobot() {
 
     override fun robotInit() {
         robotContainer = RobotContainer()
-        robotContainer.drivetrain.zeroHeading()
     }
 
     override fun robotPeriodic() {
