@@ -5,13 +5,14 @@ import frc.robot.subsystems.Wrist
 
 class SetWristAngle(
     private val wrist: Wrist,
+    private val angle: Double = 0.0
 ) : CommandBase() {
     init {
         addRequirements(wrist)
     }
 
     override fun initialize() {
-        wrist.setPosition(90.0)
+        wrist.setPosition(angle)
     }
 
     override fun execute() {

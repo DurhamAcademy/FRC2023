@@ -77,7 +77,10 @@ class Wrist : SubsystemBase() {
         }
 
     fun setPosition(position: Double) {
-        setpoint = position
+        setpoint = position.coerceIn(
+            Constants.wrist.minAngle,
+            Constants.wrist.maxAngle
+        )
     }
 
     val armVelocity: Double
@@ -94,11 +97,13 @@ class Wrist : SubsystemBase() {
     }
 
     override fun periodic() {
-//        if (setpoint != null) {
-//            val output = pid.calculate(position, setpoint!!)
-//            voltage = output
-//        } else voltage = 0.0
+        if (setpoint != null) {
+            voltage = pid.calculate(position, setpoint!!).coerceIn(-12.0..12.0)
+        }
         SmartDashboard.putNumber("wrist/encoder", position)
+        SmartDashboard.putNumber("wrist/velocity", velocity)
+        SmartDashboard.putNumber("wrist/setpoint", setpoint ?: 0.0)
+        SmartDashboard.putNumber("wrist/voltage", voltage)
     }
 
     override fun simulationPeriodic() {

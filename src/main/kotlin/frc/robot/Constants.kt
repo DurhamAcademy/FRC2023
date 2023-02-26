@@ -35,8 +35,8 @@ object Constants {
         }
 
         val simArmLength = inchesToMeters(10.0)
-        const val minAngle = -90.0
-        const val maxAngle = 180.0
+        const val minAngle = -PI / 2
+        const val maxAngle = PI / 2
         const val armMass = 1.0
         const val momentOfInertia = 1.0
     }

@@ -51,7 +51,7 @@ class Arm : SubsystemBase() {
         0.5,
         TrapezoidProfile.Constraints(
             1.0,
-            0.0
+            1.0
         )
     )
     var armFeedForward = ArmFeedforward(
