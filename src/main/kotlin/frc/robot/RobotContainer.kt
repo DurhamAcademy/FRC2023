@@ -9,8 +9,8 @@ import frc.robot.controls.ControlScheme
 import frc.robot.controls.DefaultControlScheme
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.Wrist
 import frc.robot.subsystems.Elevator
+import frc.robot.subsystems.Wrist
 
 class RobotContainer {
     val xbox = CommandXboxController(0)
@@ -18,7 +18,7 @@ class RobotContainer {
 
 //    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
 
-    val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(cameraWrapper))
+    val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(/*cameraWrapper*/))
     val elevator = Elevator(controlScheme)
     val arm = Arm()
     val wrist = Wrist()
