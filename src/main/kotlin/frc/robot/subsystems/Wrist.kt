@@ -80,10 +80,10 @@ class Wrist : SubsystemBase() {
     fun setPosition(position: Double) {
         setpoint = position
     }
-    val armVelocity: Double
+    val wristVelocity: Double
         get() = wristEncoder.velocity
-    var armSetpoint: Double? = null
-    fun setArmVoltage(voltage: Double) {
+    var wristSetpoint: Double? = null
+    fun setWristVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
         else wristMotor.setVoltage(voltage)
     }
