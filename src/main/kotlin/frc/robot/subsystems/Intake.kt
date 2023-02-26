@@ -54,6 +54,11 @@ class Intake(): SubsystemBase() {
             field = value
         }
 
+    /**
+     * spinIntakeMotor function
+     * spins the motor with the compliant wheels on intake
+     * @param speed, a double that represents the speed that the intake motor is set to
+     */
     fun spinIntakeMotor(speed: Double) {
         spinMotorSpeed = speed
     }
@@ -62,11 +67,16 @@ class Intake(): SubsystemBase() {
         deployMotor.setVoltage(voltage)
     }
 
+    /**
+     * setIntakePosition function
+     * @param position, a double from 0.0 to 1.0 that represents the percentage that the intake is deployed
+     * for example, 0.5 would mean 50% deployed
+     */
     fun setIntakePosition(position: Double) {
         intakeSetpoint = position
     }
 
-    
+
 
 
     override fun periodic() {
