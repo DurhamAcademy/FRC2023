@@ -10,6 +10,7 @@ import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
+
     const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
@@ -20,6 +21,7 @@ object Constants {
     const val FRDriveMotorId = 10
     const val BLDriveMotorId = 11
     const val FLDriveMotorId = 12
+
     const val BRDriveMotorId = 13
 
     const val FRTurnMotorId = 14
@@ -44,6 +46,7 @@ object Constants {
         Rotation3d(0.0, 0.0, PI / 2)
     )
 
+
     const val intakeSpinMotorID = 0 //TODO: change to something everett likes
     const val intakeDeployMotorID = 1 // TODO: change to something everett likes
 
@@ -66,6 +69,16 @@ object Constants {
             const val kA = 1.0
         }
     }
+
+    object ManipulatorConstants {
+        const val motorId = 0
+        const val leftSolenoidForward = 1
+        const val leftSolenoidReverse = 2
+        const val rightSolenoidForward = 3
+        const val rightSolenoidReverse = 4
+        const val manipulatorCurrent = 20
+    }
+
     object VisionConstants {
         const val cameraName: String = "OV9281"
         val robotToCam: Pose3d = Pose3d(
