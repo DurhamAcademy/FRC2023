@@ -21,4 +21,6 @@ abstract class ControlScheme {
 
     abstract val testGoToAprilTag1: Trigger
     abstract val testGoToZeroZero: Trigger
+
+    abstract val testArm90: Trigger
 }
