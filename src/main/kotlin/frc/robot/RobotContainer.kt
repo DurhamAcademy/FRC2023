@@ -13,10 +13,10 @@ class RobotContainer {
     val xbox = CommandXboxController(0)
     val controlScheme: ControlScheme = DefaultControlScheme(xbox)
 
-    var cameraWrapper = PhotonCameraWrapper()
+//    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
 
     @Suppress("unused")
-    val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(cameraWrapper))
+    val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(/*cameraWrapper*/))
     val arm = Arm()
     val wrist = Wrist()
 

@@ -76,17 +76,17 @@ object Constants {
             const val id = 34
             const val currentLimit = 40
             const val inverted = false
-            const val gearRatio = 1/170.67
+            const val gearRatio = 1 / 170.67
             const val maxVelocity = 1.0
             const val maxAcceleration = 1.0
-            const val kP = 12.0
+            const val kP = 7.6426
             const val kI = 0.0
-            const val kD = 0.0
+            const val kD = 4.2626
 
-            const val kS = 1.0
-            const val kG = 12.0
-            const val kV = 1.0
-            const val kA = 1.0
+            const val kS = 0.086989
+            const val kG = 0.42677
+            const val kV = 3.2483
+            const val kA = 0.34796
         }
 
         object encoder {

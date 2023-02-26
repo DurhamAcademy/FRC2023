@@ -11,16 +11,18 @@ class SetArmTo90(
     }
 
     override fun initialize() {
-        arm.setArmPosition(90.0)
+        arm.setArmPosition(arm.dashSetpoint.getDouble(0.0))
     }
 
     override fun execute() {
+        arm.setArmPosition(arm.dashSetpoint.getDouble(0.0))
     }
 
     override fun end(interrupted: Boolean) {
+        arm.armSetpoint = null
     }
 
     override fun isFinished(): Boolean {
-        return true
+        return false
     }
 }

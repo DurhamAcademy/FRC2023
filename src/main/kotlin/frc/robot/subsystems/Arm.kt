@@ -15,7 +15,10 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
+//import frc.robot.utils.armFeedforward
+//import frc.robot.utils.createArmSystemPlant
 import java.lang.Math.PI
+import java.lang.Math.toRadians
 
 class Arm : SubsystemBase() {
     val armMotor = CANSparkMax(
@@ -27,14 +30,14 @@ class Arm : SubsystemBase() {
         inverted = Constants.arm.motor.inverted
     }
     val simArmSystem = SingleJointedArmSim(
-        DCMotor.getNEO(1),
-        Constants.arm.motor.gearRatio,
-        Constants.arm.momentOfInertia,
-        Constants.arm.armLength,
-        Constants.arm.minAngle,
-        Constants.arm.maxAngle,
-        Constants.arm.armMass,
-        true
+        /* gearbox = */ DCMotor.getNEO(1),
+        /* gearing = */ Constants.arm.motor.gearRatio,
+        /* jKgMetersSquared = */ Constants.arm.momentOfInertia,
+        /* armLengthMeters = */ Constants.arm.armLength,
+        /* minAngleRads = */ Constants.arm.minAngle,
+        /* maxAngleRads = */ Constants.arm.maxAngle,
+        /* armMassKg = */ Constants.arm.armMass,
+        /* simulateGravity = */ true
     )
 
     val armEncoder = CANCoder(Constants.arm.encoder.id).apply {
@@ -63,17 +66,22 @@ class Arm : SubsystemBase() {
         Constants.arm.motor.kV,
         Constants.arm.motor.kA
     )
+
     val armPosition: Double
         get() = if (RobotBase.isSimulation()) simArmSystem.angleRads
-        else armEncoder.absolutePosition * ((2 * PI) / 360.0)
+        else toRadians(armEncoder.absolutePosition)
     val armVelocity: Double
-        get() = armEncoder.velocity
+        get() = toRadians(armEncoder.velocity)
     var armSetpoint: Double? = null
     fun setArmVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
     }
 
+    /**
+     * @param position angle in radians. 0 is upright, -pi/2 is horizontal over
+     * our intake.
+     */
     fun setArmPosition(position: Double) {
         armSetpoint = position
     }
@@ -83,30 +91,51 @@ class Arm : SubsystemBase() {
     val ArmMotorVoltage = ArmTab.add("Arm Motor Voltage", 0.0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(
-            mapOf("min" to -1.0, "max" to 1.0)
+            mapOf("min" to -12.0, "max" to 12.0)
         )
-        .getEntry()
+        .entry
     val ArmMotorPosition = ArmTab.add("Arm Motor Setpoint", 0.0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(
             mapOf("min" to -1.0, "max" to 1.0)
         )
         .entry
-    override fun periodic() {
-        val voltage = armFeedForward.calculate(
-            // convert from 0 being horizontal arm to 0 being upright
-            armPosition - (PI / 2), // FIXME: Test this
-            armVelocity,
-            armSetpoint ?: armPosition
-        ) + armPID.calculate(
-            armPosition,
-            armSetpoint ?: armPosition
+    val ArmFFMotorPosition = ArmTab.add("ArmFFMotorPosition", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf("min" to -12.0, "max" to 12.0)
         )
-        voltage.coerceIn(-1.0,1.0) // Fixme: remove this after testing
-        setArmVoltage(voltage)
+        .entry
+    val ArmPIDMotorPosition = ArmTab.add("ArmPIDMotorPosition", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf("min" to -12.0, "max" to 12.0)
+        )
+        .entry
+    val dashSetpoint = ArmTab.add("dashSetpoint", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf("min" to -PI, "max" to PI)
+        )
+        .entry
+
+    override fun periodic() {
+        var FF = armFeedForward.calculate(
+            // convert from 0 being horizontal arm to 0 being upright
+            armPosition + (PI / 2),
+            armVelocity
+        )
+        val calculate = armPID.calculate(armPosition, armSetpoint ?: 0.0)
+        val voltage = if (armSetpoint != null) {
+            FF + calculate
+        } else 0.0
+        setArmVoltage(voltage.coerceIn(-4.0, 4.0))
 
         // Shuffleboard stuff
         ArmMotorVoltage.setDouble(voltage)
+
+        ArmFFMotorPosition.setDouble(FF)
+        ArmPIDMotorPosition.setDouble(calculate)
 
 
         // SmartDashboard stuff

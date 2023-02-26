@@ -89,10 +89,10 @@ class Wrist : SubsystemBase() {
     }
 
     override fun periodic() {
-        if (setpoint != null) {
-            val output = pid.calculate(position, setpoint!!)
-            voltage = output
-        } else voltage = 0.0
+//        if (setpoint != null) {
+//            val output = pid.calculate(position, setpoint!!)
+//            voltage = output
+//        } else voltage = 0.0
     }
 
     override fun simulationPeriodic() {
