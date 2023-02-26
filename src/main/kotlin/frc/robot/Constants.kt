@@ -1,5 +1,7 @@
 package frc.robot
 
+import edu.wpi.first.math.util.Units.inchesToMeters
+import edu.wpi.first.math.util.Units.lbsToKilograms
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
@@ -40,16 +42,58 @@ object Constants {
         const val armMass = 1.0
         const val momentOfInertia = 1.0
     }
+    object Elevator {
+        val carriageMass = lbsToKilograms(27.5) // rough estimate (25-30 lbs)
+        val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+        val sproketRadius = inchesToMeters(1.25 / 2.0)
+
+        object elevatorMotor {
+            object Feedforward {
+                val kG: Double = 1.0
+
+                // a good starting point for kS is 1 / max voltage
+                val kS = 1.0 / 12.0
+                val kV = 1.0 / 12.0
+                val kA = 1.0 // 0.0
+            }
+
+            val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+            val gearRatio: Double = 170.0
+
+            object PID {
+                val kP = 10_000.0
+                val kI = 0.0
+                val kD: Double = 1000.0
+
+                object TrapezoidProfile {
+                    val maxVelocity: Double = 1.0
+                    val maxAcceleration: Double = 1.0
+                }
+            }
+
+            val ElevatorMotorId: Int = 32
+        }
+
+        object limitSwitch {
+            val ElevatorLimitSwitchId: Int = 0
+            val offset: Double = 0.0
+        }
+
+        object limits {
+            val bottomLimit: Double = inchesToMeters(20.0)
+            val topLimit: Double = inchesToMeters(45.0)
+        }
+    }
+    const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
-    const val BRZeroAngle = -10.0
-    const val BLZeroAngle = -29.7
-    const val FRZeroAngle = -102.2
-    const val FLZeroAngle = -47.9
-    const val FRDriveMotorId = 10
-    const val BLDriveMotorId = 11
-    const val FLDriveMotorId = 12
-
+    const val BRZeroAngle = 171.75
+    const val BLZeroAngle = 70.25
+    const val FRZeroAngle = 76.1
+    const val FLZeroAngle = 132.5
+    const val FRDriveMotorId = 10//fr
+    const val BLDriveMotorId = 11//bl
+    const val FLDriveMotorId = 12//fl
     const val BRDriveMotorId = 13
 
     const val FRTurnMotorId = 14

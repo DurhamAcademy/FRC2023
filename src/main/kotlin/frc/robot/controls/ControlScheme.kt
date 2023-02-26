@@ -17,6 +17,8 @@ abstract class ControlScheme {
     abstract val testBackLeft: Trigger
     abstract val testBackRight: Trigger
     abstract val testPercent: Double
+    abstract val elevatorTest: Trigger
+
     abstract val testGoToAprilTag1: Trigger
     abstract val testGoToZeroZero: Trigger
 
