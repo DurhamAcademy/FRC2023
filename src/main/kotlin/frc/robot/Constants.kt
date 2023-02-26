@@ -35,8 +35,8 @@ object Constants {
         }
 
         val simArmLength = inchesToMeters(10.0)
-        const val minAngle = -90.0
-        const val maxAngle = 180.0
+        const val minAngle = -PI / 2
+        const val maxAngle = PI / 2
         const val armMass = 1.0
         const val momentOfInertia = 1.0
     }
@@ -79,9 +79,9 @@ object Constants {
             const val gearRatio = 1 / 170.67
             const val maxVelocity = 1.0
             const val maxAcceleration = 1.0
-            const val kP = 7.6426
+            const val kP = 2.6426
             const val kI = 0.0
-            const val kD = 4.2626
+            const val kD = 1.2626
 
             const val kS = 0.086989
             const val kG = 0.42677
@@ -91,7 +91,7 @@ object Constants {
 
         object encoder {
             const val id = 18
-            const val offset = 0.0
+            const val offset = 131.83
             const val inverted = false
         }
 

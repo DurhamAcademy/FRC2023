@@ -10,9 +10,9 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
-import kotlin.math.PI
 
 class Wrist : SubsystemBase() {
     private val wristMotor = CANSparkMax(
@@ -31,7 +31,6 @@ class Wrist : SubsystemBase() {
         Constants.wrist.simArmLength,
         Constants.wrist.minAngle,
         Constants.wrist.maxAngle,
-        Constants.wrist.armMass,
         true
     )
 
@@ -66,7 +65,7 @@ class Wrist : SubsystemBase() {
     )
     val position: Double
         get() = if (RobotBase.isSimulation()) simWristSystem.angleRads
-        else wristEncoder.absolutePosition * ((2 * PI) / 360.0)
+        else Math.toRadians(wristEncoder.absolutePosition)
     val velocity: Double
         get() = wristEncoder.velocity
     var setpoint: Double? = null
@@ -78,8 +77,12 @@ class Wrist : SubsystemBase() {
         }
 
     fun setPosition(position: Double) {
-        setpoint = position
+        setpoint = position.coerceIn(
+            Constants.wrist.minAngle,
+            Constants.wrist.maxAngle
+        )
     }
+
     val armVelocity: Double
         get() = wristEncoder.velocity
     var armSetpoint: Double? = null
@@ -88,11 +91,19 @@ class Wrist : SubsystemBase() {
         else wristMotor.setVoltage(voltage)
     }
 
+    fun reset() {
+        pid.reset(position)
+        println("RESET")
+    }
+
     override fun periodic() {
-//        if (setpoint != null) {
-//            val output = pid.calculate(position, setpoint!!)
-//            voltage = output
-//        } else voltage = 0.0
+        if (setpoint != null) {
+            voltage = pid.calculate(position, setpoint!!).coerceIn(-12.0..12.0)
+        }
+        SmartDashboard.putNumber("wrist/encoder", position)
+        SmartDashboard.putNumber("wrist/velocity", velocity)
+        SmartDashboard.putNumber("wrist/setpoint", setpoint ?: 0.0)
+        SmartDashboard.putNumber("wrist/voltage", voltage)
     }
 
     override fun simulationPeriodic() {

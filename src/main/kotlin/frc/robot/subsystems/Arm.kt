@@ -30,36 +30,30 @@ class Arm : SubsystemBase() {
         inverted = Constants.arm.motor.inverted
     }
     val simArmSystem = SingleJointedArmSim(
-        /* gearbox = */ DCMotor.getNEO(1),
-        /* gearing = */ Constants.arm.motor.gearRatio,
-        /* jKgMetersSquared = */ Constants.arm.momentOfInertia,
-        /* armLengthMeters = */ Constants.arm.armLength,
-        /* minAngleRads = */ Constants.arm.minAngle,
-        /* maxAngleRads = */ Constants.arm.maxAngle,
-        /* armMassKg = */ Constants.arm.armMass,
-        /* simulateGravity = */ true
+        DCMotor.getNEO(1),
+        Constants.arm.motor.gearRatio,
+        Constants.arm.momentOfInertia,
+        Constants.arm.armLength,
+        Constants.arm.minAngle,
+        Constants.arm.maxAngle,
+        true
     )
 
     val armEncoder = CANCoder(Constants.arm.encoder.id).apply {
         configFactoryDefault()
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        configMagnetOffset(Constants.arm.encoder.offset)
+        configMagnetOffset(-Constants.arm.encoder.offset)
         configSensorDirection(Constants.arm.encoder.inverted)
     }
     val armPID = ProfiledPIDController(
-        Constants.arm.motor.kP,
-        Constants.arm.motor.kI,
-        Constants.arm.motor.kD,
+        5.0,
+        0.0,
+        0.5,
         TrapezoidProfile.Constraints(
-            Constants.arm.motor.maxVelocity,
-            Constants.arm.motor.maxAcceleration
+            1.0,
+            1.0
         )
-    ).apply {
-        setTolerance(
-            Constants.arm.motor.positionTolerance,
-            Constants.arm.motor.velocityTolerance
-        )
-    }
+    )
     var armFeedForward = ArmFeedforward(
         Constants.arm.motor.kS,
         Constants.arm.motor.kG,
@@ -78,12 +72,18 @@ class Arm : SubsystemBase() {
         else armMotor.setVoltage(voltage)
     }
 
+    fun reset() {
+        armPID.reset(armPosition)
+        println("RESET")
+    }
+
     /**
      * @param position angle in radians. 0 is upright, -pi/2 is horizontal over
      * our intake.
      */
     fun setArmPosition(position: Double) {
         armSetpoint = position
+
     }
 
     // shuffleboard
@@ -120,12 +120,19 @@ class Arm : SubsystemBase() {
         .entry
 
     override fun periodic() {
+        SmartDashboard.putNumber("arm/POS", armPosition)
+        SmartDashboard.putNumber("arm/SP", armSetpoint ?: -99999.0)
+
+        val calculate = armPID.calculate(
+            armPosition,
+            armSetpoint ?: 0.0
+        )
         var FF = armFeedForward.calculate(
             // convert from 0 being horizontal arm to 0 being upright
             armPosition + (PI / 2),
-            armVelocity
+            armPID.setpoint.velocity
         )
-        val calculate = armPID.calculate(armPosition, armSetpoint ?: 0.0)
+
         val voltage = if (armSetpoint != null) {
             FF + calculate
         } else 0.0
@@ -133,6 +140,9 @@ class Arm : SubsystemBase() {
 
         // Shuffleboard stuff
         ArmMotorVoltage.setDouble(voltage)
+
+        SmartDashboard.putNumber("arm/SPVel", armPID.setpoint.velocity)
+        SmartDashboard.putNumber("arm/SPErr", armPID.setpoint.position)
 
         ArmFFMotorPosition.setDouble(FF)
         ArmPIDMotorPosition.setDouble(calculate)

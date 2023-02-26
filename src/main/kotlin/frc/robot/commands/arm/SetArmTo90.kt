@@ -11,7 +11,7 @@ class SetArmTo90(
     }
 
     override fun initialize() {
-        arm.setArmPosition(arm.dashSetpoint.getDouble(0.0))
+        arm.reset()
     }
 
     override fun execute() {
