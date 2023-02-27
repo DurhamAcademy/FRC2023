@@ -8,6 +8,7 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.ElevatorSim
 import edu.wpi.first.wpilibj.simulation.RoboRioSim
@@ -24,6 +25,8 @@ class Elevator(
     ).apply {
         configFactoryDefault()
         setNeutralMode(NeutralMode.Brake)
+        inverted = Constants.Elevator.elevatorMotor.inverted
+        selectedSensorPosition = 0.0
     }
     val motorPid = ProfiledPIDController(
         Constants.Elevator.elevatorMotor.PID.kP,
@@ -57,14 +60,16 @@ class Elevator(
     )
     var offset: Double = 0.0
     var simOffset: Double =
-        Math.random() * (Constants.Elevator.limits.topLimit - Constants.Elevator.limits.bottomLimit) * 5
+        Math.random() * (Constants.Elevator.limits.topLimit -
+                Constants.Elevator.limits.bottomLimit) * 5
     var height: Double
         get() = if (RobotBase.isSimulation())
             elevatorSim.positionMeters// + simOffset + offset
         else
             (elevatorMotor.selectedSensorPosition *
                     Constants.Elevator.encoderDistancePerPulse *
-                    Constants.Elevator.elevatorMotor.gearRatio) +
+                    Constants.Elevator.elevatorMotor.gearRatio *
+                    Constants.Elevator.sproketRadius * 2 * Math.PI) +
                     Constants.Elevator.limits.bottomLimit +
                     offset
         set(value) {
@@ -83,23 +88,24 @@ class Elevator(
                         Constants.Elevator.limits.bottomLimit
         }
 
-    var setpoint: Double
+    var setpoint: Double = Constants.Elevator.limits.bottomLimit
         set(value) {
-            if (value > Constants.Elevator.limits.topLimit)
-                if (value < Constants.Elevator.limits.bottomLimit)
-                    motorPid.goal = TrapezoidProfile.State(value, 0.0)
-                else
-                    motorPid.goal = TrapezoidProfile.State(Constants.Elevator.limits.bottomLimit, 0.0)
-            else
-                motorPid.goal = TrapezoidProfile.State(Constants.Elevator.limits.topLimit, 0.0)
+            field = value.coerceIn(
+                Constants.Elevator.limits.bottomLimit,
+                Constants.Elevator.limits.topLimit
+            )
         }
-        get() = motorPid.goal.position
 
     fun setMotorVoltage(voltage: Double) {
         if (RobotBase.isSimulation())
-            elevatorSim.setInputVoltage(voltage.coerceIn(-RoboRioSim.getVInVoltage(), RoboRioSim.getVInVoltage()))
+            elevatorSim.setInputVoltage(
+                voltage.coerceIn(
+                    -RoboRioSim.getVInVoltage(),
+                    RoboRioSim.getVInVoltage()
+                )
+            )
         else
-            elevatorMotor.setVoltage(voltage)
+            elevatorMotor.setVoltage(voltage.coerceIn(-8.0, 8.0))
     }
 
 
@@ -118,6 +124,8 @@ class Elevator(
         }
     private var lastLimitSwitch: Boolean = false
 
+    private var lastVel = 0.0
+    private var lastTime = 0.0
     override fun periodic() {
         // limits
         if(limitSwitch.get()){
@@ -127,12 +135,16 @@ class Elevator(
         setMotorVoltage(
             motorPid.calculate(
                 height,
-                motorPid.goal
+                setpoint
             ) + feedforward.calculate(
-                height,
-                motorPid.goal.velocity
+                motorPid.setpoint.velocity,
+//                (motorPid.setpoint.velocity - lastVel) /
+//                        (Timer.getFPGATimestamp() - lastTime)
             )
         )
+        lastVel = motorPid.goal.velocity
+        lastTime = Timer.getFPGATimestamp()
+
 //        setMotorVoltage(voltageSetEntry.getDouble(0.0))
 
         // check if its in teleop
@@ -162,8 +174,14 @@ class Elevator(
             if (RobotBase.isSimulation()) elevatorSim.currentDrawAmps
             else elevatorMotor.statorCurrent
         )
-        SmartDashboard.putBoolean("Has hit bottom limit", elevatorSim.hasHitLowerLimit())
-        SmartDashboard.putBoolean("Has hit top limit", elevatorSim.hasHitUpperLimit())
+        SmartDashboard.putBoolean(
+            "Has hit bottom limit",
+            elevatorSim.hasHitLowerLimit()
+        )
+        SmartDashboard.putBoolean(
+            "Has hit top limit",
+            elevatorSim.hasHitUpperLimit()
+        )
         // just set the motor voltage to the control scheme's output
     }
 }

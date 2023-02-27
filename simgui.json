@@ -96,13 +96,19 @@
     }
   },
   "NetworkTables": {
+    "Shuffleboard": {
+      "Arm": {
+        "open": true
+      },
+      "open": true
+    },
     "LiveWindow": {
       "open": true
     },
-    "Shuffleboard": {
-      "open": true
-    },
     "SmartDashboard": {
+      "arm": {
+        "open": true
+      },
       "open": true
     },
     "combined": true,

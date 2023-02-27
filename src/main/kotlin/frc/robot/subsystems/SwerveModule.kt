@@ -136,6 +136,8 @@ class SwerveModule(
                 drivePid.setpoint.position,
                 drivePid.setpoint.velocity
             )
+        SmartDashboard.putNumber("drivetrain/posset", drivePid.setpoint.position)
+        SmartDashboard.putNumber("drivetrain/posvel", drivePid.setpoint.velocity)
         val anglePower = -(anglePid.calculate(
             degreesToRadians(this.turnEncoder.absolutePosition),
             setpoint.angle.radians
