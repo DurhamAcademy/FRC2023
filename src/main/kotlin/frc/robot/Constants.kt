@@ -18,9 +18,9 @@ object Constants {
             const val currentLimit = 40
             const val inverted = true
             const val gearRatio = 1.0
-            const val maxVelocity = 1.0
-            const val maxAcceleration = 1.0
-            const val kP = 12.0
+            const val maxVelocity = 8.0
+            const val maxAcceleration = 6.0
+            const val kP = 20.0
             const val kI = 0.0
             const val kD = 0.0
             const val kS = 1.0
