@@ -58,6 +58,7 @@ class RobotContainer {
                     GrabConeCommand(manipulator)
                         .until { manipulator.objectType == GamePiece.cone }
                         .andThen(HoldConeCommand(manipulator))
+                        .repeatedly()
                 )
 
             // assign the hold cone trigger to the command that

@@ -48,11 +48,11 @@ object Constants {
     )
 
     object ManipulatorConstants {
-        const val motorId = 0
-        const val leftSolenoidForward = 1
-        const val leftSolenoidReverse = 2
+        const val motorId = 31
+        const val leftSolenoidForward = 0
+        const val leftSolenoidReverse = 1
         const val rightSolenoidForward = 3
-        const val rightSolenoidReverse = 4
+        const val rightSolenoidReverse = 2
         const val manipulatorCurrent = 20
         const val manipulatorCurrentLimit = 10.0
 

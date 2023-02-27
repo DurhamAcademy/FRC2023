@@ -34,14 +34,14 @@ class Manipulator: SubsystemBase() {
 
     var isOpen: Boolean?
         get() = when (leftsolenoid.get()) {
-            Value.kForward -> true
-            Value.kReverse -> false
+            Value.kForward -> false
+            Value.kReverse -> true
             else -> null
         }
         set(value) {
             val v = when (value) {
-                true -> Value.kForward
-                false -> Value.kReverse
+                false -> Value.kForward
+                true -> Value.kReverse
                 else -> Value.kOff
             }
             leftsolenoid.set(v)
@@ -114,7 +114,7 @@ class Manipulator: SubsystemBase() {
             if (inColorRange!!) {
                 val color = colorSensor.color
                 val match = colorMatch.matchColor(color)
-                if (match.confidence < ManipConsts.confidenceThreshold)
+                if (match == null || match.confidence < ManipConsts.confidenceThreshold)
                     GamePiece.unknown
                 else when (match.color) {
                     ManipConsts.Colors.purpleCube -> GamePiece.cube

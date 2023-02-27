@@ -12,7 +12,7 @@ class GrabConeCommand(
     }
 
     override fun initialize() {
-        manipulator.isOpen = true
+        manipulator.isOpen = false
     }
 
     override fun execute() {
