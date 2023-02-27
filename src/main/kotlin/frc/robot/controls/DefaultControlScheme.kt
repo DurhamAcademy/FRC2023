@@ -66,4 +66,17 @@ class DefaultControlScheme(
 
     override val testGoToZeroZero: Trigger
         get() = xboxCon.x()
+
+
+    override val openManipulator: Trigger
+        get() = Trigger { false }
+
+    override val closeManipulator: Trigger
+        get() = Trigger { false }
+
+    override val grabCone: Trigger
+        get() = xboxCon.start()
+
+    override val holdCone: Trigger
+        get() = xboxCon.back()
 }

@@ -20,4 +20,9 @@ abstract class ControlScheme {
 
     abstract val testGoToAprilTag1: Trigger
     abstract val testGoToZeroZero: Trigger
+
+    abstract val openManipulator: Trigger
+    abstract val closeManipulator: Trigger
+    abstract val grabCone: Trigger
+    abstract val holdCone: Trigger
 }

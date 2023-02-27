@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.math.util.Units.inchesToMeters
+import edu.wpi.first.wpilibj.util.Color
 import frc.robot.utils.Area
 import kotlin.math.PI
 
@@ -52,7 +53,14 @@ object Constants {
         const val leftSolenoidReverse = 2
         const val rightSolenoidForward = 3
         const val rightSolenoidReverse = 4
-        const val manipulatorVoltage = 20
+        const val manipulatorCurrentLimit = 10.0
+
+        const val confidenceThreshold = 0.95
+
+        object Colors {
+            val purpleCube = Color(0.19, 0.07, 0.77)
+            val yellowCone = Color(0.95, 0.77, 0.06)
+        }
     }
 
     object VisionConstants {
