@@ -5,31 +5,33 @@ import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.MoveToPosition
 import frc.robot.commands.arm.SetArmToAngle
-import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.commands.manipulator.CloseManipulator
 import frc.robot.commands.manipulator.GrabConeCommand
 import frc.robot.commands.manipulator.HoldConeCommand
 import frc.robot.commands.manipulator.OpenManipulator
+import frc.robot.commands.wrist.LevelWrist
+import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.controls.ControlScheme
 import frc.robot.controls.DefaultControlScheme
-import frc.robot.subsystems.Arm
-import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.Elevator
-import frc.robot.subsystems.Wrist
+import frc.robot.subsystems.*
+import java.lang.Math.toRadians
 import kotlin.math.PI
-import frc.robot.subsystems.Manipulator
 
 class RobotContainer {
     val xbox = CommandXboxController(0)
     val controlScheme: ControlScheme = DefaultControlScheme(xbox)
 
-//    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
+    //    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
     val manipulator = Manipulator()
 
     val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(/*cameraWrapper*/))
     val elevator = Elevator(controlScheme)
     val arm = Arm()
-    val wrist = Wrist()
+    val wrist = Wrist().apply {
+        defaultCommand = LevelWrist(
+            this, arm, toRadians(60.0)
+        )
+    }
 
     init {
         controlScheme.run {
