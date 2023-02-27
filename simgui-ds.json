@@ -24,15 +24,12 @@
         {
           "decKey": 69,
           "incKey": 81
-        },
-        {
-          "incKey": 90
         }
       ],
       "axisCount": 6,
       "buttonCount": 12,
       "buttonKeys": [
-        -1,
+        90,
         88,
         67,
         86,

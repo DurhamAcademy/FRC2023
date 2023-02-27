@@ -19,10 +19,10 @@ name: Scan with Detekt
 
 on:
   # Triggers the workflow on push or pull request events but only for default and protected branches
-  #  push:
-  #    branches: [ "main" ]
-  #  pull_request:
-  #    branches: [ "main" ]
+#  push:
+#    branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
   # --- DISABLED WHILE REPO IS PRIVATE ---
 
   # Allows you to run this workflow manually from the Actions tab
