@@ -2,8 +2,10 @@ package frc.robot
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.robot.commands.MoveToPosition
+import frc.robot.commands.manipulator.CloseManipulator
 import frc.robot.commands.manipulator.GrabConeCommand
 import frc.robot.commands.manipulator.HoldConeCommand
+import frc.robot.commands.manipulator.OpenManipulator
 import frc.robot.controls.ControlScheme
 import frc.robot.controls.DefaultControlScheme
 import frc.robot.subsystems.Drivetrain
@@ -14,7 +16,7 @@ class RobotContainer {
     val controlScheme: ControlScheme = DefaultControlScheme(xbox)
 
     var cameraWrapper = PhotonCameraWrapper()
-    val manipulator = Manipulator(cameraWrapper)
+    val manipulator = Manipulator()
 
     @Suppress("unused")
     val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(cameraWrapper))
@@ -39,14 +41,14 @@ class RobotContainer {
             // opens the manipulator
             openManipulator
                 .onTrue(
-                    OpenManipulatorCommand(manipulator)
+                    OpenManipulator(manipulator)
                 )
 
             // assign the close manipulator trigger to the command that
             // closes the manipulator
             closeManipulator
                 .onTrue(
-                    CloseManipulatorCommand(manipulator)
+                    CloseManipulator(manipulator)
                 )
 
             // assign the grab cone trigger to the command that
