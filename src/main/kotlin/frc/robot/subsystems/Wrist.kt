@@ -10,20 +10,20 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import kotlin.math.PI
 
 class Wrist() : SubsystemBase() {
-
-
-    private val motor = CANSparkMax(
+    private val wristMotor = CANSparkMax(
         Constants.wrist.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
         restoreFactoryDefaults()
         setSmartCurrentLimit(Constants.wrist.motor.currentLimit)
         inverted = Constants.wrist.motor.inverted
+        idleMode = CANSparkMax.IdleMode.kBrake
     }
     private val simWristSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
@@ -32,14 +32,13 @@ class Wrist() : SubsystemBase() {
         Constants.wrist.simArmLength,
         Constants.wrist.minAngle,
         Constants.wrist.maxAngle,
-        Constants.wrist.armMass,
         true
     )
 
-    private val encoder = CANCoder(Constants.wrist.encoder.id).apply {
+    private val wristEncoder = CANCoder(Constants.wrist.encoder.id).apply {
         configFactoryDefault()
-        configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360)
-        configMagnetOffset(Constants.wrist.encoder.offset)
+        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
+        configMagnetOffset(-Constants.wrist.encoder.offset)
         configSensorDirection(Constants.wrist.encoder.inverted)
     }
     private val pid = ProfiledPIDController(
@@ -67,26 +66,46 @@ class Wrist() : SubsystemBase() {
     )
     val position: Double
         get() = if (RobotBase.isSimulation()) simWristSystem.angleRads
-        else encoder.absolutePosition * ((2 * PI) / 360.0)
+        else Math.toRadians(wristEncoder.absolutePosition)
     val velocity: Double
-        get() = encoder.velocity
+        get() = wristEncoder.velocity
     var setpoint: Double? = null
     var voltage: Double = 0.0
         set(value) {
             if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
-            else motor.setVoltage(voltage)
+            else wristMotor.setVoltage(voltage)
             field = value
         }
 
     fun setPosition(position: Double) {
-        setpoint = position
+        setpoint = position.coerceIn(
+            Constants.wrist.minAngle,
+            Constants.wrist.maxAngle
+        )
+    }
+
+    val wristVelocity: Double
+        get() = wristEncoder.velocity
+    var wristSetpoint: Double? = null
+    fun setWristVoltage(voltage: Double) {
+        if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
+        else wristMotor.setVoltage(voltage)
+    }
+
+    fun reset() {
+        pid.reset(position)
+        println("RESET")
     }
 
     override fun periodic() {
+        val output = pid.calculate(position, setpoint ?: position)
+        SmartDashboard.putNumber("wrist/position", position)
+        SmartDashboard.putNumber("wrist/velocity", velocity)
+        SmartDashboard.putNumber("wrist/setpoint", setpoint ?: position)
+        SmartDashboard.putNumber("wrist/output", output)
         if (setpoint != null) {
-            val output = pid.calculate(position, setpoint!!)
             voltage = output
-        }
+        } else voltage = 0.0
     }
 
     override fun simulationPeriodic() {

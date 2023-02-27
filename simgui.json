@@ -96,6 +96,15 @@
     }
   },
   "NetworkTables": {
+    "Shuffleboard": {
+      "Arm": {
+        "open": true
+      },
+      "open": true
+    },
+    "LiveWindow": {
+      "open": true
+    },
     "SmartDashboard": {
       "arm": {
         "open": true
@@ -235,7 +244,7 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/arm/Position"
+              "id": "NT:/SmartDashboard/Elevator Height"
             }
           ]
         }
