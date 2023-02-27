@@ -35,21 +35,61 @@ object Constants {
         }
 
         val simArmLength = inchesToMeters(10.0)
-        const val minAngle = -90.0
-        const val maxAngle = 90.0
+        const val minAngle = -PI / 2
+        const val maxAngle = PI / 2
         const val armMass = 1.0
         const val momentOfInertia = 1.0
     }
+    object Elevator {
+        val carriageMass = lbsToKilograms(27.5) // rough estimate (25-30 lbs)
+        val encoderDistancePerPulse: Double = 1.0 / 2_048.0
+        val sproketRadius = inchesToMeters(1.25 / 2.0)
 
+        object elevatorMotor {
+            object Feedforward {
+                val kG: Double = .32348
+                val kS = .053817
+                val kV = 10.248
+                val kA = .28817
+            }
+
+            val inverted = true
+            val gearRatio: Double = 1 / 10.51
+
+            object PID {
+                val kP = 32.5 / 6
+                val kI = 0.0
+                val kD: Double = 3.429
+
+                object TrapezoidProfile {
+                    val maxVelocity: Double = 2.0
+                    val maxAcceleration: Double = 1.0
+                }
+            }
+
+            val ElevatorMotorId: Int = 32
+        }
+
+        object limitSwitch {
+            val ElevatorLimitSwitchId: Int = 0
+            val offset: Double = 0.0
+        }
+
+        object limits {
+            val bottomLimit: Double = inchesToMeters(20.0)
+            val topLimit: Double = inchesToMeters(45.0)
+        }
+    }
+    const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
-    const val BRZeroAngle = -10.0
-    const val BLZeroAngle = -29.7
-    const val FRZeroAngle = -102.2
-    const val FLZeroAngle = -47.9
-    const val FRDriveMotorId = 10
-    const val BLDriveMotorId = 11
-    const val FLDriveMotorId = 12
+    const val BRZeroAngle = 171.75
+    const val BLZeroAngle = 70.25
+    const val FRZeroAngle = 76.1
+    const val FLZeroAngle = 132.5
+    const val FRDriveMotorId = 10//fr
+    const val BLDriveMotorId = 11//bl
+    const val FLDriveMotorId = 12//fl
     const val BRDriveMotorId = 13
 
     const val FRTurnMotorId = 14
@@ -76,22 +116,22 @@ object Constants {
             const val id = 34
             const val currentLimit = 40
             const val inverted = false
-            const val gearRatio = 1/170.67
+            const val gearRatio = 1 / 170.67
             const val maxVelocity = 1.0
             const val maxAcceleration = 1.0
-            const val kP = 12.0
+            const val kP = 2.6426
             const val kI = 0.0
-            const val kD = 0.0
+            const val kD = 1.2626
 
-            const val kS = 1.0
-            const val kG = 12.0
-            const val kV = 1.0
-            const val kA = 1.0
+            const val kS = 0.086989
+            const val kG = 0.42677
+            const val kV = 3.2483
+            const val kA = 0.34796
         }
 
         object encoder {
             const val id = 18
-            const val offset = 0.0
+            const val offset = 131.83
             const val inverted = false
         }
 
@@ -108,6 +148,15 @@ object Constants {
         Translation3d(0.0, 0.029, 0.0),
         Rotation3d(0.0, 0.0, PI / 2)
     )
+
+    object ManipulatorConstants {
+        const val motorId = 0
+        const val leftSolenoidForward = 1
+        const val leftSolenoidReverse = 2
+        const val rightSolenoidForward = 3
+        const val rightSolenoidReverse = 4
+        const val manipulatorCurrent = 20
+    }
 
     object VisionConstants {
         const val cameraName: String = "OV9281"

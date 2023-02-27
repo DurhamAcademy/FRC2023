@@ -60,15 +60,18 @@ class DefaultControlScheme(
             val brake = xboxCon.leftTriggerAxis.coerceIn(0.0, 1.0)
             return throttle - brake
         }
+    override val elevatorTest: Trigger
+        get() = xboxCon.rightBumper().and(testMode)
 
     override val testGoToAprilTag1: Trigger
-        get() = xboxCon.y()
+        get() = xboxCon.y().and { false }
 
     override val testGoToZeroZero: Trigger
-        get() = xboxCon.x()
+        get() = xboxCon.x().and { false }
     override val testArm90: Trigger
-        get() = xboxCon.a()
-
+        get() = xboxCon.povLeft()
     override val testArm0: Trigger
-        get() = xboxCon.b()
+        get() = xboxCon.povUp()
+    override val testArmNeg90: Trigger
+        get() = xboxCon.povRight()
 }

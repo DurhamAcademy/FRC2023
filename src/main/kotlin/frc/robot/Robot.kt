@@ -1,6 +1,5 @@
 package frc.robot
 
-import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
@@ -18,14 +17,13 @@ class Robot : TimedRobot() {
 
     override fun robotInit() {
         robotContainer = RobotContainer()
-        robotContainer.drivetrain.zeroHeading()
     }
 
     override fun robotPeriodic() {
         CommandScheduler.getInstance().run()
-        robotContainer.cameraWrapper.getEstimatedGlobalPose(Pose2d()).ifPresent {
-            SmartDashboard.putNumber("tagX", it.estimatedPose.x)
-        }
+//        robotContainer.cameraWrapper.getEstimatedGlobalPose(Pose2d()).ifPresent {
+//            SmartDashboard.putNumber("tagX", it.estimatedPose.x)
+//        }
 //        SmartDashboard.
         robotContainer.drivetrain.poseEstimator.estimatedPosition.run {
             SmartDashboard.putNumber("poseRotation", rotation.rotations)

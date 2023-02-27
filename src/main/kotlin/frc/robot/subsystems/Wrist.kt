@@ -32,7 +32,6 @@ class Wrist : SubsystemBase() {
         Constants.wrist.simArmLength,
         Constants.wrist.minAngle,
         Constants.wrist.maxAngle,
-        Constants.wrist.armMass,
         true
     )
 
@@ -67,7 +66,7 @@ class Wrist : SubsystemBase() {
     )
     val position: Double
         get() = if (RobotBase.isSimulation()) simWristSystem.angleRads
-        else wristEncoder.absolutePosition * ((2 * PI) / 360.0)
+        else Math.toRadians(wristEncoder.absolutePosition)
     val velocity: Double
         get() = wristEncoder.velocity
     var setpoint: Double? = null
@@ -79,14 +78,23 @@ class Wrist : SubsystemBase() {
         }
 
     fun setPosition(position: Double) {
-        setpoint = position
+        setpoint = position.coerceIn(
+            Constants.wrist.minAngle,
+            Constants.wrist.maxAngle
+        )
     }
+
     val wristVelocity: Double
         get() = wristEncoder.velocity
     var wristSetpoint: Double? = null
     fun setWristVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
         else wristMotor.setVoltage(voltage)
+    }
+
+    fun reset() {
+        pid.reset(position)
+        println("RESET")
     }
 
     override fun periodic() {
