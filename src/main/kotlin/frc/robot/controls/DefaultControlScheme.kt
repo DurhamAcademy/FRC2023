@@ -81,4 +81,16 @@ class DefaultControlScheme(
         get() = xboxCon.povDown()
     override val testWristNeg90: Trigger
         get() = xboxCon.leftBumper()
+
+    override val openManipulator: Trigger
+        get() = Trigger { false }
+
+    override val closeManipulator: Trigger
+        get() = Trigger { false }
+
+    override val grabCone: Trigger
+        get() = xboxCon.start()
+
+    override val holdCone: Trigger
+        get() = xboxCon.back()
 }

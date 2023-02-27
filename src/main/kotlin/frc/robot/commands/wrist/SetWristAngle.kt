@@ -15,15 +15,4 @@ class SetWristAngle(
     override fun initialize() {
         wrist.setPosition(angle.coerceIn(-PI / 2, PI / 2))
     }
-
-    override fun execute() {
-    }
-
-    override fun end(interrupted: Boolean) {
-
-    }
-
-    override fun isFinished(): Boolean {
-        return true
-    }
 }
