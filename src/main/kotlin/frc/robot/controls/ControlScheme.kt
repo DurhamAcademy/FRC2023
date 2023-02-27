@@ -29,4 +29,9 @@ abstract class ControlScheme {
     abstract val testWrist90: Trigger
     abstract val testWrist0: Trigger
     abstract val testWristNeg90: Trigger
+
+    abstract val openManipulator: Trigger
+    abstract val closeManipulator: Trigger
+    abstract val grabCone: Trigger
+    abstract val holdCone: Trigger
 }
