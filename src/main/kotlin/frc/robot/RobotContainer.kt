@@ -57,6 +57,21 @@ class RobotContainer {
                 .whileTrue(
                     SetArmToAngle(arm, -PI / 2)
                 )
+
+            // assign the wrist 90 trigger to the command that
+            // moves the wrist to 90 degrees
+            testWrist90
+                .whileTrue(
+                    SetWristAngle(wrist, PI / 2)
+                )
+            testWrist0
+                .whileTrue(
+                    SetWristAngle(wrist, 0.0)
+                )
+            testWristNeg90
+                .whileTrue(
+                    SetWristAngle(wrist, -PI / 2)
+                )
         }
 
     }

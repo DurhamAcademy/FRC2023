@@ -74,4 +74,11 @@ class DefaultControlScheme(
         get() = xboxCon.povUp()
     override val testArmNeg90: Trigger
         get() = xboxCon.povRight()
+
+    override val testWrist90: Trigger
+        get() = xboxCon.rightBumper()
+    override val testWrist0: Trigger
+        get() = xboxCon.povDown()
+    override val testWristNeg90: Trigger
+        get() = xboxCon.leftBumper()
 }
