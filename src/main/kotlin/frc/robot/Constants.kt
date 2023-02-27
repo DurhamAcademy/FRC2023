@@ -53,6 +53,7 @@ object Constants {
         const val leftSolenoidReverse = 2
         const val rightSolenoidForward = 3
         const val rightSolenoidReverse = 4
+        const val manipulatorCurrent = 20
         const val manipulatorCurrentLimit = 10.0
 
         const val confidenceThreshold = 0.95

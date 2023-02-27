@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.robot.Constants.ManipulatorConstants.manipulatorCurrent
 import frc.robot.Constants.ManipulatorConstants.leftSolenoidForward
 import frc.robot.Constants.ManipulatorConstants.leftSolenoidReverse
 import frc.robot.Constants.ManipulatorConstants.motorId
