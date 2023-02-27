@@ -30,9 +30,9 @@ class Manipulator: SubsystemBase() {
         get() = leftsolenoid.get() == Value.kForward
         set(value) {
             val v =
-                    if (value == null) Value.kOff
-                    else if (value) Value.kForward
-                    else Value.kReverse
+                if (value == null) Value.kOff
+                else if (value) Value.kForward
+                else Value.kReverse
             leftsolenoid.set(v)
             rightsolenoid.set(v)
         }
@@ -46,6 +46,33 @@ class Manipulator: SubsystemBase() {
 
     val i2cPort = I2C.Port.kOnboard
     val colorSensor = ColorSensorV3(i2cPort)
+
+
+    var proximity: Double
+        get() = colorSensor.proximity.toDouble()
+        set(value) {
+        }
+
+    var color: Color
+        get() = colorSensor.color
+        set(value) {
+        }
+
+    fun getDist(): Double {
+        return proximity
+    }
+
+    fun getBlue(): Double {
+        return color.blue
+    }
+
+    fun getRed(): Double {
+        return color.red
+    }
+    fun getGreen(): Double {
+        return color.green
+    }
+
 
     override fun periodic() {
         val detectedColor: Color = colorSensor.color
