@@ -19,8 +19,11 @@ import frc.robot.Constants
 //import frc.robot.utils.createArmSystemPlant
 import java.lang.Math.PI
 import java.lang.Math.toRadians
+import javax.swing.text.Position
 
-class Arm : SubsystemBase() {
+class Arm(
+    var wrist: Wrist
+): SubsystemBase(){
     val armMotor = CANSparkMax(
         Constants.arm.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -67,6 +70,7 @@ class Arm : SubsystemBase() {
     val armVelocity: Double
         get() = toRadians(armEncoder.velocity)
     var armSetpoint: Double? = null
+
     fun setArmVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
@@ -75,15 +79,6 @@ class Arm : SubsystemBase() {
     fun reset() {
         armPID.reset(armPosition)
         println("RESET")
-    }
-
-    /**
-     * @param position angle in radians. 0 is upright, -pi/2 is horizontal over
-     * our intake.
-     */
-    fun setArmPosition(position: Double) {
-        armSetpoint = position
-
     }
 
     // shuffleboard
@@ -119,6 +114,10 @@ class Arm : SubsystemBase() {
         )
         .entry
 
+    fun armWristSafety(): Boolean {
+        return wrist.position > 30 || wrist.position < -30
+    }
+
     override fun periodic() {
         SmartDashboard.putNumber("arm/POS", armPosition)
         SmartDashboard.putNumber("arm/SP", armSetpoint ?: -99999.0)
@@ -152,9 +151,23 @@ class Arm : SubsystemBase() {
         SmartDashboard.putNumber("arm/Position", armPosition)
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
         SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
+
+        if(armWristSafety()){
+            setArmVoltage(0.0)
+        }
+
     }
 
     override fun simulationPeriodic() {
         simArmSystem.update(0.02)
+    }
+
+    /**
+     * @param position angle in radians. 0 is upright, -pi/2 is horizontal over
+     * our intake.
+     */
+    fun setArmPosition(position: Double) {
+        armSetpoint = position
+
     }
 }
