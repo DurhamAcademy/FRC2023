@@ -54,6 +54,11 @@ object Constants {
                 val kA = .28817
             }
 
+            object tolerance {
+                val positionTolerance: Double = 0.01
+                val velocityTolerance: Double = 0.01
+            }
+
             val inverted = true
             val gearRatio: Double = 1 / 10.51
 

@@ -4,11 +4,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.MoveToPosition
+import frc.robot.commands.alltogether.P2
 import frc.robot.commands.arm.SetArmToAngle
-import frc.robot.commands.manipulator.CloseManipulator
-import frc.robot.commands.manipulator.GrabConeCommand
-import frc.robot.commands.manipulator.HoldConeCommand
-import frc.robot.commands.manipulator.OpenManipulator
+import frc.robot.commands.manipulator.*
 import frc.robot.commands.wrist.LevelWrist
 import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.controls.ControlScheme
@@ -74,7 +72,9 @@ class RobotContainer {
                 )
             testWrist0
                 .whileTrue(
-                    SetWristAngle(wrist, 0.0)
+//                    OpenManipulator(manipulator)
+//                        .andThen(
+                    SetManipulatorSpeed(manipulator, -0.1)//)
                 )
             testWristNeg90
                 .whileTrue(
@@ -109,7 +109,7 @@ class RobotContainer {
             // holds a cone
             holdCone
                 .whileTrue(
-                    HoldConeCommand(manipulator)
+                    P2(arm, elevator, wrist)//HoldConeCommand(manipulator)
                 )
         }
 

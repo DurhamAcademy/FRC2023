@@ -40,7 +40,7 @@ class Wrist : SubsystemBase() {
         configMagnetOffset(-Constants.wrist.encoder.offset)
         configSensorDirection(Constants.wrist.encoder.inverted)
     }
-    private val pid = ProfiledPIDController(
+    val pid = ProfiledPIDController(
         Constants.wrist.motor.kP,
         Constants.wrist.motor.kI,
         Constants.wrist.motor.kD,

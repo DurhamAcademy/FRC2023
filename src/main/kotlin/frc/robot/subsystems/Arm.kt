@@ -53,7 +53,12 @@ class Arm : SubsystemBase() {
             3.0,
             2.0
         )
-    )
+    ).apply {
+        setTolerance(
+            Constants.arm.motor.positionTolerance,
+            Constants.arm.motor.velocityTolerance
+        )
+    }
     var armFeedForward = ArmFeedforward(
         Constants.arm.motor.kS,
         Constants.arm.motor.kG,

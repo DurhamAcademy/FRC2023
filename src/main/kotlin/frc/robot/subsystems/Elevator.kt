@@ -36,7 +36,12 @@ class Elevator(
             Constants.Elevator.elevatorMotor.PID.TrapezoidProfile.maxVelocity,
             Constants.Elevator.elevatorMotor.PID.TrapezoidProfile.maxAcceleration
         )
-    )
+    ).apply {
+        setTolerance(
+            Constants.Elevator.elevatorMotor.tolerance.positionTolerance,
+            Constants.Elevator.elevatorMotor.tolerance.velocityTolerance
+        )
+    }
     val feedforward = ElevatorFeedforward(
         Constants.Elevator.elevatorMotor.Feedforward.kS,
         Constants.Elevator.elevatorMotor.Feedforward.kG,
