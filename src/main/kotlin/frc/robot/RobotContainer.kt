@@ -5,6 +5,7 @@ import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.MoveToPosition
 import frc.robot.commands.arm.SetArmToAngle
+import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.controls.ControlScheme
 import frc.robot.controls.DefaultControlScheme
 import frc.robot.subsystems.Arm
