@@ -1,43 +1,68 @@
 package frc.robot
 
-import edu.wpi.first.math.util.Units.inchesToMeters
-import edu.wpi.first.math.util.Units.lbsToKilograms
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
-import edu.wpi.first.math.util.Units.degreesToRadians
-import edu.wpi.first.math.util.Units.inchesToMeters
+import edu.wpi.first.math.util.Units.*
 import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
+    object wrist {
+        object motor {
+            const val positionTolerance = 0.01
+            const val velocityTolerance = 0.01
+            const val id = 33
+            const val currentLimit = 40
+            const val inverted = true
+            const val gearRatio = 1.0
+            const val maxVelocity = 1.0
+            const val maxAcceleration = 1.0
+            const val kP = 12.0
+            const val kI = 0.0
+            const val kD = 0.0
+            const val kS = 1.0
+            const val kG = 12.0
+            const val kV = 1.0
+            const val kA = 1.0
+        }
 
+        object encoder {
+            const val id = 19
+            const val offset = 2.14
+            const val inverted = false
+        }
+
+        val simArmLength = inchesToMeters(10.0)
+        const val minAngle = -PI / 2
+        const val maxAngle = PI / 2
+        const val armMass = 1.0
+        const val momentOfInertia = 1.0
+    }
     object Elevator {
         val carriageMass = lbsToKilograms(27.5) // rough estimate (25-30 lbs)
-        val encoderDistancePerPulse: Double = 1.0 / 4_096.0
+        val encoderDistancePerPulse: Double = 1.0 / 2_048.0
         val sproketRadius = inchesToMeters(1.25 / 2.0)
 
         object elevatorMotor {
             object Feedforward {
-                val kG: Double = 1.0
-
-                // a good starting point for kS is 1 / max voltage
-                val kS = 1.0 / 12.0
-                val kV = 1.0 / 12.0
-                val kA = 1.0 // 0.0
+                val kG: Double = .32348
+                val kS = .053817
+                val kV = 10.248
+                val kA = .28817
             }
 
-            val encoderDistancePerPulse: Double = 1.0 / 4_096.0
-            val gearRatio: Double = 170.0
+            val inverted = true
+            val gearRatio: Double = 1 / 10.51
 
             object PID {
-                val kP = 10_000.0
+                val kP = 32.5 / 6
                 val kI = 0.0
-                val kD: Double = 1000.0
+                val kD: Double = 3.429
 
                 object TrapezoidProfile {
-                    val maxVelocity: Double = 1.0
+                    val maxVelocity: Double = 2.0
                     val maxAcceleration: Double = 1.0
                 }
             }
@@ -84,10 +109,54 @@ object Constants {
     const val MODULE_DISTANCE_X = 0.641
     const val MODULE_DISTANCE_Y = 0.539750
 
+    object arm {
+        object motor {
+            const val positionTolerance = 0.01
+            const val velocityTolerance = 0.01
+            const val id = 34
+            const val currentLimit = 40
+            const val inverted = false
+            const val gearRatio = 1 / 170.67
+            const val maxVelocity = 1.0
+            const val maxAcceleration = 1.0
+            const val kP = 2.6426
+            const val kI = 0.0
+            const val kD = 1.2626
+
+            const val kS = 0.086989
+            const val kG = 0.42677
+            const val kV = 3.2483
+            const val kA = 0.34796
+        }
+
+        object encoder {
+            const val id = 18
+            const val offset = 131.83
+            const val inverted = false
+        }
+
+        const val minAngle = -90.0
+        const val maxAngle = 90.0
+        const val armMass = 4.76//lbsToKilograms(10.5)
+        // 640.1 in^2 lbs
+        const val momentOfInertia = 0.187318642 //kg m^2
+        // 33 in
+        const val armLength = 0.8382
+    }
+
     val cadToCode = Transform3d(
         Translation3d(0.0, 0.029, 0.0),
         Rotation3d(0.0, 0.0, PI / 2)
     )
+
+    object ManipulatorConstants {
+        const val motorId = 0
+        const val leftSolenoidForward = 1
+        const val leftSolenoidReverse = 2
+        const val rightSolenoidForward = 3
+        const val rightSolenoidReverse = 4
+        const val manipulatorCurrent = 20
+    }
 
     object VisionConstants {
         const val cameraName: String = "OV9281"

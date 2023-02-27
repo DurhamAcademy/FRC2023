@@ -64,8 +64,21 @@ class DefaultControlScheme(
         get() = xboxCon.rightBumper().and(testMode)
 
     override val testGoToAprilTag1: Trigger
-        get() = xboxCon.y()
+        get() = xboxCon.y().and { false }
 
     override val testGoToZeroZero: Trigger
-        get() = xboxCon.x()
+        get() = xboxCon.x().and { false }
+    override val testArm90: Trigger
+        get() = xboxCon.povLeft()
+    override val testArm0: Trigger
+        get() = xboxCon.povUp()
+    override val testArmNeg90: Trigger
+        get() = xboxCon.povRight()
+
+    override val testWrist90: Trigger
+        get() = xboxCon.rightBumper()
+    override val testWrist0: Trigger
+        get() = xboxCon.povDown()
+    override val testWristNeg90: Trigger
+        get() = xboxCon.leftBumper()
 }
