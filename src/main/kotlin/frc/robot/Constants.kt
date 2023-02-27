@@ -13,9 +13,9 @@ object Constants {
         object motor {
             const val positionTolerance = 0.01
             const val velocityTolerance = 0.01
-            const val id = 21
+            const val id = 33
             const val currentLimit = 40
-            const val inverted = false
+            const val inverted = true
             const val gearRatio = 1.0
             const val maxVelocity = 1.0
             const val maxAcceleration = 1.0
@@ -36,7 +36,7 @@ object Constants {
 
         val simArmLength = inchesToMeters(10.0)
         const val minAngle = -90.0
-        const val maxAngle = 180.0
+        const val maxAngle = 90.0
         const val armMass = 1.0
         const val momentOfInertia = 1.0
     }
