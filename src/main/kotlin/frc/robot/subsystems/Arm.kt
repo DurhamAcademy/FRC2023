@@ -67,11 +67,18 @@ class Arm : SubsystemBase() {
     val armVelocity: Double
         get() = toRadians(armEncoder.velocity)
     var armSetpoint: Double? = null
+    /**
+     * Sets Arm Voltage to passed in double
+     * @param voltage is a double representing the amount of power being passed through
+     */
     fun setArmVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
     }
 
+    /**
+     * Resets arm position and prints out "RESET"
+     */
     fun reset() {
         armPID.reset(armPosition)
         println("RESET")
@@ -119,6 +126,9 @@ class Arm : SubsystemBase() {
         )
         .entry
 
+    /**
+     * Sets ArmFFMotor to position double(FF), and armPIDmotor to position double(calculate)
+     */
     override fun periodic() {
         SmartDashboard.putNumber("arm/POS", armPosition)
         SmartDashboard.putNumber("arm/SP", armSetpoint ?: -99999.0)
@@ -153,7 +163,9 @@ class Arm : SubsystemBase() {
         SmartDashboard.putNumber("arm/Velocity", armVelocity)
         SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
     }
-
+/**
+ * Updates simArmSystem by 0.02 seconds
+ */
     override fun simulationPeriodic() {
         simArmSystem.update(0.02)
     }

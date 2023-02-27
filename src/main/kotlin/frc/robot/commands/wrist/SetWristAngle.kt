@@ -12,6 +12,9 @@ class SetWristAngle(
         addRequirements(wrist)
     }
 
+    /**
+     * Sets wrist position between -pi/2 and pi/2
+     */
     override fun initialize() {
         wrist.setPosition(angle.coerceIn(-PI / 2, PI / 2))
     }

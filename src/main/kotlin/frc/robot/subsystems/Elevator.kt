@@ -96,6 +96,10 @@ class Elevator(
             )
         }
 
+    /**
+     * @param voltage is a double representing the amount of power being passed through
+     * sets the Motor Voltage
+     */
     fun setMotorVoltage(voltage: Double) {
         if (RobotBase.isSimulation())
             elevatorSim.setInputVoltage(
@@ -126,6 +130,8 @@ class Elevator(
 
     private var lastVel = 0.0
     private var lastTime = 0.0
+
+
     override fun periodic() {
         // limits
 

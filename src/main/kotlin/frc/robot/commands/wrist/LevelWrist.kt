@@ -12,6 +12,10 @@ class LevelWrist(
     init {
         addRequirements(wrist)
     }
+
+    /**
+     * Sets the wrist level based on direction of arm
+     */
     fun calcAngles(): Double {
         if(arm.armPosition < -angleOfFlip){
             return -(90 + arm.armPosition)
@@ -36,9 +40,16 @@ class LevelWrist(
             return arm.armPosition * -((90-angleOfFlip)/angleOfFlip) //if arm is in the middle flip wrist
         }
     }
+
+    /**
+     * Executes the calcAngles function() to set the wrist position
+     */
     override fun execute() {
         wrist.setPosition(Math.toRadians(calcAngles()))
     }
 
+    /**
+     * Checks to see if the command is finished
+     */
     override fun isFinished() = false
 }

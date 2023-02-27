@@ -19,6 +19,9 @@ class DriveMotorTest(
         addRequirements(drivetrain)
     }
 
+    /**
+     * prints out different values for controlScheme
+     */
     override fun initialize() {
         println(controlScheme)
         println(controlScheme.driveTest.asBoolean)
@@ -27,12 +30,20 @@ class DriveMotorTest(
 
     }
 
+    /**
+     * Sets driveMotor to controlScheme.testPercent
+     */
+
     override fun execute() {
 //        modules.forEach {
 //            it.driveMotor.set(controlScheme.testPercent)
 //        }
     }
 
+    /**
+     * Sets driveMotor to 0
+     * @param interrupted boolean to process to check if the robot process has been interrupted
+     */
     override fun end(interrupted: Boolean) {
 //        modules.forEach {
 //            it.driveMotor.set(0.0)
