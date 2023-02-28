@@ -5,12 +5,13 @@ import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.*
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
-    var fullDSControl = false
+    var fullDSControl = SmartDashboard.getBoolean("Full DS Control", false)
     object wrist {
         object motor {
             const val positionTolerance = 0.05
