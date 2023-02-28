@@ -33,7 +33,7 @@ class Arm : SubsystemBase() {
         DCMotor.getNEO(1),
         Constants.arm.motor.gearRatio,
         Constants.arm.momentOfInertia,
-        Constants.arm.armLength,
+        Constants.arm.length,
         Constants.arm.minAngle,
         Constants.arm.maxAngle,
         true
@@ -71,7 +71,7 @@ class Arm : SubsystemBase() {
         else toRadians(armEncoder.absolutePosition)
     val armVelocity: Double
         get() = toRadians(armEncoder.velocity)
-    var armSetpoint: Double? = null
+    private var armSetpoint: Double? = null
     fun setArmVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
@@ -87,8 +87,10 @@ class Arm : SubsystemBase() {
      * our intake.
      */
     fun setArmPosition(position: Double) {
-        armSetpoint = position
-
+        armSetpoint = position.coerceIn(
+            Constants.arm.minAngle,
+            Constants.arm.maxAngle
+        )
     }
 
     // shuffleboard

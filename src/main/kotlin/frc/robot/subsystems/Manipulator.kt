@@ -12,15 +12,14 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.ManipulatorConstants.manipulatorCurrent
-import frc.robot.Constants.ManipulatorConstants.leftSolenoidForward
-import frc.robot.Constants.ManipulatorConstants.leftSolenoidReverse
-import frc.robot.Constants.ManipulatorConstants.motorId
-import frc.robot.Constants.ManipulatorConstants.rightSolenoidForward
-import frc.robot.Constants.ManipulatorConstants.rightSolenoidReverse
+import frc.robot.Constants.manipulator.leftSolenoidForward
+import frc.robot.Constants.manipulator.leftSolenoidReverse
+import frc.robot.Constants.manipulator.motorId
+import frc.robot.Constants.manipulator.rightSolenoidForward
+import frc.robot.Constants.manipulator.rightSolenoidReverse
 import frc.robot.GamePiece
 import kotlin.math.pow
-import frc.robot.Constants.ManipulatorConstants as ManipConsts
+import frc.robot.Constants.manipulator as ManipConsts
 
 
 class Manipulator: SubsystemBase() {

@@ -86,6 +86,7 @@ object Constants {
             val topLimit: Double = inchesToMeters(45.0)
         }
     }
+
     const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
@@ -141,13 +142,13 @@ object Constants {
             const val inverted = false
         }
 
-        const val minAngle = -90.0
-        const val maxAngle = 90.0
+        val length = inchesToMeters(30.31)
+        val minAngle = degreesToRadians(130.0 - 5.0)
+        val maxAngle = degreesToRadians(-155.0 + 5.0)
         const val armMass = 4.76//lbsToKilograms(10.5)
+
         // 640.1 in^2 lbs
         const val momentOfInertia = 0.187318642 //kg m^2
-        // 33 in
-        const val armLength = 0.8382
     }
 
     val cadToCode = Transform3d(
@@ -155,7 +156,7 @@ object Constants {
         Rotation3d(0.0, 0.0, PI / 2)
     )
 
-    object ManipulatorConstants {
+    object manipulator {
         const val motorId = 31
         const val leftSolenoidForward = 0
         const val leftSolenoidReverse = 1
@@ -164,6 +165,7 @@ object Constants {
         const val manipulatorCurrent = 20
         const val manipulatorCurrentLimit = 10.0
 
+        val wristToObj = inchesToMeters(8.0)
         const val confidenceThreshold = 0.95
 
         object Colors {

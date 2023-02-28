@@ -34,4 +34,7 @@ abstract class ControlScheme {
     abstract val closeManipulator: Trigger
     abstract val grabCone: Trigger
     abstract val holdCone: Trigger
+
+    abstract val intakeFront: Trigger
+
 }

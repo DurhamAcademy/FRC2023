@@ -12,6 +12,7 @@ import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.controls.ControlScheme
 import frc.robot.controls.DefaultControlScheme
 import frc.robot.subsystems.*
+import frc.robot.utils.Solver
 import java.lang.Math.toRadians
 import kotlin.math.PI
 
@@ -21,6 +22,10 @@ class RobotContainer {
 
     //    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
     val manipulator = Manipulator()
+
+    init {
+        Solver.robotContainer = this
+    }
 
     val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(/*cameraWrapper*/))
     val elevator = Elevator(controlScheme)
