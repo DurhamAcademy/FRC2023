@@ -9,6 +9,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.ElevatorSim
 import edu.wpi.first.wpilibj.simulation.RoboRioSim
@@ -131,9 +132,24 @@ class Elevator(
 
     private var lastVel = 0.0
     private var lastTime = 0.0
-    override fun periodic() {
-        // limits
+    val tab = Shuffleboard.getTab("Elevator")
+    val heightEntry = tab.add("Height", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf(
+                "min" to Constants.Elevator.limits.bottomLimit,
+                "max" to Constants.Elevator.limits.topLimit
+            )
+        )
+        .entry.apply {
+            // set min
+            this.setDouble(Constants.Elevator.limits.bottomLimit)
+        }
 
+    override fun periodic() {
+        // set the setpoint to the height entry
+        if (Constants.fullDSControl)
+            setpoint = heightEntry.getDouble(Constants.Elevator.limits.bottomLimit)
         // set motor voltage
         setMotorVoltage(
             motorPid.calculate(
@@ -141,8 +157,6 @@ class Elevator(
                 setpoint
             ) + feedforward.calculate(
                 motorPid.setpoint.velocity,
-//                (motorPid.setpoint.velocity - lastVel) /
-//                        (Timer.getFPGATimestamp() - lastTime)
             )
         )
         lastVel = motorPid.goal.velocity

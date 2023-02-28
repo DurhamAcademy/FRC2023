@@ -18,10 +18,6 @@ class TestingControlScheme(
         get() = xboxCon.leftX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
     override val forward: Double
         get() = xboxCon.leftY.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
-    override val driveTest : Trigger // left bumper and is in test mode
-        get() = xboxCon.leftBumper().and( testMode )
-    override val turnTest: Trigger
-        get() = xboxCon.rightBumper().and(testMode)
     val testFrontLeft: Trigger // the left stick is pointing to the top left with a deadband
         get() {
             // deadband

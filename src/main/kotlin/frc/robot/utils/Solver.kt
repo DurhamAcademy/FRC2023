@@ -9,8 +9,8 @@ object Solver {
     var armLength = Constants.arm.length
     var wristLength = Constants.manipulator.wristToObj
     var robotContainer: RobotContainer? = null
-    var wristCoords = ArrayList<Double>(4)
-    var armCoords = ArrayList<Double>(4)
+    var wristCoords = ArrayList<Double>(4).apply { for (i in 0..3) this.add(0.0) }
+    var armCoords = ArrayList<Double>(4).apply { for (i in 0..3) this.add(0.0) }
 
     /**
      * Returns the wrist pose given the elevator height, arm angle, and wrist

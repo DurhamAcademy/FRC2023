@@ -20,9 +20,6 @@ class DriveMotorTest(
 
     override fun initialize() {
         println(controlScheme)
-        println(controlScheme.driveTest.asBoolean)
-        println(controlScheme.turnTest.asBoolean)
-        println(controlScheme.testPercent)
 
     }
 

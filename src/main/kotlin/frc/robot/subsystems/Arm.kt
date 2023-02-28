@@ -122,7 +122,7 @@ class Arm : SubsystemBase() {
     val dashSetpoint = ArmTab.add("dashSetpoint", 0.0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(
-            mapOf("min" to -PI, "max" to PI)
+            mapOf("min" to Constants.arm.minAngle, "max" to Constants.arm.maxAngle)
         )
         .entry
 

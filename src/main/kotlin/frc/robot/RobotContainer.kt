@@ -13,8 +13,8 @@ import frc.robot.commands.manipulator.OpenManipulator
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.wrist.LevelWrist
 import frc.robot.commands.wrist.SetWristAngle
+import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ControlScheme
-import frc.robot.controls.TestingControlScheme
 import frc.robot.subsystems.*
 import frc.robot.utils.Solver
 import java.lang.Math.toRadians
@@ -22,7 +22,7 @@ import kotlin.math.PI
 
 class RobotContainer {
     val xbox = CommandXboxController(0)
-    val controlScheme: ControlScheme = TestingControlScheme(xbox)
+    val controlScheme: ControlScheme = BryanControlScheme()//xbox)
 
     //    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
     val manipulator = Manipulator()
@@ -34,7 +34,7 @@ class RobotContainer {
     val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(/*cameraWrapper*/))
     val elevator = Elevator(controlScheme)
     val arm = Arm()
-    val wrist = Wrist().apply {
+    val wrist = Wrist(arm).apply {
         defaultCommand = LevelWrist(
             this, arm, toRadians(60.0)
         )

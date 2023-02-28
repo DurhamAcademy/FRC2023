@@ -10,6 +10,7 @@ import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
+    var fullDSControl = false
     object wrist {
         object motor {
             const val positionTolerance = 0.05
@@ -90,10 +91,10 @@ object Constants {
     const val maxDriveAcceleration = 3.0
     const val powerPercent = .2
 
-    const val BRZeroAngle = 171.75
-    const val BLZeroAngle = 70.25
-    const val FRZeroAngle = 76.1
-    const val FLZeroAngle = 132.5
+    const val BRZeroAngle = -10.0
+    const val BLZeroAngle = -29.7
+    const val FRZeroAngle = -102.2
+    const val FLZeroAngle = -47.9
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl
@@ -143,8 +144,8 @@ object Constants {
         }
 
         val length = inchesToMeters(30.31)
-        val minAngle = degreesToRadians(130.0 - 5.0)
-        val maxAngle = degreesToRadians(-155.0 + 5.0)
+        val maxAngle = degreesToRadians(130.0 - 5.0)
+        val minAngle = degreesToRadians(-155.0 + 5.0)
         const val armMass = 4.76//lbsToKilograms(10.5)
 
         // 640.1 in^2 lbs

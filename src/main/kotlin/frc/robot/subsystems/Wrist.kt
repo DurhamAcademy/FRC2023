@@ -9,6 +9,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -118,7 +120,16 @@ class Wrist(
         println("RESET")
     }
 
+    val tab = Shuffleboard.getTab("Wrist")
+    val wristPosition = tab.add("Wrist Position", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(mapOf("min" to -2.0, "max" to 2.0))
+        .entry
+
     override fun periodic() {
+        if (Constants.fullDSControl) {
+            setPosition(wristPosition.getDouble(0.0))
+        }
         val output = pid.calculate(position, setpoint ?: position)
         SmartDashboard.putNumber("wrist/position", position)
         SmartDashboard.putNumber("wrist/velocity", velocity)
