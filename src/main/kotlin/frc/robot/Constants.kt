@@ -12,8 +12,8 @@ import kotlin.math.PI
 object Constants {
     object wrist {
         object motor {
-            const val positionTolerance = 0.01
-            const val velocityTolerance = 0.01
+            const val positionTolerance = 0.05
+            const val velocityTolerance = 0.05
             const val id = 33
             const val currentLimit = 40
             const val inverted = true
@@ -55,8 +55,8 @@ object Constants {
             }
 
             object tolerance {
-                val positionTolerance: Double = 0.01
-                val velocityTolerance: Double = 0.01
+                val positionTolerance: Double = 0.05
+                val velocityTolerance: Double = 0.05
             }
 
             val inverted = true
@@ -118,8 +118,8 @@ object Constants {
 
     object arm {
         object motor {
-            const val positionTolerance = 0.01
-            const val velocityTolerance = 0.01
+            const val positionTolerance = 0.05
+            const val velocityTolerance = 0.05
             const val id = 34
             const val currentLimit = 40
             const val inverted = false
@@ -162,11 +162,10 @@ object Constants {
         const val leftSolenoidReverse = 1
         const val rightSolenoidForward = 3
         const val rightSolenoidReverse = 2
-        const val manipulatorCurrent = 20
-        const val manipulatorCurrentLimit = 10.0
+        const val manipulatorCurrentLimit = 20.0
 
         val wristToObj = inchesToMeters(8.0)
-        const val confidenceThreshold = 0.95
+        const val confidenceThreshold = 0.75
 
         object Colors {
             val purpleCube = Color(0.19, 0.07, 0.77)

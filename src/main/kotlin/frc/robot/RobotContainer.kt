@@ -1,16 +1,20 @@
 package frc.robot
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble
+import edu.wpi.first.wpilibj2.command.RunCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.MoveToPosition
-import frc.robot.commands.alltogether.P2
+import frc.robot.commands.alltogether.*
 import frc.robot.commands.arm.SetArmToAngle
-import frc.robot.commands.manipulator.*
+import frc.robot.commands.manipulator.CloseManipulator
+import frc.robot.commands.manipulator.OpenManipulator
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.wrist.LevelWrist
 import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.controls.ControlScheme
-import frc.robot.controls.DefaultControlScheme
+import frc.robot.controls.TestingControlScheme
 import frc.robot.subsystems.*
 import frc.robot.utils.Solver
 import java.lang.Math.toRadians
@@ -18,7 +22,7 @@ import kotlin.math.PI
 
 class RobotContainer {
     val xbox = CommandXboxController(0)
-    val controlScheme: ControlScheme = DefaultControlScheme(xbox)
+    val controlScheme: ControlScheme = TestingControlScheme(xbox)
 
     //    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
     val manipulator = Manipulator()
@@ -102,20 +106,49 @@ class RobotContainer {
 
             // assign the grab cone trigger to the command that
             // grabs a cone
-            grabCone
-                .whileTrue(
-                    GrabConeCommand(manipulator)
-                        .until { manipulator.objectType == GamePiece.cone }
-                        .andThen(HoldConeCommand(manipulator))
-                        .repeatedly()
-                )
 
             // assign the hold cone trigger to the command that
             // holds a cone
-            holdCone
+
+            // idle
+            idleConfiguration
+                .whileTrue(Idle(elevator, arm, wrist))
+                .onFalse(HoldPosition(elevator, arm, wrist))
+
+            // assign l1
+            placeLvl1
                 .whileTrue(
-                    P2(arm, elevator, wrist)//HoldConeCommand(manipulator)
+                    RunCommand({
+                        if (xbox != null)
+                            xbox!!.hid.setRumble(kBothRumble, 1.0)
+                    }).finallyDo {
+                        if (xbox != null)
+                            xbox!!.hid.setRumble(kBothRumble, 0.0)
+                    }
                 )
+
+            // assign l2
+            placeLvl2
+                .whileTrue(
+                    SetPositionMid(elevator, arm, wrist)
+                ).onFalse(HoldPosition(elevator, arm, wrist))
+
+            // assign l3
+            placeLvl3
+                .whileTrue(
+                    SetPositionHigh(elevator, arm, wrist)
+                ).onFalse(HoldPosition(elevator, arm, wrist))
+
+            // assign intake
+            intake
+                .whileTrue(
+                    IntakePositionForeward(elevator, arm, wrist)
+                        .withManipulator(manipulator)
+                ).onFalse(HoldPosition(elevator, arm, wrist))
+
+            // assign outtake to set manipulator speed to -0.5
+            outtake
+                .whileTrue(SetManipulatorSpeed(manipulator, -0.5)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
         }
 
     }

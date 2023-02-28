@@ -2,9 +2,8 @@ package frc.robot.commands
 
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.controls.ControlScheme
-import frc.robot.controls.DefaultControlScheme
-import frc.robot.subsystems.SwerveModule
 import frc.robot.subsystems.Drivetrain
+import frc.robot.subsystems.SwerveModule
 
 class DriveMotorTest(
     private val drivetrain: Drivetrain,
