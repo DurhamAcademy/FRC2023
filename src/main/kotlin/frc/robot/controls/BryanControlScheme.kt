@@ -23,6 +23,6 @@ class BryanControlScheme : ControlScheme() {
     override val lowIntake = xbox.leftTrigger()
     override val highIntake = xbox.rightTrigger()
 
-    override val openManipulator = xbox.back()
-    override val closeManipulator = xbox.start()
+    override val openManipulator = xbox.povUp()
+    override val closeManipulator = xbox.povDown()
 }

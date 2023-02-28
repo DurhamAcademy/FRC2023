@@ -10,5 +10,6 @@ class CloseManipulator(private val manipulator: Manipulator):InstantCommand() {
 
     override fun execute() {
         manipulator.isOpen= false
+        manipulator.motorPercentage = -0.02
     }
 }

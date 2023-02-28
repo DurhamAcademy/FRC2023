@@ -100,8 +100,13 @@ class RobotContainer {
             // assign the close manipulator trigger to the command that
             // closes the manipulator
             closeManipulator
-                .onTrue(
+                .onTrue(CloseManipulator(manipulator))
+
+            toggleManipulator
+                .toggleOnFalse(
                     CloseManipulator(manipulator)
+                ).toggleOnTrue(
+                    OpenManipulator(manipulator)
                 )
 
             // assign the grab cone trigger to the command that
