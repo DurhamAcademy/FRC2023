@@ -12,19 +12,14 @@ class ElevatorTestUp(
         addRequirements(elevator)
     }
 
-    override fun initialize() {
-        elevator.setpoint = (Constants.Elevator.limits.topLimit -
-                Constants.Elevator.limits.bottomLimit) +
-                Constants.Elevator.limits.bottomLimit
-    }
+    override fun initialize() = Unit
 
     override fun execute() {
         elevator.setpoint = (Constants.Elevator.limits.topLimit -
-                Constants.Elevator.limits.bottomLimit) +
+                Constants.Elevator.limits.bottomLimit) / 2 +
                 Constants.Elevator.limits.bottomLimit
     }
 
-    override fun isFinished(): Boolean {
-        return elevator.height > Constants.Elevator.limits.topLimit - 0.1
-    }
+    override fun isFinished(): Boolean =
+        elevator.height > Constants.Elevator.limits.topLimit - 0.1
 }

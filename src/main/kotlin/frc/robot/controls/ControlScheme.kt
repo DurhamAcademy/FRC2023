@@ -23,4 +23,10 @@ abstract class ControlScheme {
     abstract val testGoToZeroZero: Trigger
 
     abstract val testArm90: Trigger
+    abstract val testArm0: Trigger
+    abstract val testArmNeg90: Trigger
+
+    abstract val testWrist90: Trigger
+    abstract val testWrist0: Trigger
+    abstract val testWristNeg90: Trigger
 }

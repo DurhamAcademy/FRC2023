@@ -13,8 +13,9 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
+import kotlin.math.PI
 
-class Wrist : SubsystemBase() {
+class Wrist() : SubsystemBase() {
     private val wristMotor = CANSparkMax(
         Constants.wrist.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -83,10 +84,10 @@ class Wrist : SubsystemBase() {
         )
     }
 
-    val armVelocity: Double
+    val wristVelocity: Double
         get() = wristEncoder.velocity
-    var armSetpoint: Double? = null
-    fun setArmVoltage(voltage: Double) {
+    var wristSetpoint: Double? = null
+    fun setWristVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simWristSystem.setInputVoltage(voltage)
         else wristMotor.setVoltage(voltage)
     }
@@ -97,13 +98,14 @@ class Wrist : SubsystemBase() {
     }
 
     override fun periodic() {
-        if (setpoint != null) {
-            voltage = pid.calculate(position, setpoint!!).coerceIn(-12.0..12.0)
-        }
-        SmartDashboard.putNumber("wrist/encoder", position)
+        val output = pid.calculate(position, setpoint ?: position)
+        SmartDashboard.putNumber("wrist/position", position)
         SmartDashboard.putNumber("wrist/velocity", velocity)
-        SmartDashboard.putNumber("wrist/setpoint", setpoint ?: 0.0)
-        SmartDashboard.putNumber("wrist/voltage", voltage)
+        SmartDashboard.putNumber("wrist/setpoint", setpoint ?: position)
+        SmartDashboard.putNumber("wrist/output", output)
+        if (setpoint != null) {
+            voltage = output
+        } else voltage = 0.0
     }
 
     override fun simulationPeriodic() {

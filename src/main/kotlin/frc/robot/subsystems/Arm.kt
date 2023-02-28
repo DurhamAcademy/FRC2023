@@ -23,7 +23,15 @@ import javax.swing.text.Position
 
 class Arm(
     var wrist: Wrist
-): SubsystemBase(){
+
+) : SubsystemBase() {
+    fun armWristCheck(position: Double): Boolean {
+        if(position == 0.0){
+            return true
+        }
+        return false
+    }
+
     val armMotor = CANSparkMax(
         Constants.arm.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -32,6 +40,7 @@ class Arm(
         setSmartCurrentLimit(Constants.arm.motor.currentLimit)
         inverted = Constants.arm.motor.inverted
     }
+
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
         Constants.arm.motor.gearRatio,
@@ -156,6 +165,9 @@ class Arm(
             setArmVoltage(0.0)
         }
 
+        if(armWristCheck(wrist.position)){
+            armMotor.setVoltage(0.0)
+        }
     }
 
     override fun simulationPeriodic() {
