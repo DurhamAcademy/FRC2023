@@ -24,6 +24,7 @@ abstract class ControlScheme {
 
     open val openManipulator: Trigger = Trigger { false }
     open val closeManipulator: Trigger = Trigger { false }
+    open val toggleManipulator: Trigger = Trigger { false }
     open val grabCone: Trigger = Trigger { false }
     open val holdCone: Trigger = Trigger { false }
 
