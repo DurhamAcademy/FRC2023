@@ -9,6 +9,6 @@ class SetManipulatorSpeed(private val manipulator: Manipulator, private val spee
     }
 
     override fun execute() {
-        manipulator.speed = speed
+        manipulator.motorPercentage = speed
     }
 }

@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.*
+import edu.wpi.first.wpilibj.util.Color
 import frc.robot.utils.Area
 import kotlin.math.PI
 
@@ -17,9 +18,9 @@ object Constants {
             const val currentLimit = 40
             const val inverted = true
             const val gearRatio = 1.0
-            const val maxVelocity = 1.0
-            const val maxAcceleration = 1.0
-            const val kP = 12.0
+            const val maxVelocity = 8.0
+            const val maxAcceleration = 6.0
+            const val kP = 20.0
             const val kI = 0.0
             const val kD = 0.0
             const val kS = 1.0
@@ -150,12 +151,20 @@ object Constants {
     )
 
     object ManipulatorConstants {
-        const val motorId = 0
-        const val leftSolenoidForward = 1
-        const val leftSolenoidReverse = 2
+        const val motorId = 31
+        const val leftSolenoidForward = 0
+        const val leftSolenoidReverse = 1
         const val rightSolenoidForward = 3
-        const val rightSolenoidReverse = 4
+        const val rightSolenoidReverse = 2
         const val manipulatorCurrent = 20
+        const val manipulatorCurrentLimit = 10.0
+
+        const val confidenceThreshold = 0.95
+
+        object Colors {
+            val purpleCube = Color(0.19, 0.07, 0.77)
+            val yellowCone = Color(0.95, 0.77, 0.06)
+        }
     }
 
     object VisionConstants {

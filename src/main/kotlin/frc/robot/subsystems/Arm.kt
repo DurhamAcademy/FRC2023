@@ -60,8 +60,8 @@ class Arm(
         0.0,
         0.5,
         TrapezoidProfile.Constraints(
-            1.0,
-            1.0
+            3.0,
+            2.0
         )
     )
     var armFeedForward = ArmFeedforward(
@@ -135,7 +135,7 @@ class Arm(
 
         val calculate = armPID.calculate(
             armPosition,
-            armSetpoint ?: 0.0
+            armSetpoint ?: armPosition
         )
         var FF = armFeedForward.calculate(
             // convert from 0 being horizontal arm to 0 being upright

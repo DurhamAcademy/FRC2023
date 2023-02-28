@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
-import kotlin.math.PI
 
 class Wrist() : SubsystemBase() {
     private val wristMotor = CANSparkMax(
