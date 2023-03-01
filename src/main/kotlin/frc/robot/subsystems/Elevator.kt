@@ -6,6 +6,8 @@ import edu.wpi.first.math.controller.ElevatorFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.util.Units
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
@@ -16,10 +18,15 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
+import frc.robot.RobotContainer
 import frc.robot.controls.ControlScheme
+import kotlin.math.PI
+import kotlin.math.absoluteValue
+import kotlin.math.sin
 
 class Elevator(
     val controlScheme: ControlScheme,
+    val robotContainer: RobotContainer?
 ) : SubsystemBase() {
     val elevatorMotor = WPI_TalonFX(
         Constants.Elevator.elevatorMotor.ElevatorMotorId
@@ -90,7 +97,8 @@ class Elevator(
             // the current offset
                 offset = value - elevatorMotor.selectedSensorPosition *
                         Constants.Elevator.encoderDistancePerPulse *
-                        Constants.Elevator.elevatorMotor.gearRatio -
+                        Constants.Elevator.elevatorMotor.gearRatio *
+                        Constants.Elevator.sproketRadius * 2.0 * PI -
                         Constants.Elevator.limits.bottomLimit
         }
 
@@ -100,6 +108,28 @@ class Elevator(
                 Constants.Elevator.limits.bottomLimit,
                 Constants.Elevator.limits.topLimit
             )
+            if (robotContainer!=null) {
+                val topLimit = Constants.FieldConstants.heightLimit
+                val bottomLimit = 0.1
+                val armLength = Constants.arm.length
+                // use arm angle to determine elevator height
+                val wristAngle = robotContainer.wrist.position
+                val armAngle = robotContainer.arm.armPosition
+                val armHeight = armLength * sin(armAngle) +
+                        Constants.wrist.maxWristLength * sin(armAngle+wristAngle)
+                val elevatorMaxHeight = topLimit - armHeight
+
+                field = field.coerceAtMost(elevatorMaxHeight)
+
+                if ((wristAngle.absoluteValue >= PI/4) && (armAngle >= .35)) {
+                    // if the wrist is not upright and the arm is close to it,
+                    field = field.coerceAtLeast(
+                        Constants.Elevator.limits.bottomLimit
+                                + inchesToMeters(10.0)
+                    )
+                }
+
+            }
         }
 
     fun setMotorVoltage(voltage: Double) {

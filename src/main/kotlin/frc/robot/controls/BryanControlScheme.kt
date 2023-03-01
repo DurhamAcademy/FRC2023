@@ -1,6 +1,7 @@
 package frc.robot.controls
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
+import edu.wpi.first.wpilibj2.command.button.Trigger
 import kotlin.math.absoluteValue
 
 class BryanControlScheme : ControlScheme() {
@@ -23,6 +24,5 @@ class BryanControlScheme : ControlScheme() {
     override val lowIntake = xbox.leftTrigger()
     override val highIntake = xbox.rightTrigger()
 
-    override val openManipulator = xbox.povUp()
-    override val closeManipulator = xbox.povDown()
+    override val toggleManipulator = xbox.povUp()
 }

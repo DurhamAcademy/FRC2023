@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value
 import edu.wpi.first.wpilibj.I2C
 import edu.wpi.first.wpilibj.PneumaticsModuleType
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -74,8 +75,7 @@ class Manipulator: SubsystemBase() {
      */
     val color: Color?
         get() = if (sensorConnected)
-            if (inColorRange!!) colorSensor.color
-            else null
+            colorSensor.color
         else null
 
 
@@ -102,7 +102,7 @@ class Manipulator: SubsystemBase() {
         get() = colorSensor.isConnected
 
     val inColorRange: Boolean?
-        get() = if (sensorConnected) distance!! < 0.06 else null
+        get() = if (sensorConnected) distance!! < 0.09 else null
 
     private val colorMatch = ColorMatch().apply {
         addColorMatch(ManipConsts.Colors.purpleCube)
@@ -123,6 +123,29 @@ class Manipulator: SubsystemBase() {
             } else GamePiece.none
         } else GamePiece.none
 
+    val tab = Shuffleboard.getTab("Manipulator")
+    val motorCurrent = tab.add("Motor Current", 0.0)
+        .withWidget("Number Bar")
+        .withProperties(mapOf("min" to 0.0, "max" to 40.0))
+        .getEntry()
+    val colorRed = tab.add("Red", 0.0)
+        .withWidget("Number Bar")
+        .withProperties(mapOf("min" to 0.0, "max" to 1.0))
+        .getEntry()
+    val colorGreen = tab.add("Green", 0.0)
+        .withWidget("Number Bar")
+        .withProperties(mapOf("min" to 0.0, "max" to 1.0))
+        .getEntry()
+    val colorBlue = tab.add("Blue", 0.0)
+        .withWidget("Number Bar")
+        .withProperties(mapOf("min" to 0.0, "max" to 1.0))
+        .getEntry()
+    val colorIR = tab.add("IR", 0.0)
+        .withWidget("Number Bar")
+        .withProperties(mapOf("min" to 0.0, "max" to 1.0))
+        .getEntry()
+
+
     override fun periodic() {
         if (sensorConnected) {
             val distFiltered = distFilter.calculate(colorSensor.proximity.toDouble())
@@ -141,5 +164,13 @@ class Manipulator: SubsystemBase() {
         } else {
             distance = null
         }
+
+        motorCurrent.setDouble(motor.outputCurrent)
+        colorRed.setDouble(color?.red ?: 0.0)
+        colorGreen.setDouble(color?.green ?: 0.0)
+        colorBlue.setDouble(color?.blue ?: 0.0)
+        colorIR.setDouble(distance ?: 0.0)
+
+
     }
 }

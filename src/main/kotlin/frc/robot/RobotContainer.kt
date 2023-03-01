@@ -24,7 +24,7 @@ class RobotContainer {
     val xbox = CommandXboxController(0)
     val controlScheme: ControlScheme = BryanControlScheme()//xbox)
 
-    //    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
+    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
     val manipulator = Manipulator()
 
     init {
@@ -117,31 +117,25 @@ class RobotContainer {
 
             // idle
             idleConfiguration
-                .whileTrue(Idle(elevator, arm, wrist))
+                .whileTrue(SetPosition.idle(this@RobotContainer))
                 .onFalse(HoldPosition(elevator, arm, wrist))
 
             // assign l1
             placeLvl1
                 .whileTrue(
-                    RunCommand({
-                        if (xbox != null)
-                            xbox!!.hid.setRumble(kBothRumble, 1.0)
-                    }).finallyDo {
-                        if (xbox != null)
-                            xbox!!.hid.setRumble(kBothRumble, 0.0)
-                    }
+                    SetPosition.setpoint(PlacePoint.Level1, this@RobotContainer)
                 )
 
             // assign l2
             placeLvl2
                 .whileTrue(
-                    SetPositionMid(elevator, arm, wrist)
+                    SetPosition.setpoint(PlacePoint.Level2, this@RobotContainer)
                 ).onFalse(HoldPosition(elevator, arm, wrist))
 
             // assign l3
             placeLvl3
                 .whileTrue(
-                    SetPositionHigh(elevator, arm, wrist)
+                    SetPosition.setpoint(PlacePoint.Level3, this@RobotContainer)
                 ).onFalse(HoldPosition(elevator, arm, wrist))
 
             // assign intake

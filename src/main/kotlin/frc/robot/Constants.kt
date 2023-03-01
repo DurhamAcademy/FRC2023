@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.*
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -11,8 +12,19 @@ import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
-    var fullDSControl = SmartDashboard.getBoolean("Full DS Control", false)
+    val leds = object {
+        val count = 74// 74 is what chris said
+    }
+    init {
+        SmartDashboard.setDefaultBoolean("Full DS Control", false)
+    }
+    var fullDSControl: Boolean
+        get() = SmartDashboard.getBoolean("Full DS Control", false)
+        set(value: Boolean) {
+            SmartDashboard.putBoolean("Full DS Control", value)
+        }
     object wrist {
+        val maxWristLength = inchesToMeters(10.0)
         object motor {
             const val positionTolerance = 0.05
             const val velocityTolerance = 0.05
@@ -46,7 +58,7 @@ object Constants {
     object Elevator {
         val carriageMass = lbsToKilograms(27.5) // rough estimate (25-30 lbs)
         val encoderDistancePerPulse: Double = 1.0 / 2_048.0
-        val sproketRadius = inchesToMeters(1.25 / 2.0)
+        val sproketRadius = inchesToMeters(1.273 / 2.0)
 
         object elevatorMotor {
             object Feedforward {
@@ -71,7 +83,7 @@ object Constants {
 
                 object TrapezoidProfile {
                     val maxVelocity: Double = 2.0
-                    val maxAcceleration: Double = 1.0
+                    val maxAcceleration: Double = 2.0
                 }
             }
 
@@ -79,13 +91,13 @@ object Constants {
         }
 
         object limitSwitch {
-            val ElevatorLimitSwitchId: Int = 0
+            val ElevatorLimitSwitchId: Int = 9
             val offset: Double = 0.0
         }
 
         object limits {
             val bottomLimit: Double = inchesToMeters(20.0)
-            val topLimit: Double = inchesToMeters(45.0)
+            val topLimit: Double = 1.33//inchesToMeters(45.0)
         }
     }
 
@@ -181,14 +193,15 @@ object Constants {
             Translation3d(0.0, inchesToMeters(10.188), inchesToMeters(5.433)),
             Rotation3d(
                 0.0,
-                degreesToRadians(100.0),
+                degreesToRadians(110.0),
                 degreesToRadians(90.0)
             )
-        ).transformBy(cadToCode)
+        )
     }
 
     @Suppress("unused") //TODO: Remove this suppression
     object FieldConstants {
+        val heightLimit = feetToMeters(6.5) //FIXME: is this correct
         const val width = 3.048
         const val length = 5.486
     }
@@ -211,63 +224,134 @@ object Constants {
 
     @Suppress("unused") //TODO: Remove this suppression
     object Field2dLayout {
-        val bounds = listOf(
-            // judge side red -> judge side blue -> far side blue -> far side red
-            Translation3d(8.25, -4.0, 0.0),
-            Translation3d(-8.25, -4.0, 0.0),
-            Translation3d(-8.25, 4.0, 0.0),
-            Translation3d(8.25, 4.0, 0.0)
-        )
-        val center = Translation3d(0.0, 0.0, 0.0)
-
-        object Areas {
-            val blueChargingStation = Area(
-                Translation3d(-3.5, 0.0, 0.0),
-                Translation3d(-5.5, 0.0, 0.0),
-                Translation3d(-5.5, 2.5, 0.0),
-                Translation3d(-3.5, 2.5, 0.0)
-            )
-            val redChargingStation = Area(
-                Translation3d(3.5, 0.0, 0.0),
-                Translation3d(5.5, 0.0, 0.0),
-                Translation3d(5.5, 2.5, 0.0),
-                Translation3d(3.5, 2.5, 0.0)
-            )
-            val blueCommunityZone = Area(
-                Translation3d(-5.0, -1.5, 0.0),
-                Translation3d(-5.0, -2.75, 0.0),
-                Translation3d(-1.6, -2.75, 0.0),
-                Translation3d(-1.6, -4.0, 0.0),
-                Translation3d(-8.25, -4.0, 0.0),
-                Translation3d(-8.25, -1.5, 0.0)
-            )
-            val redCommunityZone = Area(
-                Translation3d(5.0, -1.5, 0.0),
-                Translation3d(5.0, -2.75, 0.0),
-                Translation3d(1.6, -2.75, 0.0),
-                Translation3d(1.6, -4.0, 0.0),
-                Translation3d(8.25, -4.0, 0.0),
-                Translation3d(8.25, -1.5, 0.0)
-            )
-
-            val blueScoringZone = Area(
-                Translation3d(-5.0, -1.4, 0.0),
-                Translation3d(-8.25, -1.4, 0.0),
-                Translation3d(-8.25, -1.4, 0.0),
-                Translation3d(-8.25, -4.0, 0.0),
-                Translation3d(-3.4, -4.0, 0.0),
-                Translation3d(-3.4, 0.0, 0.0),
-                Translation3d(-5.0, 0.0, 0.0)
-            )
-            val redScoringZone = Area(
-                Translation3d(5.0, -1.4, 0.0),
-                Translation3d(8.25, -1.4, 0.0),
-                Translation3d(8.25, -1.4, 0.0),
-                Translation3d(8.25, -4.0, 0.0),
-                Translation3d(3.4, -4.0, 0.0),
-                Translation3d(3.4, 0.0, 0.0),
-                Translation3d(5.0, 0.0, 0.0)
-            )
+//        val bounds = listOf(
+//            // judge side red -> judge side blue -> far side blue -> far side red
+//            Translation3d(8.25, -4.0, 0.0),
+//            Translation3d(-8.25, -4.0, 0.0),
+//            Translation3d(-8.25, 4.0, 0.0),
+//            Translation3d(8.25, 4.0, 0.0)
+//        )
+//        val center = Translation3d(0.0, 0.0, 0.0)
+//
+//        object Areas {
+//            val blueChargingStation = Area(
+//                Translation3d(-3.5, 0.0, 0.0),
+//                Translation3d(-5.5, 0.0, 0.0),
+//                Translation3d(-5.5, 2.5, 0.0),
+//                Translation3d(-3.5, 2.5, 0.0)
+//            )
+//            val redChargingStation = Area(
+//                Translation3d(3.5, 0.0, 0.0),
+//                Translation3d(5.5, 0.0, 0.0),
+//                Translation3d(5.5, 2.5, 0.0),
+//                Translation3d(3.5, 2.5, 0.0)
+//            )
+//            val blueCommunityZone = Area(
+//                Translation3d(-5.0, -1.5, 0.0),
+//                Translation3d(-5.0, -2.75, 0.0),
+//                Translation3d(-1.6, -2.75, 0.0),
+//                Translation3d(-1.6, -4.0, 0.0),
+//                Translation3d(-8.25, -4.0, 0.0),
+//                Translation3d(-8.25, -1.5, 0.0)
+//            )
+//            val redCommunityZone = Area(
+//                Translation3d(5.0, -1.5, 0.0),
+//                Translation3d(5.0, -2.75, 0.0),
+//                Translation3d(1.6, -2.75, 0.0),
+//                Translation3d(1.6, -4.0, 0.0),
+//                Translation3d(8.25, -4.0, 0.0),
+//                Translation3d(8.25, -1.5, 0.0)
+//            )
+//
+//            val blueScoringZone = Area(
+//                Translation3d(-5.0, -1.4, 0.0),
+//                Translation3d(-8.25, -1.4, 0.0),
+//                Translation3d(-8.25, -1.4, 0.0),
+//                Translation3d(-8.25, -4.0, 0.0),
+//                Translation3d(-3.4, -4.0, 0.0),
+//                Translation3d(-3.4, 0.0, 0.0),
+//                Translation3d(-5.0, 0.0, 0.0)
+//            )
+//            val redScoringZone = Area(
+//                Translation3d(5.0, -1.4, 0.0),
+//                Translation3d(8.25, -1.4, 0.0),
+//                Translation3d(8.25, -1.4, 0.0),
+//                Translation3d(8.25, -4.0, 0.0),
+//                Translation3d(3.4, -4.0, 0.0),
+//                Translation3d(3.4, 0.0, 0.0),
+//                Translation3d(5.0, 0.0, 0.0)
+//            )
+//        }
+//
+        val size = Translation2d(16.5, 8.0)
+        object Axes {
+            object XInt {
+                val communityPlacementLineBlue = 1.4
+                val communityPlacementLineRed = size.x - communityPlacementLineBlue
+                val loadingZonePlatformStartRed = .35
+                val loadingZonePlatformStartBlue = size.x - loadingZonePlatformStartRed
+                val loadingZoneStartRed = 3.35
+                val loadingZoneStartBlue = size.x - loadingZoneStartRed
+            }
+            object YInt {
+                val platform1 = 7.45
+                val platform2 = 6.15
+                val cone1Left = 4.975
+                val cube1 = 4.425
+                val cone1Right = 3.865
+                val cone2Left = 3.305
+                val cube2 = 2.75
+                val cone2Right = 2.19
+                val cone3Left = 1.63
+                val cube3 = 1.065
+                val cone3Right = .51
+                val platforms = arrayOf(platform1, platform2)
+                val cones = arrayOf(
+                    cone1Left, cone1Right,
+                    cone2Left, cone2Right,
+                    cone3Left, cone3Right
+                )
+                val cubes = arrayOf(cube1, cube2, cube3)
+                val score = arrayOf(
+                    cone1Left, cube1, cone1Right,
+                    cone2Left, cube2, cone2Right,
+                    cone3Left, cube3, cone3Right
+                )
+            }
+            object Red {
+                const val fieldOffsetMultiplier = -1.0
+                val scoringPoints = YInt.score.map {
+                    Translation2d(XInt.communityPlacementLineRed, it)
+                }
+                val loadingZonePlatforms = YInt.platforms.map {
+                    Translation2d(XInt.loadingZoneStartRed, it)
+                }
+                val conePlacement = YInt.cones.map {
+                    Translation2d(XInt.loadingZoneStartRed, it)
+                }
+                val cubePlacement = YInt.cubes.map {
+                    Translation2d(XInt.loadingZoneStartRed, it)
+                }
+            }
+            object Blue {
+                const val fieldOffsetMultiplier = 1.0
+                val scoringPoints = YInt.score.map {
+                    Translation2d(XInt.communityPlacementLineBlue, it)
+                }
+                val loadingZonePlatforms = YInt.platforms.map {
+                    Translation2d(XInt.loadingZoneStartBlue, it)
+                }
+                val conePlacement = YInt.cones.map {
+                    Translation2d(XInt.loadingZoneStartBlue, it)
+                }
+                val cubePlacement = YInt.cubes.map {
+                    Translation2d(XInt.loadingZoneStartBlue, it)
+                }
+            }
+            fun closest(
+                to: Translation2d,
+                inIterable: Iterable<Translation2d>
+            ): Translation2d? = inIterable.minByOrNull { it.getDistance(to) }
         }
     }
 }

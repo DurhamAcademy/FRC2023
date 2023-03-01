@@ -18,6 +18,5 @@ class OpenManipulator(
 
     override fun execute() {
         manipulator.isOpen = true
-        manipulator.motorPercentage = 0.02
     }
 }

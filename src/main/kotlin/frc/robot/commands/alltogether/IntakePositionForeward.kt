@@ -17,7 +17,7 @@ class IntakePositionForeward(
 ) : CommandBase() {
     fun withManipulator(manipulator: Manipulator) =
         this
-            .raceWith(CollectObject(manipulator))
+            .raceWith(CollectObject())
 
     init {
         addRequirements(elevator, arm, wrist)

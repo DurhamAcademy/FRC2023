@@ -95,6 +95,9 @@ class Wrist(
         else wristMotor.setVoltage(voltage)
     }
 
+    /**
+     * @param angleOfFlip the angle at which the arm is flipped in radians
+     */
     fun levelAngle(angleOfFlip: Double): Double {
         /*
                   If arm is in negative direction set wrist level to floor

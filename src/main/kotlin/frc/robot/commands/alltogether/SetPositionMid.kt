@@ -1,5 +1,6 @@
 package frc.robot.commands.alltogether
 
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.Constants
 import frc.robot.subsystems.Arm
@@ -25,13 +26,13 @@ class SetPositionMid(
         if (arm.armPosition < 0.25) {
             elevator.setpoint = Constants.Elevator.limits.bottomLimit
         } else {
-            elevator.setpoint = (Constants.Elevator.limits.bottomLimit + 34)
+            elevator.setpoint = inchesToMeters(34.0)
         }
 
-        if (elevator.height < 25) {
-            wrist.setPosition(wrist.levelAngle(20.0))
+        if (elevator.height < inchesToMeters(30.0)) {
+            wrist.setPosition(wrist.levelAngle(Math.toRadians(60.0)))
         } else {
-            wrist.setPosition(wrist.levelAngle(60.0))
+            wrist.setPosition(-.26)
         }
     }
 

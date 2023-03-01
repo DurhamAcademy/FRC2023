@@ -18,7 +18,7 @@ class Idle(
     override fun execute() {
         elevator.setpoint = Constants.Elevator.limits.bottomLimit
         arm.setArmPosition(0.0)
-        wrist.setPosition(wrist.levelAngle(50.0))
+        wrist.setPosition(wrist.levelAngle(Math.toRadians(50.0)))
     }
 
     override fun isFinished(): Boolean =
