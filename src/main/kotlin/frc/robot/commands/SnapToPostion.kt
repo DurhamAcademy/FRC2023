@@ -1,9 +1,11 @@
 package frc.robot.commands
 
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.kyberlib.command.Game
 import frc.robot.Constants
+import frc.robot.Constants.Field2dLayout.Axes.AliancePointList
 import frc.robot.subsystems.Drivetrain
 
 class SnapToPostion(
@@ -12,13 +14,29 @@ class SnapToPostion(
     init {
         addRequirements(drivetrain)
     }
-    var closest = Constants.Field2dLayout.Axes.closest(
-        drivetrain.poseEstimator.estimatedPosition.translation,
-        Constants.Field2dLayout.Axes.run {
+    fun closest(): Translation2d {
+        Constants.Field2dLayout.Axes.closest(
+            drivetrain.poseEstimator.estimatedPosition.translation,
             (if (Game.alliance == DriverStation.Alliance.Blue)
                 Constants.Field2dLayout.Axes.Blue
-            else Constants.Field2dLayout.Axes.Red).scoringPoints
+            else Constants.Field2dLayout.Axes.Red).run {
+                if (drivetrain.poseEstimator.estimatedPosition.translation.y
+                    > Constants.Field2dLayout.Axes.YInt.barrier
+                ) this.loadingZonePlatforms
+                else this.scoringPoints
+            }
+        )
+    }
+    override fun initialize(){
+        if (closest.getDistance(drivetrain.poseEstimator.estimatedPosition.translation) < 1.0){
+            closest = Constants.Field2dLayout.Axes.closest(
+                drivetrain.poseEstimator.estimatedPosition.translation,
+                Constants.Field2dLayout.Axes.run {
+                    (if (Game.alliance == DriverStation.Alliance.Blue)
+                        Constants.Field2dLayout.Axes.Blue
+                    else Constants.Field2dLayout.Axes.Red).scoringPoints
+                }
+            )
         }
-    )
-    override fun initialize() = TODO("write go to position code")
+    }
 }

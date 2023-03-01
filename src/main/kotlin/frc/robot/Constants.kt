@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.*
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
-import frc.robot.utils.Area
 import kotlin.math.PI
 
 object Constants {
@@ -294,17 +293,18 @@ object Constants {
                 val loadingZoneStartBlue = size.x - loadingZoneStartRed
             }
             object YInt {
-                val platform1 = 7.45
-                val platform2 = 6.15
-                val cone1Left = 4.975
-                val cube1 = 4.425
-                val cone1Right = 3.865
-                val cone2Left = 3.305
-                val cube2 = 2.75
-                val cone2Right = 2.19
-                val cone3Left = 1.63
-                val cube3 = 1.065
-                val cone3Right = .51
+                private const val platform1 = 7.45
+                private const val platform2 = 6.15
+                private const val cone1Left = 4.975
+                private const val cube1 = 4.425
+                private const val cone1Right = 3.865
+                private const val cone2Left = 3.305
+                private const val cube2 = 2.75
+                private const val cone2Right = 2.19
+                private const val cone3Left = 1.63
+                private const val cube3 = 1.065
+                private const val cone3Right = .51
+                const val barrier = 5.5
                 val platforms = arrayOf(platform1, platform2)
                 val cones = arrayOf(
                     cone1Left, cone1Right,
