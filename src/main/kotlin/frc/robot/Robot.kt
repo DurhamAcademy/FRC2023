@@ -31,6 +31,7 @@ class Robot : TimedRobot() {
             SmartDashboard.putNumber("tagX", y)
         }
 
+        robotContainer.update()
     }
 
     // schedule test commands during test mode

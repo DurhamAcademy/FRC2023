@@ -1,8 +1,17 @@
 package frc.robot
 
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble
 import edu.wpi.first.wpilibj2.command.RunCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
+import frc.kyberlib.command.Game
+import frc.kyberlib.lighting.KLEDRegion
+import frc.kyberlib.lighting.KLEDStrip
+import frc.kyberlib.lighting.animations.*
+import frc.kyberlib.math.kEpsilon
+import frc.kyberlib.math.units.extensions.feetPerSecond
+import frc.kyberlib.math.units.extensions.inches
+import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.MoveToPosition
@@ -17,6 +26,7 @@ import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.*
 import frc.robot.utils.Solver
+import java.awt.Color
 import java.lang.Math.toRadians
 import kotlin.math.PI
 
@@ -24,7 +34,7 @@ class RobotContainer {
     val xbox = CommandXboxController(0)
     val controlScheme: ControlScheme = BryanControlScheme()//xbox)
 
-    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
+//    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
     val manipulator = Manipulator()
 
     init {
@@ -32,7 +42,7 @@ class RobotContainer {
     }
 
     val drivetrain = Drivetrain(controlScheme, cameraWrappers = listOf(/*cameraWrapper*/))
-    val elevator = Elevator(controlScheme)
+    val elevator = Elevator(controlScheme, this)
     val arm = Arm()
     val wrist = Wrist(arm).apply {
         defaultCommand = LevelWrist(
@@ -150,5 +160,22 @@ class RobotContainer {
                 .whileTrue(SetManipulatorSpeed(manipulator, -0.5)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
         }
 
+    }
+    val leds = KLEDStrip(0, Constants.leds.count).apply {
+        val coral = Color(255, 93, 115)
+        val allianceColor = if (Game.alliance == DriverStation.Alliance.Red) coral else Color.CYAN
+
+        // idle alliance animations
+        val prematchArms = AnimationRGBFade(7.seconds)//AnimationRGBWave(1.0, .1.seconds)
+        val idleArms = AnimationSolid(Color.BLACK) { Game.enabled }
+        val idleCylon = AnimationSparkle(allianceColor, false) { Game.enabled }
+
+        val chain = KLEDRegion(0, Constants.leds.count,
+            prematchArms, idleArms, idleCylon
+        )
+        this += (chain)
+    }
+    fun update() {
+        leds.update()
     }
 }

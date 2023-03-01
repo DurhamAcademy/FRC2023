@@ -14,7 +14,7 @@ class SnapToPostion(
     init {
         addRequirements(drivetrain)
     }
-    fun closest(): Translation2d {
+    fun closest(): Translation2d? =
         Constants.Field2dLayout.Axes.closest(
             drivetrain.poseEstimator.estimatedPosition.translation,
             (if (Game.alliance == DriverStation.Alliance.Blue)
@@ -26,17 +26,12 @@ class SnapToPostion(
                 else this.scoringPoints
             }
         )
-    }
     override fun initialize(){
-        if (closest.getDistance(drivetrain.poseEstimator.estimatedPosition.translation) < 1.0){
-            closest = Constants.Field2dLayout.Axes.closest(
-                drivetrain.poseEstimator.estimatedPosition.translation,
-                Constants.Field2dLayout.Axes.run {
-                    (if (Game.alliance == DriverStation.Alliance.Blue)
-                        Constants.Field2dLayout.Axes.Blue
-                    else Constants.Field2dLayout.Axes.Red).scoringPoints
-                }
-            )
-        }
+        val closest = closest()
+//        if (closest != null) {
+//            if (closest.getDistance(
+//                    drivetrain.poseEstimator.estimatedPosition.translation
+//            ) < 1.0)
+//        }//todo: yea
     }
 }

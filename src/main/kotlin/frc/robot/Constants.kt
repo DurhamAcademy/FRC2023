@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.util.Color
 import kotlin.math.PI
 
 object Constants {
-    val leds = object {
+    object leds {
         val count = 74// 74 is what chris said
     }
     init {
@@ -31,7 +31,7 @@ object Constants {
             const val currentLimit = 40
             const val inverted = true
             const val gearRatio = 1.0
-            const val maxVelocity = 8.0
+            const val maxVelocity = 24.0
             const val maxAcceleration = 6.0
             const val kP = 20.0
             const val kI = 0.0
@@ -76,12 +76,12 @@ object Constants {
             val gearRatio: Double = 1 / 10.51
 
             object PID {
-                val kP = 32.5 / 6
+                val kP = 32.5 / 2
                 val kI = 0.0
                 val kD: Double = 3.429
 
                 object TrapezoidProfile {
-                    val maxVelocity: Double = 2.0
+                    val maxVelocity: Double = 4.0
                     val maxAcceleration: Double = 2.0
                 }
             }
@@ -96,7 +96,7 @@ object Constants {
 
         object limits {
             val bottomLimit: Double = inchesToMeters(20.0)
-            val topLimit: Double = 1.33//inchesToMeters(45.0)
+            val topLimit: Double = inchesToMeters(45.0)
         }
     }
 
@@ -200,7 +200,7 @@ object Constants {
 
     @Suppress("unused") //TODO: Remove this suppression
     object FieldConstants {
-        val heightLimit = feetToMeters(6.5) //FIXME: is this correct
+        val heightLimit = feetToMeters(8.5) //FIXME: is this correct
         const val width = 3.048
         const val length = 5.486
     }

@@ -56,11 +56,9 @@ class Elevator(
         Constants.Elevator.elevatorMotor.Feedforward.kV,
         Constants.Elevator.elevatorMotor.Feedforward.kA
     )
-    val limitSwitch = DigitalInput(0).apply {
-        if (RobotBase.isSimulation()) {
-//            this.setSimDevice(simLimitSwitch)
-        }
-    }
+    val limitSwitch = DigitalInput(
+        Constants.Elevator.limitSwitch.ElevatorLimitSwitchId
+    )
 
     val elevatorSim = ElevatorSim(
         DCMotor.getFalcon500(1),
@@ -115,19 +113,19 @@ class Elevator(
                 // use arm angle to determine elevator height
                 val wristAngle = robotContainer.wrist.position
                 val armAngle = robotContainer.arm.armPosition
-                val armHeight = armLength * sin(armAngle) +
-                        Constants.wrist.maxWristLength * sin(armAngle+wristAngle)
+                val armHeight = armLength * sin((PI/2)-armAngle) +
+                        Constants.wrist.maxWristLength * sin((PI/2)-(armAngle+wristAngle))
                 val elevatorMaxHeight = topLimit - armHeight
 
                 field = field.coerceAtMost(elevatorMaxHeight)
-
-                if ((wristAngle.absoluteValue >= PI/4) && (armAngle >= .35)) {
-                    // if the wrist is not upright and the arm is close to it,
-                    field = field.coerceAtLeast(
-                        Constants.Elevator.limits.bottomLimit
-                                + inchesToMeters(10.0)
-                    )
-                }
+                field = field.coerceAtLeast(Constants.Elevator.limits.bottomLimit)
+//                if ((wristAngle.absoluteValue >= PI/4) && (armAngle >= .35)) {
+//                    // if the wrist is not upright and the arm is close to it,
+//                    field = field.coerceAtLeast(
+//                        Constants.Elevator.limits.bottomLimit
+//                                + inchesToMeters(10.0)
+//                    )
+//                }
 
             }
         }
