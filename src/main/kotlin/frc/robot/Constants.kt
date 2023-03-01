@@ -318,33 +318,39 @@ object Constants {
                     cone3Left, cube3, cone3Right
                 )
             }
-            object Red {
+            interface AliancePointList {
+                abstract val scoringPoints: List<Translation2d>
+                abstract val loadingZonePlatforms: List<Translation2d>
+                abstract val conePlacement: List<Translation2d>
+                abstract val cubePlacement: List<Translation2d>
+            }
+            object Red: AliancePointList {
                 const val fieldOffsetMultiplier = -1.0
-                val scoringPoints = YInt.score.map {
+                override val scoringPoints = YInt.score.map {
                     Translation2d(XInt.communityPlacementLineRed, it)
                 }
-                val loadingZonePlatforms = YInt.platforms.map {
+                override val loadingZonePlatforms = YInt.platforms.map {
                     Translation2d(XInt.loadingZoneStartRed, it)
                 }
-                val conePlacement = YInt.cones.map {
+                override val conePlacement = YInt.cones.map {
                     Translation2d(XInt.loadingZoneStartRed, it)
                 }
-                val cubePlacement = YInt.cubes.map {
+                override val cubePlacement = YInt.cubes.map {
                     Translation2d(XInt.loadingZoneStartRed, it)
                 }
             }
-            object Blue {
+            object Blue: AliancePointList {
                 const val fieldOffsetMultiplier = 1.0
-                val scoringPoints = YInt.score.map {
+                override val scoringPoints = YInt.score.map {
                     Translation2d(XInt.communityPlacementLineBlue, it)
                 }
-                val loadingZonePlatforms = YInt.platforms.map {
+                override val loadingZonePlatforms = YInt.platforms.map {
                     Translation2d(XInt.loadingZoneStartBlue, it)
                 }
-                val conePlacement = YInt.cones.map {
+                override val conePlacement = YInt.cones.map {
                     Translation2d(XInt.loadingZoneStartBlue, it)
                 }
-                val cubePlacement = YInt.cubes.map {
+                override val cubePlacement = YInt.cubes.map {
                     Translation2d(XInt.loadingZoneStartBlue, it)
                 }
             }
