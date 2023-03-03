@@ -40,7 +40,6 @@ class Robot : TimedRobot() {
     }
 
     override fun testPeriodic() {
-        robotContainer.drivetrain.frontLeft.driveMotor.setVoltage(6.0)
 
     }
 }

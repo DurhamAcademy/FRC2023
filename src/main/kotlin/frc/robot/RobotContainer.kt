@@ -1,8 +1,21 @@
 package frc.robot
 
+import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.revrobotics.CANSparkMax
+import edu.wpi.first.hal.PowerJNI
+import edu.wpi.first.hal.simulation.RoboRioDataJNI
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble
+import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
+import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.RunCommand
+import edu.wpi.first.wpilibj2.command.Subsystem
+import edu.wpi.first.wpilibj2.command.SubsystemBase
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController
+import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -53,7 +66,7 @@ class RobotContainer {
 //    val powerDistributionHub = PowerDistribution(0, kRev)
 
     init {
-        arrayOf(controlSchemeA, controlSchemeB).forEach {
+        arrayOf(controlSchemeA, controlSchemeB).forEachIndexed { i, it ->
             it.run {
                 xbox!!.a().whileTrue(ElevatorTestUp(elevator))
                 xbox!!.b().whileTrue(ElevatorTestDown(elevator))
@@ -173,36 +186,92 @@ class RobotContainer {
                         drivetrain.zeroHeading()
                     }, drivetrain)
                 )
-                //fixme dont do this
-                xbox!!.povLeft().onTrue(
-                    InstantCommand ({
-                        arm.armOffset += 1.0
-                    }, arm).ignoringDisable(true)
-                )
-                xbox!!.povRight().onTrue(
-                    InstantCommand ({
-                        arm.armOffset -= 1.0
-                    }, arm).ignoringDisable(true)
-                )
+                if (i == 0) {
+                    //fixme dont do this
+                    xbox!!.povLeft().onTrue(
+                        InstantCommand({
+                            arm.armOffset += 1.0
+                        }, arm).ignoringDisable(true)
+                    )
+                    xbox!!.povRight().onTrue(
+                        InstantCommand({
+                            arm.armOffset -= 1.0
+                        }, arm).ignoringDisable(true)
+                    )
+                } else {
+                    xbox!!.povLeft().onTrue(
+                        InstantCommand({
+                            this@RobotContainer.wantingObject =
+                                if (this@RobotContainer.wantingObject == GamePiece.cube)
+                                    GamePiece.cone
+                                else GamePiece.cube
+                        }, NoSubsystem).ignoringDisable(true)
+                    )
+                }
             }
         }
     }
+    var wantingObject: GamePiece = GamePiece.cone
     val leds = KLEDStrip(9, Constants.leds.count).apply {
         val coral = Color(255, 93, 115)
+        val coneColor = Color(255, 255, 0)
+        val cubeColor = Color(123, 0, 255)
+
         val allianceColor = if (Game.alliance == DriverStation.Alliance.Red) coral else Color.CYAN
 
         // idle alliance animations
         val prematchArms = AnimationRGBFade(7.seconds)//AnimationRGBWave(1.0, .1.seconds)
-        val idleArms = AnimationSolid(Color.lightGray) { Game.enabled }
-        val idleCylon = AnimationSparkle(allianceColor, false) { Game.enabled }
-        val lowPower = AnimationPulse(Color.RED.withAlpha(50),0.15.seconds, enableTransparency = true) { /*powerDistributionHub.voltage < 10.0 */ false }
+        val percentage = AnimationCustom({t, l ->
+            val percent = ((Game.batteryVoltage-7.0)/6.0).coerceIn(0.0, 1.0)
+            return@AnimationCustom List(l) { i ->
+                return@List if (i < (Constants.leds.count * percent)) {
+                    Color.green
+                } else {
+                    allianceColor
+                }
+            }
+        }, {Game.disabled}, false)
+        val wantsCone = AnimationSolid(coneColor, condition =
+        {!Game.disabled && (wantingObject == GamePiece.cone)})
+        val wantsCube = AnimationSolid(cubeColor, condition =
+        {!Game.disabled && (wantingObject == GamePiece.cube)})
+
         val chain = KLEDRegion(0, Constants.leds.count,
-            prematchArms, idleArms, idleCylon, lowPower
+            prematchArms, percentage, wantsCone, wantsCube
         )
         this += (chain)
     }
+    val limpCommand = RunCommand({
+        arm.armMotor.idleMode = CANSparkMax.IdleMode.kCoast
+        wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kCoast
+        elevator.elevatorMotor.setNeutralMode(NeutralMode.Coast)
+    }, arm, wrist, elevator)
+        .ignoringDisable(true)
+        .handleInterrupt {
+            arm.armMotor.idleMode = CANSparkMax.IdleMode.kBrake
+            wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kBrake
+            elevator.elevatorMotor.setNeutralMode(NeutralMode.Brake)
+        }
+    val limpTrigger: Trigger =
+        Trigger {
+            Game.TEST && RoboRioDataJNI.getFPGAButton()
+        }.apply {
+            this.debounce(0.25).whileTrue(
+                limpCommand
+            )
+        }
+    val limpLongButton = Trigger {RoboRioDataJNI.getFPGAButton() && !Game.COMPETITION}.debounce(5.0)
+        .run {
+            this.whileTrue(
+                InstantCommand({
+                    drivetrain.zeroHeading()
+                }, drivetrain)
+            )
+        }
     fun update() {
         leds.update()
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
     }
 }
+
+object NoSubsystem: SubsystemBase()
