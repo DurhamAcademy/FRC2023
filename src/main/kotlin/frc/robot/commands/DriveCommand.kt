@@ -36,7 +36,7 @@ class DriveCommand(
                         Constants.powerPercent *.25
             ),
             true,
-            Translation2d(-Constants.MODULE_DISTANCE_X *0.4, 0.0)
+            Translation2d() // chris wants in the middle
         )
     }
 }

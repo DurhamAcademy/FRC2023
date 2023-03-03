@@ -79,7 +79,7 @@ class Manipulator: SubsystemBase() {
         else null
 
 
-    private val distFilter = LinearFilter.movingAverage(10)
+    private val distFilter = LinearFilter.singlePoleIIR(0.1, 0.02)
 
     /**
      * the distance from the sensor to the object in meters
@@ -102,7 +102,7 @@ class Manipulator: SubsystemBase() {
         get() = colorSensor.isConnected
 
     val inColorRange: Boolean?
-        get() = if (sensorConnected) distance!! < 0.09 else null
+        get() = if (sensorConnected) distance!! < 0.095 else null
 
     private val colorMatch = ColorMatch().apply {
         addColorMatch(ManipConsts.Colors.purpleCube)

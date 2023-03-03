@@ -10,7 +10,7 @@ import frc.robot.subsystems.Wrist
 import frc.robot.utils.Solver
 import kotlin.math.PI
 
-class IntakePositionForeward(
+class IntakePositionForward(
     private val elevator: Elevator,
     private val arm: Arm,
     private val wrist: Wrist,
@@ -25,7 +25,7 @@ class IntakePositionForeward(
 
     override fun execute() {
         val armAngle = degreesToRadians(125.0)
-        wrist.setpoint
+//        wrist.setpoint
         arm.setArmPosition(armAngle)
         Solver.getWristPose(0.0, armAngle, armAngle - PI / 2)
         elevator.setpoint = inchesToMeters(7.0 + 20)

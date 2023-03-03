@@ -36,7 +36,7 @@ class RobotContainer {
     val controlSchemeA: ControlScheme = BryanControlScheme(0)//xbox)
     val controlSchemeB: ControlScheme = BryanControlScheme(1)//xbox)
 
-//    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
+    var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
 
     init {
         Solver.robotContainer = this
@@ -44,7 +44,7 @@ class RobotContainer {
 
     val drivetrain = Drivetrain(
         controlSchemeA,
-        cameraWrappers = listOf(/*cameraWrapper*/),
+        cameraWrappers = listOf(cameraWrapper),
         this
     )
     val manipulator = Manipulator()
@@ -158,21 +158,20 @@ class RobotContainer {
                     ).onFalse(HoldPosition(elevator, arm, wrist))
 
                 // assign intake
-                intake
+                lowIntake
                     .whileTrue(
-                        IntakePositionForeward(elevator, arm, wrist)
+                        IntakePositionForward(elevator, arm, wrist)
                             .withManipulator(manipulator)
                     ).onFalse(HoldPosition(elevator, arm, wrist))
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
-                    .whileTrue(SetManipulatorSpeed(manipulator, -0.5)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -0.4)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 highIntake
                     .whileTrue(
-                        SetPosition
-                            .humanPlayer(elevator, arm, wrist)
-                            .withManipulator(manipulator)
+                        SetPosition.humanPlayer(elevator, arm, wrist).alongWith(CollectObject(manipulator))
+                            // previous setposition command was finishing before the race would actually work
                     )
 
                 xbox!!.povDown().onTrue(

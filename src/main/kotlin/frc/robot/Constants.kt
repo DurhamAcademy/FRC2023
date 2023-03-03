@@ -82,8 +82,8 @@ object Constants {
                 val kD: Double = 3.429
 
                 object TrapezoidProfile {
-                    val maxVelocity: Double = 4.0
-                    val maxAcceleration: Double = 2.0
+                    val maxVelocity: Double = 1.0
+                    val maxAcceleration: Double = 1.0
                 }
             }
 
@@ -97,17 +97,17 @@ object Constants {
 
         object limits {
             val bottomLimit: Double = inchesToMeters(20.0)
-            val topLimit: Double = inchesToMeters(45.0)
+            val topLimit: Double = inchesToMeters(50.0)
         }
     }
 
     const val maxDriveAcceleration = 3.0
     const val powerPercent = 1.0
 
-    const val BRZeroAngle = -10.0
-    const val BLZeroAngle = -29.7
-    const val FRZeroAngle = -102.2
-    const val FLZeroAngle = -47.9
+    const val BRZeroAngle = -10.0-5
+    const val BLZeroAngle = -29.7+2.3
+    const val FRZeroAngle = -102.2-3.7
+    const val FLZeroAngle = -47.9+1.3
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl
@@ -125,7 +125,7 @@ object Constants {
 
     const val WHEEL_RADIUS = .0508
     const val WHEEL_CIRCUMFRENCE = WHEEL_RADIUS * 2 * PI
-    const val DRIVE_GEAR_RATIO = 6.75 * 10
+    const val DRIVE_GEAR_RATIO = 6.75
 
     const val MODULE_DISTANCE_X = 0.641
     const val MODULE_DISTANCE_Y = 0.539750
@@ -152,7 +152,7 @@ object Constants {
 
         object encoder {
             const val id = 18
-            const val offset = -76.15+17+25-5-5//-87.49
+            const val offset = -76.15+17+25-5-5+77//-87.49
             const val inverted = true
         }
 
@@ -189,12 +189,12 @@ object Constants {
 
     object VisionConstants {
         const val cameraName: String = "OV9281"
-        val robotToCam: Pose3d = Pose3d(
-            Translation3d(0.0, inchesToMeters(10.188), inchesToMeters(5.433)),
+        val robotToCam: Transform3d = Transform3d(
+            Translation3d(-0.258, 0.0, 0.137),
             Rotation3d(
                 0.0,
-                degreesToRadians(110.0),
-                degreesToRadians(90.0)
+                degreesToRadians(-12.0),
+                degreesToRadians(180.0)
             )
         )
     }
@@ -210,17 +210,17 @@ object Constants {
     const val DRIVE_I = 0.0
     const val DRIVE_D = 0.0
 
-    const val driveKS = 0.21862
-    const val driveKV = 2.2997
-    const val driveKA = 0.26242
+    const val driveKS = 0.20285
+    const val driveKV = 2.2335
+    const val driveKA = 0.34271
 
     const val ANGLE_P = 0.5
     const val ANGLE_I = 0.0
     const val ANGLE_D = 0.0
 
-    const val angleKS = 0.24233
-    const val angleKV = 0.28267
-    const val angleKA = 0.0144
+    const val angleKS = 0.44475
+    const val angleKV = 0.25237
+    const val angleKA = 0.01973
 
     @Suppress("unused") //TODO: Remove this suppression
     object Field2dLayout {

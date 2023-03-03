@@ -6,6 +6,8 @@ import java.awt.Color
 
 class AnimationRGBWave(private val cycles: Double = 1.0, val secondsPerMovement: Time = .2.seconds, val reversed: Boolean = false, enableTransparency: Boolean = false, condition: ()->Boolean = { true }) : LEDAnimation(condition, enableTransparency) {
 
+    private var buf: MutableList<Color> = ArrayList<Color>()
+    private var t = 0
     fun constructInitialBuffer(length: Int): MutableList<Color> {
 
         return if (cycles >= 1) {
@@ -22,14 +24,17 @@ class AnimationRGBWave(private val cycles: Double = 1.0, val secondsPerMovement:
     }
 
     override fun getBuffer(time: Time, length: Int): List<Color> {
-        val b = constructInitialBuffer(length)
-
-        for (i in 0 until (time / secondsPerMovement).toInt() % b.size) {
-            b.add(0, b.removeAt(b.size - 1))
+        if(buf.size != length) {
+            buf = constructInitialBuffer(length)
         }
 
-        if (reversed) b.reverse()
+        val curT = (time / secondsPerMovement).toInt()
+        if(curT != t) {
+            t = curT
+            buf.add(0, buf.removeAt(buf.size - 1))
+        }
+//        if (reversed) buf.reverse()
 
-        return b.take(length)
+        return buf.take(length)
     }
 }
