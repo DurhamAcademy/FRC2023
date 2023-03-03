@@ -19,7 +19,7 @@ import frc.robot.Constants
 class Wrist(
     private val arm: Arm
 ) : SubsystemBase() {
-    private val wristMotor = CANSparkMax(
+    val wristMotor = CANSparkMax(
         Constants.wrist.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {

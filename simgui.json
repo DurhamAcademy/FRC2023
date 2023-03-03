@@ -1,5 +1,14 @@
 {
   "HALProvider": {
+    "Addressable LEDs": {
+      "0": {
+        "columns": 13,
+        "serpentine": true
+      },
+      "window": {
+        "visible": true
+      }
+    },
     "Other Devices": {
       "DutyCycleEncoder[2]": {
         "header": {
@@ -45,6 +54,26 @@
         "header": {
           "open": true
         }
+      },
+      "Talon FX[16]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[16]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[16]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      }
+    },
+    "PWM Outputs": {
+      "window": {
+        "visible": true
       }
     },
     "RoboRIO": {
@@ -56,11 +85,6 @@
       },
       "window": {
         "visible": true
-      }
-    },
-    "Timing": {
-      "window": {
-        "visible": false
       }
     }
   },
@@ -85,10 +109,11 @@
       "/LiveWindow/Ungrouped/Talon FX [14]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [15]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
-      "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller"
+      "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
+      "/SmartDashboard/Drivetrain/sendable": "Subsystem"
     },
     "windows": {
-      "/FMSInfo": {
+      "/SmartDashboard/Drivetrain/sendable": {
         "window": {
           "visible": true
         }
@@ -99,17 +124,12 @@
     "Shuffleboard": {
       "Arm": {
         "open": true
-      },
-      "open": true
-    },
-    "LiveWindow": {
-      "open": true
+      }
     },
     "SmartDashboard": {
       "arm": {
         "open": true
-      },
-      "open": true
+      }
     },
     "combined": true,
     "createNonCanonical": true,
@@ -189,12 +209,6 @@
       "open": true
     },
     "Server": {
-      "Publishers": {
-        "open": true
-      },
-      "Subscribers": {
-        "open": true
-      },
       "open": true
     },
     "visible": true
@@ -208,7 +222,7 @@
               "autoFit": true
             }
           ],
-          "height": 446,
+          "height": -43,
           "series": [
             {
               "color": [

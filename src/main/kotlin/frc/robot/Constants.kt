@@ -92,7 +92,7 @@ object Constants {
 
         object limitSwitch {
             val ElevatorLimitSwitchId: Int = 9
-            val offset: Double = 0.0
+            val offset: Double = Elevator.limits.bottomLimit//0.0
         }
 
         object limits {
