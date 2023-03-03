@@ -264,7 +264,7 @@ class RobotContainer {
                 limpCommand
             )
         }
-    val limpLongButton = Trigger {RoboRioDataJNI.getFPGAButton()}.debounce(5.0)
+    val limpLongButton = Trigger {RoboRioDataJNI.getFPGAButton() && !Game.COMPETITION}.debounce(5.0)
         .run {
             this.whileTrue(
                 InstantCommand({
