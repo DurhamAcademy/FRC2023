@@ -117,20 +117,20 @@
     }
   },
   "NetworkTables": {
+    "Shuffleboard": {
+      "Arm": {
+        "open": true
+      },
+      "open": true
+    },
+    "LiveWindow": {
+      "open": true
+    },
     "SmartDashboard": {
-      "Field": {
+      "arm": {
         "open": true
       },
-      "open": true,
-      "rpid": {
-        "open": true
-      },
-      "xpid": {
-        "open": true
-      },
-      "ypid": {
-        "open": true
-      }
+      "open": true
     },
     "combined": true,
     "createNonCanonical": true,
@@ -240,10 +240,16 @@
                 1.0,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/SPEED",
-              "marker": "None",
-              "name": "Robot Speed",
-              "weight": 1.0000001192092896
+              "id": "Joystick[0] Axis[0]"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator Height"
             }
           ]
         }

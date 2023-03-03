@@ -84,7 +84,7 @@ open class Drivetrain(
         *modules.map { it.location }.toTypedArray()
     )
 
-    private val gyro = Pigeon2(54, "rio").apply {
+    private val gyro = Pigeon2(20, "rio").apply {
         configFactoryDefault()
     }
 
@@ -177,10 +177,14 @@ open class Drivetrain(
 
         SmartDashboard.putNumber("gyroangle", gyro.yaw)
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
-        cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
-            SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
-            SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
-        }
+        SmartDashboard.putNumber("posex", poseEstimator.estimatedPosition.translation.x)
+        SmartDashboard.putNumber("posey", poseEstimator.estimatedPosition.translation.y)
+//        cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
+//            SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
+//            SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
+//        }
+
+
 //        gyroEntry.setDouble(gyro.yaw)
 //        odometry.update(
 //            Rotation2d.fromDegrees(gyro.yaw),
