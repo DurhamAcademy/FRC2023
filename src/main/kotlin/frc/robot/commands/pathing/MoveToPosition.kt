@@ -169,7 +169,6 @@ class MoveToPosition(
         // stop when the robot is within 0.1 meters of the desired position
         return drivetrain.estimatedPose2d.minus(Pose2d(pose.translation, Rotation2d())).translation.norm < toleranceppos
                 && drivetrain.estimatedPose2d.rotation.minus(Rotation2d(pose.rotation.radians)).radians < tolerancerpos
-        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(x, y, Rotation2d(angle))).translation.norm < 0.1
     }
 
     override fun end(interrupted: Boolean) {

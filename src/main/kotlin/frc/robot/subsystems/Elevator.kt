@@ -190,8 +190,6 @@ class Elevator(
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 
-//        setMotorVoltage(voltageSetEntry.getDouble(0.0))
-
         // check if its in teleop
 //        if (RobotController.getUserButton()) setMotorVoltage(0.0)
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))

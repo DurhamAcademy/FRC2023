@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.alltogether.*
 import frc.robot.commands.arm.SetArmToAngle
 import frc.robot.commands.manipulator.CloseManipulator

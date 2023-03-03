@@ -241,7 +241,14 @@ open class Drivetrain(
                     simEstimatedPose2d.plus(estimatedVelocity * 0.02)
                 }
             }
+        }
 
+        // use oldPose to calculate the estimated velocity
+        estimatedVelocity = Transform2d(
+            estimatedPose2d.translation.minus(lastPose.translation),
+            Rotation2d.fromDegrees(estimatedPose2d.rotation.degrees - lastPose.rotation.degrees)
+        )
+    }
     var powerSaveMode: Int = 0
         set(value) {
             field = value
@@ -254,14 +261,6 @@ open class Drivetrain(
                 }
             }
         }
-
-        }
-        // use oldPose to calculate the estimated velocity
-        estimatedVelocity = Transform2d(
-            estimatedPose2d.translation.minus(lastPose.translation),
-            Rotation2d.fromDegrees(estimatedPose2d.rotation.degrees - lastPose.rotation.degrees)
-        )
-    }
     /**
      * Zeroes the heading of the robot
      */

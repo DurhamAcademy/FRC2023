@@ -93,7 +93,25 @@
       "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[14]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[15]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[16]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[17]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[18]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[19]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[20]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[21]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[22]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[23]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[24]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[25]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[26]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[27]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[28]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[29]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
@@ -113,10 +131,23 @@
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [32]": "Motor Controller",
-      "/SmartDashboard/Drivetrain/sendable": "Subsystem"
+      "/SmartDashboard/Drivetrain/sendable": "Subsystem",
+      "/SmartDashboard/FIELD": "Field2d",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/elevcmd": "Subsystem"
     },
     "windows": {
       "/SmartDashboard/Drivetrain/sendable": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/FIELD": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
         "window": {
           "visible": true
         }
