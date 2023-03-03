@@ -2,7 +2,7 @@
   "HALProvider": {
     "Addressable LEDs": {
       "0": {
-        "columns": 13,
+        "columns": 37,
         "serpentine": true
       },
       "window": {
@@ -71,12 +71,10 @@
         }
       }
     },
-    "PWM Outputs": {
-      "window": {
-        "visible": true
-      }
-    },
     "RoboRIO": {
+      "5V Rail": {
+        "open": true
+      },
       "6V Rail": {
         "open": true
       },
@@ -92,6 +90,9 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/SwerveModule": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
@@ -100,6 +101,7 @@
       "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon 2 [0]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/Talon FX [10]": "Motor Controller",
@@ -110,6 +112,7 @@
       "/LiveWindow/Ungrouped/Talon FX [15]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [32]": "Motor Controller",
       "/SmartDashboard/Drivetrain/sendable": "Subsystem"
     },
     "windows": {
@@ -212,6 +215,9 @@
       "open": true
     },
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   },
   "Plot": {
     "Plot <0>": {

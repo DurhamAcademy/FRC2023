@@ -2,31 +2,21 @@ package frc.robot
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.revrobotics.CANSparkMax
-import edu.wpi.first.hal.PowerJNI
-import edu.wpi.first.hal.simulation.RoboRioDataJNI
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble
-import edu.wpi.first.wpilibj.PowerDistribution
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
-import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.RunCommand
-import edu.wpi.first.wpilibj2.command.Subsystem
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
-import frc.kyberlib.math.kEpsilon
-import frc.kyberlib.math.units.extensions.feetPerSecond
-import frc.kyberlib.math.units.extensions.inches
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
-import frc.robot.commands.MoveToPosition
+import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.alltogether.*
 import frc.robot.commands.arm.SetArmToAngle
 import frc.robot.commands.manipulator.CloseManipulator
@@ -239,16 +229,19 @@ class RobotContainer {
         {!Game.disabled && (wantingObject == GamePiece.cone)})
         val wantsCube = AnimationSolid(cubeColor, condition =
         {!Game.disabled && (wantingObject == GamePiece.cube)})
-
+        val limpMode = AnimationBlink(Color.RED, 0.5.seconds, condition = {isLimpHeld})
         val chain = KLEDRegion(0, Constants.leds.count,
-            prematchArms, percentage, wantsCone, wantsCube
+            prematchArms, percentage, wantsCone, wantsCube, limpMode
         )
         this += (chain)
     }
+    var isLimpHeld = false
+    var isLimp = false
     val limpCommand = RunCommand({
         arm.armMotor.idleMode = CANSparkMax.IdleMode.kCoast
         wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kCoast
         elevator.elevatorMotor.setNeutralMode(NeutralMode.Coast)
+        isLimp = true
     }, arm, wrist, elevator)
         .ignoringDisable(true)
         .handleInterrupt {
@@ -258,19 +251,21 @@ class RobotContainer {
         }
     val limpTrigger: Trigger =
         Trigger {
-            Game.TEST && RoboRioDataJNI.getFPGAButton()
+            Game.TEST && RobotController.getUserButton()
         }.apply {
-            this.debounce(0.25).whileTrue(
-                limpCommand
-            )
+            this
+                .onTrue(InstantCommand({ isLimpHeld = true },NoSubsystem))
+                .debounce(0.25).whileTrue(
+                    limpCommand
+                )
         }
-    val limpLongButton = Trigger {RoboRioDataJNI.getFPGAButton() && !Game.COMPETITION}.debounce(5.0)
+    val limpLongButton = Trigger {RobotController.getUserButton() && !Game.COMPETITION}
         .run {
-            this.whileTrue(
-                InstantCommand({
-                    drivetrain.zeroHeading()
-                }, drivetrain)
-            )
+            this.onTrue(InstantCommand({ isLimpHeld = true },NoSubsystem))
+                .debounce(5.0)
+                .whileTrue(
+                    limpCommand
+                )
         }
     fun update() {
         leds.update()

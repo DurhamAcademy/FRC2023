@@ -12,6 +12,7 @@ class KLEDStrip(port: Int, private val length: Int) {
         private var singleton: KLEDStrip? = null
     }
 
+
     private val addressableLED = AddressableLED(port)
     private val regions = arrayListOf<KLEDRegion>()
 
