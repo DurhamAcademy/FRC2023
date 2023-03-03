@@ -24,7 +24,7 @@ class CollectObject(
             manipulator.motorPercentage = 0.005
             manipulator.isOpen = false
         } else if (manipulator.sensorConnected) {
-            manipulator.motorPercentage = 1.0
+            manipulator.motorPercentage = 0.5
             // close manipulator if distance is lower than 0.05
             manipulator.isOpen = true
         } else {

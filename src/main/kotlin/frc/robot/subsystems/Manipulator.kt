@@ -102,7 +102,7 @@ class Manipulator: SubsystemBase() {
         get() = colorSensor.isConnected
 
     val inColorRange: Boolean?
-        get() = if (sensorConnected) distance!! < 0.15 else null
+        get() = if (sensorConnected) distance!! < 0.095 else null
 
     private val colorMatch = ColorMatch().apply {
         addColorMatch(ManipConsts.Colors.purpleCube)
