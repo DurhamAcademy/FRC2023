@@ -1,4 +1,4 @@
-package frc.robot.commands
+package frc.robot.commands.pathing
 
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.geometry.Pose2d
@@ -48,11 +48,8 @@ class MoveToPosition(
     val speedr = drivetrain.Idrc.add("speedr1${Random.nextDouble()}", 0.0)
         .entry
 
-    private val xP = 1.5
-    private val yP = 1.5
-    private val rP = 3.0
     val xPIDController = ProfiledPIDController(
-        xP, 0.0, 0.0, TrapezoidProfile.Constraints(
+        Companion.xP, 0.0, 0.0, TrapezoidProfile.Constraints(
             4.0,
             3.0
         )
@@ -61,7 +58,7 @@ class MoveToPosition(
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val yPIDController = ProfiledPIDController(
-        yP, 0.0, 0.0, TrapezoidProfile.Constraints(
+        Companion.yP, 0.0, 0.0, TrapezoidProfile.Constraints(
             4.0,
             3.0
         )
@@ -70,7 +67,7 @@ class MoveToPosition(
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val rPIDController = ProfiledPIDController(
-        rP, 0.0, 0.0, TrapezoidProfile.Constraints(
+        Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
             PI / 2, PI / 1.5
         )
     ).also {
@@ -180,5 +177,11 @@ class MoveToPosition(
         xPIDController.reset(0.0, 0.0)
         yPIDController.reset(0.0, 0.0)
         rPIDController.reset(0.0, 0.0)
+    }
+
+    companion object {
+        const val rP = 3.0
+        const val yP = 1.5
+        const val xP = 1.5
     }
 }
