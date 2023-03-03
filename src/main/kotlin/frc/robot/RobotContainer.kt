@@ -1,21 +1,12 @@
 package frc.robot
 
-import edu.wpi.first.hal.PowerJNI
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble
-import edu.wpi.first.wpilibj.PowerDistribution
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.InstantCommand
-import edu.wpi.first.wpilibj2.command.RunCommand
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
-import frc.kyberlib.math.kEpsilon
-import frc.kyberlib.math.units.extensions.feetPerSecond
-import frc.kyberlib.math.units.extensions.inches
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
@@ -39,7 +30,7 @@ class RobotContainer {
     val controlSchemeA: ControlScheme = BryanControlScheme(0)//xbox)
     val controlSchemeB: ControlScheme = BryanControlScheme(1)//xbox)
 
-//    var cameraWrapper: PhotonCameraWrapper = TODO("camera not working")//PhotonCameraWrapper()
+    var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
 
     init {
         Solver.robotContainer = this
@@ -47,7 +38,7 @@ class RobotContainer {
 
     val drivetrain = Drivetrain(
         controlSchemeA,
-        cameraWrappers = listOf(/*cameraWrapper*/),
+        cameraWrappers = listOf(cameraWrapper),
         this
     )
     val manipulator = Manipulator()
@@ -161,21 +152,20 @@ class RobotContainer {
                     ).onFalse(HoldPosition(elevator, arm, wrist))
 
                 // assign intake
-                intake
+                lowIntake
                     .whileTrue(
-                        IntakePositionForeward(elevator, arm, wrist)
+                        IntakePositionForward(elevator, arm, wrist)
                             .withManipulator(manipulator)
                     ).onFalse(HoldPosition(elevator, arm, wrist))
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
-                    .whileTrue(SetManipulatorSpeed(manipulator, -0.5)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -0.4)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 highIntake
                     .whileTrue(
-                        SetPosition
-                            .humanPlayer(elevator, arm, wrist)
-                            .withManipulator(manipulator)
+                        SetPosition.humanPlayer(elevator, arm, wrist).alongWith(CollectObject(manipulator))
+                            // previous setposition command was finishing before the race would actually work
                     )
 
                 xbox!!.povDown().onTrue(

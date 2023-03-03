@@ -1,6 +1,7 @@
 package frc.robot.subsystems
 
 import com.ctre.phoenix.sensors.Pigeon2
+import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
@@ -10,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
@@ -24,6 +26,7 @@ class Drivetrain(
     val cameraWrappers: List<PhotonCameraWrapper>,
     val robotContainer: RobotContainer
 ) : SubsystemBase() {
+
     init {
         defaultCommand = DriveCommand(this, controlScheme)
     }
@@ -88,27 +91,8 @@ class Drivetrain(
         configFactoryDefault()
     }
 
-    /**
-     * The odometry object for tracking robot pose
-     * This is used to get the robot's position on the field using the motors.
-     * When the motors move, the odometry object calculates where the robot
-     * should be according to the motors. What the motors report will, on its
-     * own, not be accurate enough and slowly drift from the actual position.
-     *
-     * To correct for the drift, we use the camera's pose estimators to
-     * correct the odometry object's position estimate. This is done in the
-     * periodic method.
-     * @author A1cD
-     * @see periodic
-     * @see SwerveDriveOdometry
-     */
-    var odometry = SwerveDriveOdometry(
-        kinematics,
-        Rotation2d.fromDegrees(gyro.yaw),
-        modules
-            .map { it.swerveModulePosition }
-            .toTypedArray()
-    )
+    private val f2d = Field2d()
+
     val Idrc = getTab("drivetrain")
 
     // pose shuffleboard stuff (using the field 2d widget)
@@ -118,7 +102,9 @@ class Drivetrain(
         modules.map {
             it.swerveModulePosition
         }.toTypedArray(),
-        Pose2d()
+        Pose2d(),
+        VecBuilder.fill(0.1, 0.1, 0.1),
+        VecBuilder.fill(1.8, 1.8, 1.8)
     )
     val poseEntryX = Idrc.add("posex", 0.0)
         .withProperties(mapOf("min" to -10.0, "max" to 10.0))
@@ -137,17 +123,14 @@ class Drivetrain(
     override fun periodic() {
         // This method will be called once per scheduler run
 
-        // we need to update odometry and the pose estimator with the current
-        // position of the robot.
-        odometry.update(
-            Rotation2d.fromDegrees(gyro.yaw),
-            modules.map { it.swerveModulePosition }.toTypedArray()
-        )
-        // and the pose estimator:
+        // pose estimator handles odometry too
         poseEstimator.update(
             Rotation2d.fromDegrees(gyro.yaw),
             modules.map { it.swerveModulePosition }.toTypedArray()
         )
+
+        f2d.robotPose = poseEstimator.estimatedPosition
+        SmartDashboard.putData("FIELD", f2d)
 
         // we want to get the estimated position from each camera's pose
         // estimator and add it to the drivetrain's pose estimator. This helps
@@ -199,7 +182,7 @@ class Drivetrain(
         val chassisSpeedsField =
             if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
                 chassisSpeeds,
-                odometry.poseMeters.rotation
+                poseEstimator.estimatedPosition.rotation
             )
             else chassisSpeeds
         val swerveModuleStates = kinematics.toSwerveModuleStates(
@@ -245,12 +228,12 @@ class Drivetrain(
      * Zeroes the heading of the robot
      */
     fun zeroHeading() {
-        odometry.resetPosition(
+        poseEstimator.resetPosition(
             Rotation2d.fromDegrees(gyro.yaw),
             modules.map { it.swerveModulePosition }
                 .toTypedArray(),
             Pose2d(
-                odometry.poseMeters.translation,
+                poseEstimator.estimatedPosition.translation,
                 Rotation2d()
             )
         )

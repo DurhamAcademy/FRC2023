@@ -33,7 +33,7 @@ class SwerveModule(
         .entry
     val driveMotor = WPI_TalonFX(driveMotorId).apply {
         configFactoryDefault()
-        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.0)) // why 0.5?
+//        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.0)) // why 0.5?
         //driveMotor.configClosedloopRamp(0.25);
         configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
@@ -45,6 +45,7 @@ class SwerveModule(
 //        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
 //        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
 //        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
+        configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
     }
     private val turnEncoder = CANCoder(encoderId).apply {
@@ -76,7 +77,7 @@ class SwerveModule(
         Constants.DRIVE_P,
         Constants.DRIVE_I,
         Constants.DRIVE_D,
-        TrapezoidProfile.Constraints(3.0, .0)// TODO: Fix these
+        TrapezoidProfile.Constraints(3.0, 12.0)// TODO: Fix these
     )
     private val driveFF = SimpleMotorFeedforward(Constants.driveKS, Constants.driveKV, Constants.driveKA)
 
@@ -107,14 +108,14 @@ class SwerveModule(
 //    }
     val swerveModulePosition: SwerveModulePosition
         get() = SwerveModulePosition(
-            driveMotor.selectedSensorPosition / 2048.0 * WHEEL_CIRCUMFRENCE * 10 / DRIVE_GEAR_RATIO,
+            driveMotor.selectedSensorPosition / 2048.0 * WHEEL_CIRCUMFRENCE / DRIVE_GEAR_RATIO,
             Rotation2d(MathUtil.angleModulus(degreesToRadians(turnEncoder.absolutePosition)))
         )
 
     @Suppress("RedundantSetter")
     val currentPosition: SwerveModuleState
         get() = SwerveModuleState(
-            (driveMotor.selectedSensorVelocity / 2048.0 * WHEEL_CIRCUMFRENCE / DRIVE_GEAR_RATIO),
+            (driveMotor.selectedSensorVelocity * 10.0 / 2048.0 * WHEEL_CIRCUMFRENCE / DRIVE_GEAR_RATIO),
             Rotation2d(MathUtil.angleModulus(degreesToRadians(turnEncoder.absolutePosition)))
         )
     var setpoint = SwerveModuleState()

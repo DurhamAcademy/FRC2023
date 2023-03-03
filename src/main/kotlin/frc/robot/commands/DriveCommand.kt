@@ -2,7 +2,9 @@ package frc.robot.commands
 
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandBase
+import frc.kyberlib.command.Game
 import frc.robot.Constants
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.Arm
@@ -17,7 +19,12 @@ class DriveCommand(
     }
 //    val rotPID
     override fun execute() {
-        val vec = Translation2d(controlScheme.forward, controlScheme.strafe).times(2.0)
+        var vec = Translation2d(controlScheme.forward, controlScheme.strafe).times(2.0)
+
+        if(Game.alliance == DriverStation.Alliance.Blue) {
+            vec = vec.times(-1.0)
+        }
+
 //        val normalized = if (vec.norm == 0.0) Translation2d() else vec.div(vec.norm).times(2.0)
         drivetrain.drive(
             ChassisSpeeds(
@@ -27,7 +34,7 @@ class DriveCommand(
                         Constants.powerPercent *.25
             ),
             true,
-            Translation2d(-Constants.MODULE_DISTANCE_X *0.4, 0.0)
+            Translation2d() // chris wants in the middle
 
         )
 

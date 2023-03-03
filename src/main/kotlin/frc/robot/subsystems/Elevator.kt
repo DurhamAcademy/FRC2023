@@ -174,6 +174,7 @@ class Elevator(
         }
 
     override fun periodic() {
+        SmartDashboard.putData("elevcmd",this)
         // set the setpoint to the height entry
         if (Constants.fullDSControl)
             setpoint = heightEntry.getDouble(Constants.Elevator.limits.bottomLimit)

@@ -31,7 +31,7 @@ class PhotonCameraWrapper {
             AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json"),
             PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
             photonCamera,
-            VisionConstants.robotToCam.minus(Pose3d())
+            VisionConstants.robotToCam
         )
 
     /**
