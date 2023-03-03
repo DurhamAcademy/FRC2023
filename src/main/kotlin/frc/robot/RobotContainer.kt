@@ -172,7 +172,11 @@ class RobotContainer {
                     .whileTrue(SetManipulatorSpeed(manipulator, -0.5)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 highIntake
-                    .whileTrue(SetPosition.humanPlayer(elevator, arm, wrist))
+                    .whileTrue(
+                        SetPosition
+                            .humanPlayer(elevator, arm, wrist)
+                            .withManipulator(manipulator)
+                    )
 
                 xbox!!.povDown().onTrue(
                     InstantCommand ({

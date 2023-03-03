@@ -8,6 +8,7 @@ import frc.robot.PlacePoint
 import frc.robot.RobotContainer
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
+import frc.robot.subsystems.Manipulator
 import frc.robot.subsystems.Wrist
 import kotlin.math.absoluteValue
 import kotlin.math.sin
@@ -31,6 +32,8 @@ class SetPosition(
         elevatorPosition,
         wristPosition
     )
+    fun withManipulator(manipulator: Manipulator) =
+        this.raceWith(CollectObject(manipulator))
     companion object {
         fun setpoint(placePoint: PlacePoint, elevator: Elevator, arm: Arm, wrist: Wrist) =
             when (placePoint) {
