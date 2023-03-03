@@ -11,6 +11,7 @@ class GrabConeCommand(
         addRequirements(manipulator)
     }
 
+
     override fun initialize() {
         manipulator.isOpen = false
     }

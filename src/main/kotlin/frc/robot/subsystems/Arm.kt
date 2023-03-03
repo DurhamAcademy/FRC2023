@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ArmFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.Preferences
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -28,12 +29,13 @@ class Arm : SubsystemBase() {
         restoreFactoryDefaults()
         setSmartCurrentLimit(Constants.arm.motor.currentLimit)
         inverted = Constants.arm.motor.inverted
+        this.serialNumber
     }
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
         Constants.arm.motor.gearRatio,
         Constants.arm.momentOfInertia,
-        Constants.arm.armLength,
+        Constants.arm.length,
         Constants.arm.minAngle,
         Constants.arm.maxAngle,
         true
@@ -51,9 +53,14 @@ class Arm : SubsystemBase() {
         0.5,
         TrapezoidProfile.Constraints(
             3.0,
-            2.0
+            1.0
         )
-    )
+    ).apply {
+        setTolerance(
+            Constants.arm.motor.positionTolerance,
+            Constants.arm.motor.velocityTolerance
+        )
+    }
     var armFeedForward = ArmFeedforward(
         Constants.arm.motor.kS,
         Constants.arm.motor.kG,
@@ -61,12 +68,28 @@ class Arm : SubsystemBase() {
         Constants.arm.motor.kA
     )
 
+    var armOffset = Preferences.getDouble("armOffset", 0.0).apply {
+        this@Arm.armEncoder
+            .configMagnetOffset(-this + Constants.arm.encoder.offset)
+    }
+        get() = field
+        set(value) {
+            field = value
+            if (Preferences.containsKey("armOffset")) {
+                Preferences.setDouble("armOffset", value)
+            } else {
+                Preferences.initDouble("armOffset", value)
+            }
+            this@Arm.armEncoder
+                .configMagnetOffset(-value + Constants.arm.encoder.offset)
+        }
+
     val armPosition: Double
         get() = if (RobotBase.isSimulation()) simArmSystem.angleRads
         else toRadians(armEncoder.absolutePosition)
     val armVelocity: Double
         get() = toRadians(armEncoder.velocity)
-    var armSetpoint: Double? = null
+    private var armSetpoint: Double? = null
     fun setArmVoltage(voltage: Double) {
         if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
@@ -82,8 +105,10 @@ class Arm : SubsystemBase() {
      * our intake.
      */
     fun setArmPosition(position: Double) {
-        armSetpoint = position
-
+        armSetpoint = position.coerceIn(
+            Constants.arm.minAngle,
+            Constants.arm.maxAngle
+        )
     }
 
     // shuffleboard
@@ -115,7 +140,7 @@ class Arm : SubsystemBase() {
     val dashSetpoint = ArmTab.add("dashSetpoint", 0.0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(
-            mapOf("min" to -PI, "max" to PI)
+            mapOf("min" to Constants.arm.minAngle, "max" to Constants.arm.maxAngle)
         )
         .entry
 

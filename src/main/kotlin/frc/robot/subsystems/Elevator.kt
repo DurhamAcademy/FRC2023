@@ -6,19 +6,26 @@ import edu.wpi.first.math.controller.ElevatorFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.util.Units
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.ElevatorSim
 import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
+import frc.robot.RobotContainer
 import frc.robot.controls.ControlScheme
+import kotlin.math.PI
+import kotlin.math.absoluteValue
+import kotlin.math.sin
 
 class Elevator(
-    val controlScheme: ControlScheme,
+    val robotContainer: RobotContainer?
 ) : SubsystemBase() {
     val elevatorMotor = WPI_TalonFX(
         Constants.Elevator.elevatorMotor.ElevatorMotorId
@@ -36,18 +43,21 @@ class Elevator(
             Constants.Elevator.elevatorMotor.PID.TrapezoidProfile.maxVelocity,
             Constants.Elevator.elevatorMotor.PID.TrapezoidProfile.maxAcceleration
         )
-    )
+    ).apply {
+        setTolerance(
+            Constants.Elevator.elevatorMotor.tolerance.positionTolerance,
+            Constants.Elevator.elevatorMotor.tolerance.velocityTolerance
+        )
+    }
     val feedforward = ElevatorFeedforward(
         Constants.Elevator.elevatorMotor.Feedforward.kS,
         Constants.Elevator.elevatorMotor.Feedforward.kG,
         Constants.Elevator.elevatorMotor.Feedforward.kV,
         Constants.Elevator.elevatorMotor.Feedforward.kA
     )
-    val limitSwitch = DigitalInput(0).apply {
-        if (RobotBase.isSimulation()) {
-//            this.setSimDevice(simLimitSwitch)
-        }
-    }
+    val limitSwitch = DigitalInput(
+        Constants.Elevator.limitSwitch.ElevatorLimitSwitchId
+    )
 
     val elevatorSim = ElevatorSim(
         DCMotor.getFalcon500(1),
@@ -84,7 +94,8 @@ class Elevator(
             // the current offset
                 offset = value - elevatorMotor.selectedSensorPosition *
                         Constants.Elevator.encoderDistancePerPulse *
-                        Constants.Elevator.elevatorMotor.gearRatio -
+                        Constants.Elevator.elevatorMotor.gearRatio *
+                        Constants.Elevator.sproketRadius * 2.0 * PI -
                         Constants.Elevator.limits.bottomLimit
         }
 
@@ -94,6 +105,28 @@ class Elevator(
                 Constants.Elevator.limits.bottomLimit,
                 Constants.Elevator.limits.topLimit
             )
+            if (robotContainer!=null) {
+                val topLimit = Constants.FieldConstants.heightLimit
+                val bottomLimit = 0.1
+                val armLength = Constants.arm.length
+                // use arm angle to determine elevator height
+                val wristAngle = robotContainer.wrist.position
+                val armAngle = robotContainer.arm.armPosition
+                val armHeight = armLength * sin((PI/2)-armAngle) +
+                        Constants.wrist.maxWristLength * sin((PI/2)-(armAngle+wristAngle))
+                val elevatorMaxHeight = topLimit - armHeight
+
+                field = field.coerceAtMost(elevatorMaxHeight)
+                field = field.coerceAtLeast(Constants.Elevator.limits.bottomLimit)
+//                if ((wristAngle.absoluteValue >= PI/4) && (armAngle >= .35)) {
+//                    // if the wrist is not upright and the arm is close to it,
+//                    field = field.coerceAtLeast(
+//                        Constants.Elevator.limits.bottomLimit
+//                                + inchesToMeters(10.0)
+//                    )
+//                }
+
+            }
         }
 
     fun setMotorVoltage(voltage: Double) {
@@ -126,9 +159,25 @@ class Elevator(
 
     private var lastVel = 0.0
     private var lastTime = 0.0
-    override fun periodic() {
-        // limits
+    val tab = Shuffleboard.getTab("Elevator")
+    val heightEntry = tab.add("Height", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(
+            mapOf(
+                "min" to Constants.Elevator.limits.bottomLimit,
+                "max" to Constants.Elevator.limits.topLimit
+            )
+        )
+        .entry.apply {
+            // set min
+            this.setDouble(Constants.Elevator.limits.bottomLimit)
+        }
 
+    override fun periodic() {
+        SmartDashboard.putData("elevcmd",this)
+        // set the setpoint to the height entry
+        if (Constants.fullDSControl)
+            setpoint = heightEntry.getDouble(Constants.Elevator.limits.bottomLimit)
         // set motor voltage
         setMotorVoltage(
             motorPid.calculate(
@@ -136,8 +185,6 @@ class Elevator(
                 setpoint
             ) + feedforward.calculate(
                 motorPid.setpoint.velocity,
-//                (motorPid.setpoint.velocity - lastVel) /
-//                        (Timer.getFPGATimestamp() - lastTime)
             )
         )
         lastVel = motorPid.goal.velocity

@@ -9,13 +9,17 @@ import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 
-class Wrist : SubsystemBase() {
-    private val wristMotor = CANSparkMax(
+class Wrist(
+    private val arm: Arm
+) : SubsystemBase() {
+    val wristMotor = CANSparkMax(
         Constants.wrist.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
@@ -40,7 +44,7 @@ class Wrist : SubsystemBase() {
         configMagnetOffset(-Constants.wrist.encoder.offset)
         configSensorDirection(Constants.wrist.encoder.inverted)
     }
-    private val pid = ProfiledPIDController(
+    val pid = ProfiledPIDController(
         Constants.wrist.motor.kP,
         Constants.wrist.motor.kI,
         Constants.wrist.motor.kD,
@@ -91,12 +95,44 @@ class Wrist : SubsystemBase() {
         else wristMotor.setVoltage(voltage)
     }
 
+    /**
+     * @param angleOfFlip the angle at which the arm is flipped in radians
+     */
+    fun levelAngle(angleOfFlip: Double): Double {
+        /*
+                  If arm is in negative direction set wrist level to floor
+                  The arm and wrist must add up to 90 (e.g. if the arm is flat at 90 degrees the wrist must be at 0 degrees)
+                  As armPosition is negative 90 + armPosition is the remaining amount that adds up to 90
+                  Then it is multiplied by -1 to keep it on the same side
+                */
+        val armPosition = arm.armPID.setpoint.position
+        return if (armPosition < -angleOfFlip) -(Math.toRadians(90.0) + armPosition)
+        else if (armPosition > angleOfFlip) Math.toRadians(90.0) - armPosition
+        else if (armPosition > 0) armPosition * ((Math.toRadians(90.0) - angleOfFlip) / angleOfFlip)
+        else armPosition * ((Math.toRadians(90.0) - angleOfFlip) / angleOfFlip)
+        //if arm is in the middle flip wrist
+        //if arm is in the middle flip wrist
+        /*
+                      If arm is in the positive direction set wrist level to floor
+                      90 - armPosition is the amount wrist needs to be set at
+                    */
+    }
+
     fun reset() {
         pid.reset(position)
         println("RESET")
     }
 
+    val tab = Shuffleboard.getTab("Wrist")
+    val wristPosition = tab.add("Wrist Position", 0.0)
+        .withWidget(BuiltInWidgets.kNumberSlider)
+        .withProperties(mapOf("min" to -2.0, "max" to 2.0))
+        .entry
+
     override fun periodic() {
+        if (Constants.fullDSControl) {
+            setPosition(wristPosition.getDouble(0.0))
+        }
         val output = pid.calculate(position, setpoint ?: position)
         SmartDashboard.putNumber("wrist/position", position)
         SmartDashboard.putNumber("wrist/velocity", velocity)

@@ -31,6 +31,7 @@ class Robot : TimedRobot() {
             SmartDashboard.putNumber("tagX", y)
         }
 
+        robotContainer.update()
     }
 
     // schedule test commands during test mode
@@ -39,7 +40,6 @@ class Robot : TimedRobot() {
     }
 
     override fun testPeriodic() {
-        robotContainer.drivetrain.frontLeft.driveMotor.setVoltage(6.0)
 
     }
 }
