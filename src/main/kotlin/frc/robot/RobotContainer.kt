@@ -245,22 +245,31 @@ class RobotContainer {
         )
         this += (chain)
     }
+    val limpCommand = RunCommand({
+        arm.armMotor.idleMode = CANSparkMax.IdleMode.kCoast
+        wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kCoast
+        elevator.elevatorMotor.setNeutralMode(NeutralMode.Coast)
+    }, arm, wrist, elevator)
+        .ignoringDisable(true)
+        .handleInterrupt {
+            arm.armMotor.idleMode = CANSparkMax.IdleMode.kBrake
+            wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kBrake
+            elevator.elevatorMotor.setNeutralMode(NeutralMode.Brake)
+        }
     val limpTrigger: Trigger =
         Trigger {
             Game.TEST && RoboRioDataJNI.getFPGAButton()
         }.apply {
             this.debounce(0.25).whileTrue(
-                RunCommand({
-                    arm.armMotor.idleMode = CANSparkMax.IdleMode.kCoast
-                    wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kCoast
-                    elevator.elevatorMotor.setNeutralMode(NeutralMode.Coast)
-                }, arm, wrist, elevator)
-                    .ignoringDisable(true)
-                    .handleInterrupt {
-                        arm.armMotor.idleMode = CANSparkMax.IdleMode.kBrake
-                        wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kBrake
-                        elevator.elevatorMotor.setNeutralMode(NeutralMode.Brake)
-                    }
+                limpCommand
+            )
+        }
+    val limpLongButton = Trigger {RoboRioDataJNI.getFPGAButton()}.debounce(5.0)
+        .run {
+            this.whileTrue(
+                InstantCommand({
+                    drivetrain.zeroHeading()
+                }, drivetrain)
             )
         }
     fun update() {
