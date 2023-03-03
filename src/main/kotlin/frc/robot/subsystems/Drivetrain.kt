@@ -8,11 +8,13 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry
+import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Constants
 import frc.robot.PhotonCameraWrapper
+import frc.robot.RobotContainer
 import frc.robot.commands.DriveCommand
 import frc.robot.controls.ControlScheme
 import java.lang.Math.PI
@@ -20,6 +22,7 @@ import java.lang.Math.PI
 class Drivetrain(
     controlScheme: ControlScheme,
     val cameraWrappers: List<PhotonCameraWrapper>,
+    val robotContainer: RobotContainer
 ) : SubsystemBase() {
     init {
         defaultCommand = DriveCommand(this, controlScheme)
@@ -188,9 +191,16 @@ class Drivetrain(
      * @param chassisSpeeds the chassis speeds to drive at
      * @param fieldRelative whether the chassis speeds are field-relative
      */
-    fun drive(chassisSpeeds: ChassisSpeeds, fieldRelative: Boolean) {
+    fun drive(
+        chassisSpeeds: ChassisSpeeds,
+        fieldRelative: Boolean,
+        rotAxis: Translation2d = Translation2d(0.0, 0.0)
+    ) {
         val chassisSpeedsField =
-            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, Rotation2d.fromDegrees(gyro.yaw))
+            if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
+                chassisSpeeds,
+                odometry.poseMeters.rotation
+            )
             else chassisSpeeds
         val swerveModuleStates = kinematics.toSwerveModuleStates(
             chassisSpeedsField
@@ -218,11 +228,32 @@ class Drivetrain(
         }
     }
 
+    var powerSaveMode: Int = 0
+        set(value) {
+            field = value
+            if (value == 0) {
+                modules.forEach { it.powerSaveMode = false }
+            } else {
+                modules.forEachIndexed { i, module ->
+                    module.powerSaveMode = i < value
+                    // only enable power save mode for the first n modules
+                }
+            }
+        }
+
     /**
      * Zeroes the heading of the robot
      */
     fun zeroHeading() {
-        gyro.yaw = 0.0
+        odometry.resetPosition(
+            Rotation2d.fromDegrees(gyro.yaw),
+            modules.map { it.swerveModulePosition }
+                .toTypedArray(),
+            Pose2d(
+                odometry.poseMeters.translation,
+                Rotation2d()
+            )
+        )
     }
 
 }

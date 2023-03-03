@@ -121,7 +121,29 @@ class SwerveModule(
         set(value) {
             field = SwerveModuleState.optimize(value, currentPosition.angle)
         }
-
+    var powerSaveMode = false
+        set(value) {
+            field = value
+            if (value) {
+                driveMotor.setNeutralMode(NeutralMode.Coast)
+                turnMotor.setNeutralMode(NeutralMode.Coast)
+                driveMotor.configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(
+                    true,
+                    10.0,
+                    20.0,
+                    0.0
+                ))
+            } else {
+                driveMotor.setNeutralMode(NeutralMode.Brake)
+                turnMotor.setNeutralMode(NeutralMode.Brake)
+                driveMotor.configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(
+                    true,
+                    40.0,
+                    45.0,
+                    0.0
+                ))
+            }
+        }
     private fun setMotorSpeed(drive: Double, angle: Double) {
         driveMotor.setVoltage(drive)
         turnMotor.setVoltage(angle)

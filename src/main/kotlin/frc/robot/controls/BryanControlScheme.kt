@@ -4,8 +4,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import kotlin.math.absoluteValue
 
-class BryanControlScheme : ControlScheme() {
-    override val xbox = CommandXboxController(0)
+class BryanControlScheme(
+    xboxNum: Int = 0
+) : ControlScheme() {
+    override val xbox = CommandXboxController(xboxNum)
     override val rotation: Double
         get() = xbox.rightX.coerceIn(-1.0, 1.0).let { if (it.absoluteValue < 0.05) 0.0 else it }
     override val strafe: Double

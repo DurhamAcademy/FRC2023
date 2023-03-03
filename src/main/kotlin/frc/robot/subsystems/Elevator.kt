@@ -25,7 +25,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.sin
 
 class Elevator(
-    val controlScheme: ControlScheme,
     val robotContainer: RobotContainer?
 ) : SubsystemBase() {
     val elevatorMotor = WPI_TalonFX(

@@ -21,12 +21,12 @@ class MoveToPosition(
 
     // these entries are used to debug how fast the robot wants to move to get
     // to the desired position
-    val speedx = drivetrain.Idrc.add("speedx1$x.$y.$angle", 0.0)
-        .entry
-    val speedy = drivetrain.Idrc.add("speedy1$x.$y.$angle", 0.0)
-        .entry
-    val speedr = drivetrain.Idrc.add("speedr1$x.$y.$angle", 0.0)
-        .entry
+//    val speedx = drivetrain.Idrc.add("speedx1$x.$y.$angle", 0.0)
+//        .entry
+//    val speedy = drivetrain.Idrc.add("speedy1$x.$y.$angle", 0.0)
+//        .entry
+//    val speedr = drivetrain.Idrc.add("speedr1$x.$y.$angle", 0.0)
+//        .entry
 
     override fun execute() {
         // get the current position of the robot and offset it by the desired position
@@ -54,9 +54,9 @@ class MoveToPosition(
 
         // set the debug entries to the speeds so we can see values in the
         // smartdashboard
-        speedx.setDouble(speeds.vxMetersPerSecond)
-        speedy.setDouble(speeds.vyMetersPerSecond)
-        speedr.setDouble(speeds.omegaRadiansPerSecond)
+//        speedx.setDouble(speeds.vxMetersPerSecond)
+//        speedy.setDouble(speeds.vyMetersPerSecond)
+//        speedr.setDouble(speeds.omegaRadiansPerSecond)
 
 
         // tell the drivetrain to drive at the calculated speeds

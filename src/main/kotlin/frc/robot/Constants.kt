@@ -29,7 +29,7 @@ object Constants {
             const val velocityTolerance = 0.05
             const val id = 33
             const val currentLimit = 40
-            const val inverted = true
+            const val inverted = false
             const val gearRatio = 1.0
             const val maxVelocity = 24.0
             const val maxAcceleration = 6.0
@@ -44,8 +44,8 @@ object Constants {
 
         object encoder {
             const val id = 19
-            const val offset = 2.14
-            const val inverted = false
+            const val offset = 14.0
+            const val inverted = true
         }
 
         val simArmLength = inchesToMeters(10.0)
@@ -68,9 +68,10 @@ object Constants {
             }
 
             object tolerance {
-                val positionTolerance: Double = 0.05
-                val velocityTolerance: Double = 0.05
+                const val positionTolerance: Double = 0.05
+                const val velocityTolerance: Double = 0.05
             }
+            //todo add encoder offset to smartdashboard
 
             val inverted = true
             val gearRatio: Double = 1 / 10.51
@@ -101,7 +102,7 @@ object Constants {
     }
 
     const val maxDriveAcceleration = 3.0
-    const val powerPercent = .2
+    const val powerPercent = 1.0
 
     const val BRZeroAngle = -10.0
     const val BLZeroAngle = -29.7
@@ -135,7 +136,7 @@ object Constants {
             const val velocityTolerance = 0.05
             const val id = 34
             const val currentLimit = 40
-            const val inverted = false
+            const val inverted = true
             const val gearRatio = 1 / 170.67
             const val maxVelocity = 1.0
             const val maxAcceleration = 1.0
@@ -151,8 +152,8 @@ object Constants {
 
         object encoder {
             const val id = 18
-            const val offset = 131.83
-            const val inverted = false
+            const val offset = -76.15+17+25-5-5//-87.49
+            const val inverted = true
         }
 
         val length = inchesToMeters(30.31)

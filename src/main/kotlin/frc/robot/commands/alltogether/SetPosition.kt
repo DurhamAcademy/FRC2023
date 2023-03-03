@@ -50,7 +50,7 @@ class SetPosition(
             wrist,
             1.4,
             Constants.Elevator.limits.topLimit,
-            Math.toRadians(85.0)
+            Math.toRadians(95.0)
         )
         fun mid(elevator: Elevator, arm: Arm, wrist: Wrist) = SetPosition(
             elevator,
@@ -58,7 +58,7 @@ class SetPosition(
             wrist,
             1.4,
             inchesToMeters(38.0),
-            Math.toRadians(-10.0)
+            Math.toRadians(0.0)
         )
         fun low(elevator: Elevator, arm: Arm, wrist: Wrist) = SetPosition(
             elevator,

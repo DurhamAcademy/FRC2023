@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLED
 import edu.wpi.first.wpilibj.AddressableLEDBuffer
 import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.kyberlib.command.Game
+import java.awt.Color
 
 class KLEDStrip(port: Int, private val length: Int) {
 
@@ -30,15 +31,22 @@ class KLEDStrip(port: Int, private val length: Int) {
         regions.add(other)
     }
 
+    val buffer = AddressableLEDBuffer(length)
+    val mutableBuffer = Array(length) { Color.black }
     fun update() {
-        val buffer = AddressableLEDBuffer(length)
         val dt = Game.time - startTime
-        val mutableBuffer = KLEDRegion.composite(length, dt, regions).map {
-            it.gammaCorrect()
+        KLEDRegion.optimizedComposite(mutableBuffer, dt, regions)
+        mutableBuffer.forEachIndexed { index, color ->
+            mutableBuffer[index] = mutableBuffer[index].gammaCorrect()
         }
 
         for (i in mutableBuffer.indices) {
-            buffer.setLED(i, Color8Bit(mutableBuffer[i].red, mutableBuffer[i].green, mutableBuffer[i].blue))
+            buffer.setRGB(
+                i,
+                mutableBuffer[i].red,
+                mutableBuffer[i].green,
+                mutableBuffer[i].blue
+            )
         }
 
         addressableLED.setData(buffer)

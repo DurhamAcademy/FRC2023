@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ArmFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.Preferences
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -28,6 +29,7 @@ class Arm : SubsystemBase() {
         restoreFactoryDefaults()
         setSmartCurrentLimit(Constants.arm.motor.currentLimit)
         inverted = Constants.arm.motor.inverted
+        this.serialNumber
     }
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
@@ -51,7 +53,7 @@ class Arm : SubsystemBase() {
         0.5,
         TrapezoidProfile.Constraints(
             3.0,
-            2.0
+            1.0
         )
     ).apply {
         setTolerance(
@@ -65,6 +67,22 @@ class Arm : SubsystemBase() {
         Constants.arm.motor.kV,
         Constants.arm.motor.kA
     )
+
+    var armOffset = Preferences.getDouble("armOffset", 0.0).apply {
+        this@Arm.armEncoder
+            .configMagnetOffset(-this + Constants.arm.encoder.offset)
+    }
+        get() = field
+        set(value) {
+            field = value
+            if (Preferences.containsKey("armOffset")) {
+                Preferences.setDouble("armOffset", value)
+            } else {
+                Preferences.initDouble("armOffset", value)
+            }
+            this@Arm.armEncoder
+                .configMagnetOffset(-value + Constants.arm.encoder.offset)
+        }
 
     val armPosition: Double
         get() = if (RobotBase.isSimulation()) simArmSystem.angleRads
