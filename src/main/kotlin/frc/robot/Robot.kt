@@ -42,4 +42,12 @@ class Robot : TimedRobot() {
     override fun testPeriodic() {
 
     }
+
+    override fun autonomousInit() {
+        robotContainer.auto.schedule()
+    }
+
+    override fun autonomousExit() {
+        robotContainer.auto.cancel()
+    }
 }

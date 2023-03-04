@@ -192,7 +192,7 @@ class Drivetrain(
             swerveModuleStates,
             chassisSpeedsField,
             4.0,
-            2.0,
+            3.5,
             2 * PI
         )
 

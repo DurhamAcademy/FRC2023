@@ -55,7 +55,7 @@ class Manipulator: SubsystemBase() {
         }
 
 
-    private val i2cPort = I2C.Port.kOnboard
+    private val i2cPort = I2C.Port.kMXP
     val colorSensor = ColorSensorV3(i2cPort)
 
 

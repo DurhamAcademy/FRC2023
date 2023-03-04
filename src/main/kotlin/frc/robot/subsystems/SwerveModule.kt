@@ -33,7 +33,7 @@ class SwerveModule(
         .entry
     val driveMotor = WPI_TalonFX(driveMotorId).apply {
         configFactoryDefault()
-//        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.0)) // why 0.5?
+//        configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(true, 40.0, 45.0, 0.0))
         //driveMotor.configClosedloopRamp(0.25);
         configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
@@ -42,10 +42,10 @@ class SwerveModule(
     }
     private val turnMotor = WPI_TalonFX(turnMotorId).apply {
         configFactoryDefault()
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
-        configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 40.0, 45.0, 0.5))
+        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
+        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
+        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
+        configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 30.0, 35.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
     }
     private val turnEncoder = CANCoder(encoderId).apply {
@@ -77,7 +77,7 @@ class SwerveModule(
         Constants.DRIVE_P,
         Constants.DRIVE_I,
         Constants.DRIVE_D,
-        TrapezoidProfile.Constraints(3.0, 12.0)// TODO: Fix these
+        TrapezoidProfile.Constraints(10.0, 1000.0)// TODO: Fix these
     )
     private val driveFF = SimpleMotorFeedforward(Constants.driveKS, Constants.driveKV, Constants.driveKA)
 
@@ -124,6 +124,7 @@ class SwerveModule(
         }
     var powerSaveMode = false
         set(value) {
+            return
             field = value
             if (value) {
                 driveMotor.setNeutralMode(NeutralMode.Coast)

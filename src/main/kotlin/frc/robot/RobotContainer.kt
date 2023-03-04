@@ -264,8 +264,8 @@ class RobotContainer {
                 .debounce(5.0)
                 .whileTrue(
                     limpCommand
-                )
-        }
+                )        }
+    val auto = MoveToPosition.pathRed(drivetrain, elevator, arm, wrist, manipulator)
     fun update() {
         leds.update()
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)

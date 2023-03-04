@@ -27,13 +27,13 @@ class DriveCommand(
             Alliance.Red -> Constants.Field2dLayout.Axes.Red.fieldOffsetMultiplier
         }
         val vec = Translation2d(-controlScheme.forward, -controlScheme.strafe)
-            .times(2.0)
+            .times(3.5)
         drivetrain.drive(
             ChassisSpeeds(
                 vec.x * Constants.powerPercent * alianceMulitplier,
-                vec.y * Constants.powerPercent,
+                vec.y * Constants.powerPercent * alianceMulitplier,
                 -controlScheme.rotation *2 * Math.PI *
-                        Constants.powerPercent *.25
+                        Constants.powerPercent *.5
             ),
             true,
             Translation2d() // chris wants in the middle
