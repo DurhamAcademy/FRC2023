@@ -123,9 +123,9 @@ class RobotContainer {
 
                 toggleManipulator
                     .toggleOnFalse(
-                        CloseManipulator(manipulator)
+                        SetManipulatorSpeed(manipulator,0.1)
                     ).toggleOnTrue(
-                        OpenManipulator(manipulator)
+                        OpenManipulator(manipulator, 0.0)
                     )
 
                 // assign the grab cone trigger to the command that
@@ -176,7 +176,8 @@ class RobotContainer {
 
                 xbox!!.povDown().onTrue(
                     InstantCommand ({
-                        drivetrain.zeroHeading()
+                        if (!Game.COMPETITION)
+                            drivetrain.zeroHeading()
                     }, drivetrain)
                 )
                 if (i == 0) {
