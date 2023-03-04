@@ -1,6 +1,7 @@
 package frc.robot.commands
 
 import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Translation2d
@@ -25,14 +26,18 @@ class DriveCommand(
     init {
         addRequirements(drivetrain)
     }
-    var heldRotation2d = Rotation2d.fromDegrees(drivetrain.gyro.yaw)
+
+    var heldRotation2d = if (!Game.sim) Rotation2d.fromDegrees(drivetrain.gyro.yaw)
+    else null
     val rPIDController = ProfiledPIDController(
         MoveToPosition.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
             PI / 2, PI / 1.5
         )
     ).also {
         it.enableContinuousInput(-PI, PI)
-        it.reset(drivetrain.estimatedPose2d.rotation.radians, drivetrain.estimatedVelocity.rotation.radians)
+        print(Game.sim)
+        it.reset((drivetrain.estimatedPose2d ?: Pose2d()).rotation.radians, drivetrain.estimatedVelocity.rotation.radians)
+
     }
     override fun execute() {
         val alianceMulitplier = when (Game.alliance) {
@@ -43,10 +48,10 @@ class DriveCommand(
         val vec = Translation2d(-controlScheme.forward, controlScheme.strafe)
             .times(2.0)
         val rotCorrection =
-            if (controlScheme.rotation == 0.0)
+            if (controlScheme.rotation == 0.0 && !Game.sim)
                 rPIDController.calculate(
                     Rotation2d.fromDegrees(drivetrain.gyro.yaw).radians,
-                    heldRotation2d.radians
+                    heldRotation2d!!.radians
                 )
             else 0.0
                 .also { heldRotation2d = Rotation2d.fromDegrees(drivetrain.gyro.yaw) }

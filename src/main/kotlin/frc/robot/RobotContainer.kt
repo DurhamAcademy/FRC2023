@@ -292,6 +292,9 @@ class RobotContainer {
         leds.update()
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
     }
+
+    val auto = Trigger { Game.AUTO }
+        .whileTrue(MoveToPosition.pathBlue(drivetrain, elevator, arm, wrist, manipulator))
 }
 
 object NoSubsystem: SubsystemBase()

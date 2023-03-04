@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.kyberlib.command.Game
 import frc.robot.Constants
 import frc.robot.PhotonCameraWrapper
 import frc.robot.RobotContainer
@@ -112,10 +113,10 @@ open class Drivetrain(
     private var simEstimatedPose2d: Pose2d = Pose2d()
 
     open val estimatedPose2d: Pose2d
-        get() = if (RobotBase.isReal()) {
+        get() = if (!Game.sim) {
             poseEstimator.estimatedPosition
         } else {
-            simEstimatedPose2d
+            simEstimatedPose2d ?: Pose2d()
         }
 
     open var estimatedVelocity = Transform2d()

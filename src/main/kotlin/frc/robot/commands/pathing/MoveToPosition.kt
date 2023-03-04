@@ -14,10 +14,7 @@ import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.manipulator.OpenManipulator
 import frc.robot.commands.manipulator.SetManipulatorSpeed
-import frc.robot.subsystems.Arm
-import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.Elevator
-import frc.robot.subsystems.Wrist
+import frc.robot.subsystems.*
 import kotlin.math.PI
 import kotlin.math.hypot
 import kotlin.random.Random
@@ -193,14 +190,14 @@ class MoveToPosition(
         const val yP = 1.5
         const val xP = 1.5
 
-        fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
-            run {
-                (drivetrain.poseEstimator.estimatedPosition)
-                MoveToPosition(drivetrain, 1.8, 1.0)
-                    .andThen(SetPosition.high(elevator, arm, wrist)
-                        .deadlineWith(WaitCommand(3.0)))
-                    .andThen(OpenManipulator(manipulator).alongWith(SetManipulatorSpeed(manipulator, 1.0)).deadlineWith(WaitCommand(1.0)))
-                    .andThen(MoveToPosition(drivetrain, 6.0, 0.75, PI))
-            }
+            fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
+                run {
+                    (drivetrain.poseEstimator.estimatedPosition)
+                    MoveToPosition(drivetrain, 1.8, 1.0)
+                        .andThen(SetPosition.high(elevator, arm, wrist)
+                            .deadlineWith(WaitCommand(3.0)))
+                        .andThen(OpenManipulator(manipulator).alongWith(SetManipulatorSpeed(manipulator, 1.0)).deadlineWith(WaitCommand(1.0)))
+                        .andThen(MoveToPosition(drivetrain, 6.0, 0.75, PI))
+                }
     }
 }
