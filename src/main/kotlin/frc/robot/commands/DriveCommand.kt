@@ -26,7 +26,7 @@ class DriveCommand(
             Alliance.Blue -> Constants.Field2dLayout.Axes.Blue.fieldOffsetMultiplier
             Alliance.Red -> Constants.Field2dLayout.Axes.Red.fieldOffsetMultiplier
         }
-        val vec = Translation2d(-controlScheme.forward, controlScheme.strafe)
+        val vec = Translation2d(-controlScheme.forward, -controlScheme.strafe)
             .times(2.0)
         drivetrain.drive(
             ChassisSpeeds(

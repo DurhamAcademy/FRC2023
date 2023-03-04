@@ -77,7 +77,7 @@ class SetPosition(
             arm,
             wrist,
             1.4,
-            1.3- inchesToMeters(7.0),
+            1.3- inchesToMeters(9.5),
             Math.toRadians(-5.0)
         )
 
