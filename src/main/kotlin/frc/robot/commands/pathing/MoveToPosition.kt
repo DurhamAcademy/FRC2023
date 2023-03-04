@@ -9,7 +9,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.WaitCommand
+import frc.robot.commands.alltogether.IntakePositionForward
+import frc.robot.commands.alltogether.SetPosition
+import frc.robot.commands.manipulator.OpenManipulator
+import frc.robot.commands.manipulator.SetManipulatorSpeed
+import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
+import frc.robot.subsystems.Elevator
+import frc.robot.subsystems.Wrist
 import kotlin.math.PI
 import kotlin.math.hypot
 import kotlin.random.Random
@@ -28,6 +36,7 @@ class MoveToPosition(
     private val tolerancepvel: Double = 0.01,
     private val tolerancerpos: Double = 0.025,
     private val tolerancervel: Double = 0.01,
+    val inverted: Boolean = false
 ) : CommandBase() {
     constructor(drivetrain: Drivetrain, x: Double = 0.0, y: Double = 0.0, angle: Double = 0.0) : this(
         drivetrain,
@@ -183,5 +192,15 @@ class MoveToPosition(
         const val rP = 3.0
         const val yP = 1.5
         const val xP = 1.5
+
+        fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, 1.8, 1.0)
+                    .andThen(SetPosition.high(elevator, arm, wrist)
+                        .deadlineWith(WaitCommand(3.0)))
+                    .andThen(OpenManipulator(manipulator).alongWith(SetManipulatorSpeed(manipulator, 1.0)).deadlineWith(WaitCommand(1.0)))
+                    .andThen(MoveToPosition(drivetrain, 6.0, 0.75, PI))
+            }
     }
 }
