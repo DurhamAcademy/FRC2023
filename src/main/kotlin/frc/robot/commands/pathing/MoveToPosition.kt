@@ -10,6 +10,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
+import frc.robot.Constants
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.manipulator.CloseManipulator
@@ -24,7 +25,7 @@ class MoveToPosition(
     /**
      * The desired position of the robot (in meters)
      */
-    private val pose: Pose2d,
+    private var pose: Pose2d,
     /**
      * The desired velocity of the robot (in meters per second)
      */
@@ -33,6 +34,7 @@ class MoveToPosition(
     private val tolerancepvel: Double = 0.1,
     private val tolerancerpos: Double = 0.025,
     private val tolerancervel: Double = 0.1,
+    private val snapMode: Boolean = false
 ) : CommandBase() {
     constructor(drivetrain: Drivetrain, x: Double = 0.0, y: Double = 0.0, angle: Double = 0.0) : this(
         drivetrain,
@@ -40,18 +42,19 @@ class MoveToPosition(
         Transform2d(Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)),
     )
 
+
     init {
         addRequirements(drivetrain)
     }
 
     // these entries are used to debug how fast the robot wants to move to get
     // to the desired position
-    val speedx = drivetrain.Idrc.add("speedx1${Random.nextDouble()}", 0.0)
-        .entry
-    val speedy = drivetrain.Idrc.add("speedy1${Random.nextDouble()}", 0.0)
-        .entry
-    val speedr = drivetrain.Idrc.add("speedr1${Random.nextDouble()}", 0.0)
-        .entry
+//    val speedx = drivetrain.Idrc.add("speedx1${Random.nextDouble()}", 0.0)
+//        .entry
+//    val speedy = drivetrain.Idrc.add("speedy1${Random.nextDouble()}", 0.0)
+//        .entry
+//    val speedr = drivetrain.Idrc.add("speedr1${Random.nextDouble()}", 0.0)
+//        .entry
 
     val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.0, TrapezoidProfile.Constraints(
@@ -84,6 +87,7 @@ class MoveToPosition(
     val start = drivetrain.poseEstimator.estimatedPosition
 
     override fun initialize() {
+        if (snapMode) pose = SnapToPostion.closestPose(drivetrain)?: pose
         xPIDController.reset(drivetrain.poseEstimator.estimatedPosition.translation.x,0.0)
         yPIDController.reset(drivetrain.poseEstimator.estimatedPosition.translation.y, 0.0)
         rPIDController.reset(drivetrain.poseEstimator.estimatedPosition.rotation.radians, 0.0)
@@ -161,9 +165,9 @@ class MoveToPosition(
 
         // set the debug entries to the speeds so we can see values in the
         // smartdashboard
-        speedx.setDouble(speeds.vxMetersPerSecond)
-        speedy.setDouble(speeds.vyMetersPerSecond)
-        speedr.setDouble(speeds.omegaRadiansPerSecond)
+//        speedx.setDouble(speeds.vxMetersPerSecond)
+//        speedy.setDouble(speeds.vyMetersPerSecond)
+//        speedr.setDouble(speeds.omegaRadiansPerSecond)
 
 
         // tell the drivetrain to drive at the calculated speeds
@@ -189,23 +193,23 @@ class MoveToPosition(
         const val yP = 2.25
         const val xP = 2.25
 
-            fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
-                run {
-                    (drivetrain.poseEstimator.estimatedPosition)
-                    CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 1.8, 1.0))
-                        .andThen(SetPosition.high(elevator, arm, wrist)
-                            .withTimeout(3.0))
-                        .andThen(SetManipulatorSpeed(manipulator, -1.0, true).deadlineWith(WaitCommand(1.0)))
-                        .andThen(MoveToPosition(drivetrain, 6.0, 0.75, 180.0))
-                }
+        fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 1.8, 1.0).withTimeout(1.0))
+                    .andThen(SetPosition.high(elevator, arm, wrist)
+                        .withTimeout(3.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
+            }
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
                 CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0))
                     .andThen(SetPosition.high(elevator, arm, wrist)
                         .withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).deadlineWith(WaitCommand(1.0)))
-                    .andThen(Idle(elevator, arm, wrist).withTimeout(0.5))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm, wrist).withTimeout(1.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
                     .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
             }

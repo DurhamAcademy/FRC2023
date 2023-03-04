@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.RunCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -112,20 +113,20 @@ class RobotContainer {
                 // assign the open manipulator trigger to the command that
                 // opens the manipulator
                 openManipulator
-                    .onTrue(
-                        OpenManipulator(manipulator)
+                    .whileTrue(
+                        SetManipulatorSpeed(manipulator, 0.0, true)
                     )
 
                 // assign the close manipulator trigger to the command that
                 // closes the manipulator
                 closeManipulator
-                    .onTrue(CloseManipulator(manipulator))
+                    .whileTrue(SetManipulatorSpeed(manipulator,0.75, false))
 
                 toggleManipulator
                     .toggleOnFalse(
                         SetManipulatorSpeed(manipulator,0.1)
                     ).toggleOnTrue(
-                        OpenManipulator(manipulator, 0.0)
+                        SetManipulatorSpeed(manipulator, 0.0)
                     )
 
                 // assign the grab cone trigger to the command that
@@ -174,6 +175,9 @@ class RobotContainer {
                             // previous setposition command was finishing before the race would actually work
                     )
 
+                moveToClosest
+                    .whileTrue(MoveToPosition(drivetrain, drivetrain.poseEstimator.estimatedPosition, snapMode = true))
+
                 xbox!!.povDown().onTrue(
                     InstantCommand ({
                         if (!Game.COMPETITION)
@@ -184,12 +188,12 @@ class RobotContainer {
                     //fixme dont do this
                     xbox!!.povLeft().onTrue(
                         InstantCommand({
-                            arm.armOffset += 1.0
+                            arm.armOffset += 5.0
                         }, arm).ignoringDisable(true)
                     )
                     xbox!!.povRight().onTrue(
                         InstantCommand({
-                            arm.armOffset -= 1.0
+                            arm.armOffset -= 5.0
                         }, arm).ignoringDisable(true)
                     )
                 } else {
@@ -266,7 +270,12 @@ class RobotContainer {
                 .whileTrue(
                     limpCommand
                 )        }
-    val auto = MoveToPosition.pathRed(drivetrain, elevator, arm, wrist, manipulator)
+    val auto
+    get() = ConditionalCommand(
+        MoveToPosition.pathRed(drivetrain, elevator, arm, wrist, manipulator),
+        MoveToPosition.pathBlue(drivetrain, elevator, arm, wrist, manipulator),
+        { Game.alliance == DriverStation.Alliance.Red }
+    )
     fun update() {
         leds.update()
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)

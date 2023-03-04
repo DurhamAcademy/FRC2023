@@ -11,6 +11,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -39,6 +41,15 @@ class Drivetrain(
     private val ySpeedEntry = swerveTab.add("xBox ySpeed", 0)
         .entry
     private val rotEntry = swerveTab.add("xBox rot", 0)
+        .entry
+    val invertx = swerveTab.add("invert x", false)
+        .withWidget("Toggle Button")
+        .entry
+    val inverty = swerveTab.add("invert y", false)
+        .withWidget("Toggle Button")
+        .entry
+    val invertrot = swerveTab.add("invert rot", false)
+        .withWidget("Toggle Button")
         .entry
     val frontLeft = SwerveModule( // front right
         Constants.FLDriveMotorId,

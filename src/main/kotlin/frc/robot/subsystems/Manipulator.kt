@@ -28,6 +28,7 @@ class Manipulator: SubsystemBase() {
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
         setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
         setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
+        idleMode = CANSparkMax.IdleMode.kBrake
     }
     private val leftsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, leftSolenoidForward, leftSolenoidReverse)
     private val rightsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, rightSolenoidForward, rightSolenoidReverse)

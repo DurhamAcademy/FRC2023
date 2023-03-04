@@ -67,10 +67,10 @@ class Arm : SubsystemBase() {
         Constants.arm.motor.kV,
         Constants.arm.motor.kA
     )
-
     var armOffset = Preferences.getDouble("armOffset", 0.0).apply {
         this@Arm.armEncoder
             .configMagnetOffset(-this + Constants.arm.encoder.offset)
+
     }
         get() = field
         set(value) {
@@ -145,6 +145,7 @@ class Arm : SubsystemBase() {
         .entry
 
     override fun periodic() {
+
         SmartDashboard.putNumber("arm/POS", armPosition)
         SmartDashboard.putNumber("arm/SP", armSetpoint ?: -99999.0)
 

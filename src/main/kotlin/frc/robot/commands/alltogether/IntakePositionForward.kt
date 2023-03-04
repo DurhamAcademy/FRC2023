@@ -28,7 +28,7 @@ class IntakePositionForward(
 //        wrist.setpoint
         arm.setArmPosition(armAngle)
         Solver.getWristPose(0.0, armAngle, armAngle - PI / 2)
-        elevator.setpoint = inchesToMeters(7.0 + 20 +1)
+        elevator.setpoint = inchesToMeters(7.0 + 20 +1+2)
         wrist.setPosition(-0.5)
     }
 }

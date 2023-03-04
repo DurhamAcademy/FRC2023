@@ -1,20 +1,17 @@
 package frc.robot.commands.pathing
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.robot.Constants
 import frc.robot.subsystems.Drivetrain
 
-class SnapToPostion(
-    val drivetrain: Drivetrain
-): CommandBase() {
-    init {
-        addRequirements(drivetrain)
-    }
-
-    fun closest(): Translation2d? =
+object SnapToPostion {
+    fun closest(drivetrain: Drivetrain): Translation2d? =
         Constants.Field2dLayout.Axes.closest(
             drivetrain.poseEstimator.estimatedPosition.translation,
             (if (Game.alliance == DriverStation.Alliance.Blue)
@@ -26,12 +23,7 @@ class SnapToPostion(
                 else this.scoringPoints
             }
         )
-    override fun initialize(){
-        val closest = closest()
-//        if (closest != null) {
-//            if (closest.getDistance(
-//                    drivetrain.poseEstimator.estimatedPosition.translation
-//            ) < 1.0)
-//        }//todo: yea
-    }
+    fun closestPose(drivetrain: Drivetrain): Pose2d? =
+        Pose2d(closest(drivetrain),drivetrain.poseEstimator.estimatedPosition.rotation)
+
 }
