@@ -183,7 +183,7 @@ class RobotContainer {
                         MoveToPosition.snapToYValue(drivetrain,
                             {Constants.Field2dLayout.Axes.YInt.platforms[0]},
                             r = {
-                                if (Game.alliance == Alliance.red) Rotation2d()
+                                if (Game.alliance == DriverStation.Alliance.Red) Rotation2d()
                                 else Rotation2d.fromDegrees(180.0)
                                 },
                         )
@@ -229,24 +229,24 @@ class RobotContainer {
         val allianceColor = if (Game.alliance == DriverStation.Alliance.Red) coral else Color.CYAN
 
         // idle alliance animations
-        val prematchArms = AnimationRGBFade(7.seconds)//AnimationRGBWave(1.0, .1.seconds)
-        val percentage = AnimationCustom({t, l ->
-            val percent = ((Game.batteryVoltage-7.0)/6.0).coerceIn(0.0, 1.0)
-            return@AnimationCustom List(l) { i ->
-                return@List if (i < (Constants.leds.count * percent)) {
-                    Color.green
-                } else {
-                    allianceColor
-                }
-            }
-        }, {Game.disabled}, false)
+        val prematchArms = AnimationRGBWave(1.0, 1.0.seconds) {Game.disabled}
+//        val percentage = AnimationCustom({t, l ->
+//            val percent = ((Game.batteryVoltage-7.0)/6.0).coerceIn(0.0, 1.0)
+//            return@AnimationCustom List(l) { i ->
+//                return@List if (i < (Constants.leds.count * percent)) {
+//                    Color.green
+//                } else {
+//                    allianceColor
+//                }
+//            }
+//        }, {Game.disabled}, false)
         val wantsCone = AnimationSolid(coneColor, condition =
         {!Game.disabled && (wantingObject == GamePiece.cone)})
         val wantsCube = AnimationSolid(cubeColor, condition =
         {!Game.disabled && (wantingObject == GamePiece.cube)})
         val limpMode = AnimationBlink(Color.RED, 0.5.seconds, condition = {isLimpHeld})
         val chain = KLEDRegion(0, Constants.leds.count,
-            prematchArms, percentage, wantsCone, wantsCube, limpMode
+            prematchArms,/* percentage,*/ wantsCone, wantsCube, limpMode
         )
         this += (chain)
     }

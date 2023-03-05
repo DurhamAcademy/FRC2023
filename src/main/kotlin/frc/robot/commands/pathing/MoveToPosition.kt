@@ -106,7 +106,9 @@ class MoveToPosition(
     val start = drivetrain.poseEstimator.estimatedPosition
 
     override fun initialize() {
-        if (snapMode) pose = SnapToPostion.closestPose(drivetrain)?: pose
+        if (snapMode) pose = {
+            (SnapToPostion.closestPose(drivetrain) ?: pose) as Pose2d
+        }
         xPIDController.reset(drivetrain.poseEstimator.estimatedPosition.translation.x,0.0)
         yPIDController.reset(drivetrain.poseEstimator.estimatedPosition.translation.y, 0.0)
         rPIDController.reset(drivetrain.poseEstimator.estimatedPosition.rotation.radians, 0.0)
@@ -116,7 +118,7 @@ class MoveToPosition(
 
     override fun execute() {
         val current = drivetrain.poseEstimator.estimatedPosition
-        val desired = pose
+        val desired = pose()
 
         // log the current position and the desired position
         SmartDashboard.putNumber("curr-x", current.translation.x)
@@ -195,8 +197,8 @@ class MoveToPosition(
 
     override fun isFinished(): Boolean {
         // stop when the robot is within 0.1 meters of the desired position
-        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(pose.translation, Rotation2d())).translation.norm < toleranceppos
-                && drivetrain.poseEstimator.estimatedPosition.rotation.minus(Rotation2d(pose.rotation.radians)).radians < tolerancerpos
+        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(pose().translation, Rotation2d())).translation.norm < toleranceppos
+                && drivetrain.poseEstimator.estimatedPosition.rotation.minus(Rotation2d(pose().rotation.radians)).radians < tolerancerpos
     }
 
     override fun end(interrupted: Boolean) {
@@ -254,12 +256,6 @@ class MoveToPosition(
                     toleranceppos = yTolerance,
                     tolerancerpos = rTolerance
                 ).withTimeout(1.0)
-                    .alongWith(
-                        Idle(drivetrain.elevator, drivetrain.arm, drivetrain.wrist)
-                    )
-                    .withInterruptBehavior(
-                        Command.InterruptionBehavior.kCancelSelf
-                    )
             }
     }
 }

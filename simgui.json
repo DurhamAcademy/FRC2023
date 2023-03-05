@@ -113,10 +113,17 @@
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [32]": "Motor Controller",
-      "/SmartDashboard/Drivetrain/sendable": "Subsystem"
+      "/SmartDashboard/Drivetrain/sendable": "Subsystem",
+      "/SmartDashboard/FIELD": "Field2d",
+      "/SmartDashboard/elevcmd": "Subsystem"
     },
     "windows": {
       "/SmartDashboard/Drivetrain/sendable": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/FIELD": {
         "window": {
           "visible": true
         }
@@ -228,7 +235,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": -43,
           "series": [
             {
               "color": [
