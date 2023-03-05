@@ -21,15 +21,15 @@ class CollectObject(
 
     override fun execute() {
         if (debounce.calculate(manipulator.inColorRange == true)) {//
-            manipulator.motorPercentage = 0.05
+            manipulator.motorPercentage = 0.1
             manipulator.isOpen = false
         } else if (manipulator.sensorConnected) {
-            manipulator.motorPercentage = 0.75
+            manipulator.motorPercentage = 1.0
             // close manipulator if distance is lower than 0.05
             manipulator.isOpen = true
         } else {
             manipulator.isOpen = true
-            manipulator.motorPercentage = 0.75
+            manipulator.motorPercentage = 1.0
         }
     }
 

@@ -15,7 +15,7 @@ class HoldConeCommand(
     }
 
     override fun execute() {
-        manipulator.motorPercentage = 0.05
+        manipulator.motorPercentage = 0.1
     }
 
     override fun end(interrupted: Boolean) {

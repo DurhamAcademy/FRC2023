@@ -17,7 +17,7 @@ class GrabConeCommand(
     }
 
     override fun execute() {
-        manipulator.motorPercentage = 0.5
+        manipulator.motorPercentage = 1.0
     }
 
     override fun end(interrupted: Boolean) {

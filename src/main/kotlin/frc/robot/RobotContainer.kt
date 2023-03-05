@@ -120,7 +120,7 @@ class RobotContainer {
                 // assign the close manipulator trigger to the command that
                 // closes the manipulator
                 closeManipulator
-                    .whileTrue(SetManipulatorSpeed(manipulator,0.75, false))
+                    .whileTrue(SetManipulatorSpeed(manipulator,1.0, false))
 
                 toggleManipulator
                     .toggleOnFalse(
