@@ -217,11 +217,21 @@ class MoveToPosition(
         fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
+                CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 14.66-(2*(14.66-8.3)), 0.0).withTimeout(1.0))
+                    .andThen(SetPosition.high(elevator, arm, wrist)
+                        .withTimeout(3.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm, wrist).withTimeout(1.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
+                    .andThen(MoveToPosition(drivetrain, 14.0-(2*(14-8.3)),1.0, 0.0).withTimeout(1.0))
+                    .andThen(MoveToPosition(drivetrain, 10.5-(2*(10.5-8.3)), 1.0, 0.0).withTimeout(6.0))
+
+                /*(drivetrain.poseEstimator.estimatedPosition)
                 CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 1.8, 1.0).withTimeout(1.0))
                     .andThen(SetPosition.high(elevator, arm, wrist)
                         .withTimeout(3.0))
                     .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
                     .andThen(Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
+                    */
             }
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
             run {
