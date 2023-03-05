@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.kyberlib.math.units.extensions.radians
 import frc.robot.Constants
 import frc.robot.commands.alltogether.Idle
+import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.manipulator.CloseManipulator
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -224,6 +225,52 @@ class MoveToPosition(
                         .withTimeout(3.0))
                     .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
                     .andThen(Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
+            }
+        fun pathBlueAdvanced(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                // start
+                CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 1.8, 1.0).withTimeout(1.0))
+                    // move arm into position
+                    .andThen(SetPosition.high(elevator, arm, wrist)
+                        .withTimeout(3.0))
+                    //eject cube
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    // stop manipulator and move to idle
+                    .andThen(
+                        Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, 0.0, true))
+                            // while this is happening, wait and then begin movement to fit position 1
+                            .alongWith(WaitCommand(0.5)
+                                .andThen(MoveToPosition(drivetrain, 3.22, 0.73,45.0).withTimeout(1.5))
+                                .andThen(MoveToPosition(drivetrain, 4.8,.66, 180.0).withTimeout(1.5))
+                            ).withTimeout(3.6)
+                    )
+                    // move into deploy position and deploy
+                    .andThen(
+                        MoveToPosition(drivetrain, 5.72, 0.94, 180.0).withTimeout(1.0)
+                            // while moving, deploy
+                            .alongWith(IntakePositionForward(elevator, arm, wrist).withTimeout(1.5))
+                        // withtimeout of total depoy time
+                            .withTimeout(1.75)
+                        //and then move to the should have intaked position
+                            .andThen(MoveToPosition(drivetrain,6.66,0.93).withTimeout(2.0))
+                            .andThen(CloseManipulator(manipulator))
+                    )
+                    .andThen(
+                        Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, -0.1, true))
+                            .alongWith()
+                        // start moving back
+                            .alongWith(WaitCommand(0.5)
+                                .andThen(MoveToPosition(drivetrain, 4.8, .66,0.0).withTimeout(1.75))
+                                .andThen(MoveToPosition(drivetrain, 1.87,1.05, 0.0).withTimeout(3.0))
+                            ).withTimeout(4.0)
+                    )
+                    //place
+                    .andThen(SetPosition.high(elevator, arm, wrist)
+                        .withTimeout(3.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .withTimeout(15.0)
+
             }
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
             run {
