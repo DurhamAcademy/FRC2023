@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
+import frc.kyberlib.math.units.extensions.radians
 import frc.robot.Constants
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.SetPosition
@@ -18,6 +19,7 @@ import frc.robot.commands.manipulator.CloseManipulator
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.subsystems.*
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.hypot
 import kotlin.random.Random
 
@@ -229,7 +231,7 @@ class MoveToPosition(
                 CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0))
                     .andThen(SetPosition.high(elevator, arm, wrist)
                         .withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true).withTimeout(1.0))
                     .andThen(Idle(elevator, arm, wrist).withTimeout(1.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
                     .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
@@ -255,7 +257,28 @@ class MoveToPosition(
                     },
                     toleranceppos = yTolerance,
                     tolerancerpos = rTolerance
-                ).withTimeout(1.0)
+                ).withTimeout(3.5)
             }
+
+        /**
+         * @param rotValues The angle in radians
+         */
+        fun snapToScoring(drivetrain: Drivetrain, yValues: () -> Iterable<Double>, rotValues: () -> Iterable<Double>): Command =
+            snapToYValue(
+                drivetrain,
+                {yValues().minByOrNull { value ->
+                    (value - drivetrain.poseEstimator.estimatedPosition.y).absoluteValue
+                }?: drivetrain.poseEstimator.estimatedPosition.y},
+                yTolerance = 0.05,
+                {
+                    Rotation2d.fromRadians(
+                        rotValues().minByOrNull { value ->
+                            (value.mod(PI*2) - drivetrain.poseEstimator.estimatedPosition.rotation.radians.mod(PI*2)).absoluteValue
+                        }?: drivetrain.poseEstimator.estimatedPosition.rotation.radians
+                    )
+                },
+                rTolerance = 0.15
+            )
+
     }
 }
