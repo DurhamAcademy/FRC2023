@@ -34,5 +34,6 @@ class BryanControlScheme(
         get() = xbox.povDown()
 
 
-    override val moveToClosest: Trigger = xbox.start()
+    override val moveToClosestHPS: Trigger = xbox.start()
+    override val moveToClosestScoreStation: Trigger = xbox.back()
 }

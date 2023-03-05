@@ -41,6 +41,7 @@ abstract class ControlScheme {
     open val lowIntake: Trigger = Trigger { false }
     open val highIntake: Trigger = Trigger { false }
 
-    open val moveToClosest: Trigger = Trigger { false }
+    open val moveToClosestHPS: Trigger = Trigger { false }
+    open val moveToClosestScoreStation: Trigger = Trigger { false }
 
 }

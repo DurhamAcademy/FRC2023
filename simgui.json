@@ -118,12 +118,27 @@
       "/SmartDashboard/elevcmd": "Subsystem"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Drivetrain/sendable": {
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/FIELD": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/FIELD": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/elevcmd": {
         "window": {
           "visible": true
         }
@@ -235,7 +250,7 @@
               "autoFit": true
             }
           ],
-          "height": 414,
+          "height": 0,
           "series": [
             {
               "color": [

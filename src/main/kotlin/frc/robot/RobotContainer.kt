@@ -2,11 +2,9 @@ package frc.robot
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.revrobotics.CANSparkMax
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.PrintCommand
@@ -23,8 +21,6 @@ import frc.robot.commands.ElevatorTestUp
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.alltogether.*
 import frc.robot.commands.arm.SetArmToAngle
-import frc.robot.commands.manipulator.CloseManipulator
-import frc.robot.commands.manipulator.OpenManipulator
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.wrist.LevelWrist
 import frc.robot.commands.wrist.SetWristAngle
@@ -178,14 +174,24 @@ class RobotContainer {
                             // previous setposition command was finishing before the race would actually work
                     )
 
-                moveToClosest
+                moveToClosestHPS
                     .whileTrue(
-                        MoveToPosition.snapToYValue(drivetrain,
-                            {Constants.Field2dLayout.Axes.YInt.platforms[0]},
-                            r = {
-                                if (Game.alliance == DriverStation.Alliance.Red) Rotation2d()
-                                else Rotation2d.fromDegrees(180.0)
-                                },
+                        MoveToPosition.snapToScoring(
+                            drivetrain,
+                            {
+                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.platforms.toList()
+                            },
+                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
+                        )
+                    )
+                moveToClosestScoreStation
+                    .whileTrue(
+                        MoveToPosition.snapToScoring(
+                            drivetrain,
+                            {
+                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.score.toList()
+                            },
+                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
                         )
                     )
 
