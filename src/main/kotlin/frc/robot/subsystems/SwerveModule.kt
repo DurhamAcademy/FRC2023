@@ -77,7 +77,7 @@ class SwerveModule(
         Constants.DRIVE_P,
         Constants.DRIVE_I,
         Constants.DRIVE_D,
-        TrapezoidProfile.Constraints(10.0, 1000.0)// TODO: Fix these
+        TrapezoidProfile.Constraints(25.0, 1000.0)// TODO: Fix these
     )
     private val driveFF = SimpleMotorFeedforward(Constants.driveKS, Constants.driveKV, Constants.driveKA)
 
@@ -87,8 +87,8 @@ class SwerveModule(
         Constants.ANGLE_I,
         Constants.ANGLE_D,
         TrapezoidProfile.Constraints(
-            32.0,
-            64.0
+            64.0,
+            256.0
         )// TODO: Fix these
     ).apply {
         enableContinuousInput(-Math.PI, Math.PI)

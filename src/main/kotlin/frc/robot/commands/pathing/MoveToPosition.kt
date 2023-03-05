@@ -249,7 +249,12 @@ class MoveToPosition(
                     .andThen(
                         MoveToPosition(drivetrain, 5.72, 0.94, 180.0).withTimeout(1.0)
                             // while moving, deploy
-                            .alongWith(IntakePositionForward(elevator, arm, wrist).withTimeout(1.5))
+                            .alongWith(
+                                IntakePositionForward(elevator, arm, wrist)
+                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0, true)
+                                        .withTimeout(1.5)
+                                    )
+                            )
                         // withtimeout of total depoy time
                             .withTimeout(1.75)
                         //and then move to the should have intaked position
@@ -257,13 +262,13 @@ class MoveToPosition(
                             .andThen(CloseManipulator(manipulator))
                     )
                     .andThen(
-                        Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, -0.1, true))
-                            .alongWith()
+                        Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, 0.1, false).withTimeout(5.0))
                         // start moving back
                             .alongWith(WaitCommand(0.5)
                                 .andThen(MoveToPosition(drivetrain, 4.8, .66,0.0).withTimeout(1.75))
-                                .andThen(MoveToPosition(drivetrain, 1.87,1.05, 0.0).withTimeout(3.0))
-                            ).withTimeout(4.0)
+                                .andThen(MoveToPosition(drivetrain, 1.95, 1.05, 0.0).withTimeout(3.5))
+                                .andThen(MoveToPosition(drivetrain, 1.87,1.05, 0.0).withTimeout(1.0))
+                            ).withTimeout(6.0)
                     )
                     //place
                     .andThen(SetPosition.high(elevator, arm, wrist)
@@ -275,11 +280,9 @@ class MoveToPosition(
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
-                CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0))
-                    .andThen(SetPosition.high(elevator, arm, wrist)
-                        .withTimeout(3.0))
+                MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0)
                     .andThen(SetManipulatorSpeed(manipulator, 1.0, true).withTimeout(1.0))
-                    .andThen(Idle(elevator, arm, wrist).withTimeout(1.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
+                    .andThen(Idle(elevator, arm, wrist).withTimeout(0.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
                     .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
             }
