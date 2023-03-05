@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.Constants
@@ -25,7 +26,7 @@ class MoveToPosition(
     /**
      * The desired position of the robot (in meters)
      */
-    private var pose: Pose2d,
+    private var pose: () -> Pose2d,
     /**
      * The desired velocity of the robot (in meters per second)
      */
@@ -42,6 +43,24 @@ class MoveToPosition(
         Transform2d(Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)),
     )
 
+    constructor(drivetrain: Drivetrain,
+                pose: Pose2d,
+                velocity: Transform2d = Transform2d(),
+                toleranceppos: Double = 0.1,
+                tolerancepvel: Double = 0.1,
+                tolerancerpos: Double = 0.025,
+                tolerancervel: Double = 0.1,
+                snapMode: Boolean = false
+    ) : this(
+        drivetrain,
+        { pose },
+        velocity,
+        toleranceppos,
+        tolerancepvel,
+        tolerancerpos,
+        tolerancervel,
+        snapMode
+    )
 
     init {
         addRequirements(drivetrain)
@@ -212,6 +231,35 @@ class MoveToPosition(
                     .andThen(Idle(elevator, arm, wrist).withTimeout(1.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
                     .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
+            }
+
+        fun snapToYValue(
+            drivetrain: Drivetrain,
+            y: () -> Double,
+            yTolerance: Double = 0.1,
+            r: () -> Rotation2d = { drivetrain.poseEstimator.estimatedPosition.rotation },
+            rTolerance: Double = 0.1,
+        ) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(
+                    drivetrain,
+                    {
+                        Pose2d(
+                            drivetrain.poseEstimator.estimatedPosition.translation.x,
+                            y(),
+                            r()
+                        )
+                    },
+                    toleranceppos = yTolerance,
+                    tolerancerpos = rTolerance
+                ).withTimeout(1.0)
+                    .alongWith(
+                        Idle(drivetrain.elevator, drivetrain.arm, drivetrain.wrist)
+                    )
+                    .withInterruptBehavior(
+                        Command.InterruptionBehavior.kCancelSelf
+                    )
             }
     }
 }

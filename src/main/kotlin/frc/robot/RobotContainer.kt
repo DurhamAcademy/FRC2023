@@ -2,6 +2,7 @@ package frc.robot
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.revrobotics.CANSparkMax
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -178,7 +179,15 @@ class RobotContainer {
                     )
 
                 moveToClosest
-                    .whileTrue(MoveToPosition(drivetrain, drivetrain.poseEstimator.estimatedPosition, snapMode = true))
+                    .whileTrue(
+                        MoveToPosition.snapToYValue(drivetrain,
+                            {Constants.Field2dLayout.Axes.YInt.platforms[0]},
+                            r = {
+                                if (Game.alliance == Alliance.red) Rotation2d()
+                                else Rotation2d.fromDegrees(180.0)
+                                },
+                        )
+                    )
 
                 xbox!!.povDown().onTrue(
                     InstantCommand ({
