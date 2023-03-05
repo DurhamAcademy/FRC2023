@@ -5,8 +5,10 @@ import com.revrobotics.CANSparkMax
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.RunCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.button.Trigger
@@ -271,11 +273,17 @@ class RobotContainer {
                     limpCommand
                 )        }
     val auto
-    get() = ConditionalCommand(
-        MoveToPosition.pathRed(drivetrain, elevator, arm, wrist, manipulator),
-        MoveToPosition.pathBlue(drivetrain, elevator, arm, wrist, manipulator),
-        { Game.alliance == DriverStation.Alliance.Red }
-    )
+    get() =
+        ConditionalCommand(
+            MoveToPosition.pathRed(drivetrain, elevator, arm, wrist, manipulator),
+            ConditionalCommand(
+                MoveToPosition.pathBlue(drivetrain, elevator, arm, wrist, manipulator),
+                PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                { Game.alliance == DriverStation.Alliance.Blue}
+            ),
+            { Game.alliance == DriverStation.Alliance.Red }
+        )
+
     fun update() {
         leds.update()
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
