@@ -14,26 +14,29 @@ object Constants {
     object leds {
         val count = 74// 74 is what chris said
     }
+
     init {
         SmartDashboard.setDefaultBoolean("Full DS Control", false)
     }
+
     var fullDSControl: Boolean
         get() = SmartDashboard.getBoolean("Full DS Control", false)
         set(value: Boolean) {
             SmartDashboard.putBoolean("Full DS Control", value)
         }
-        object encoder {
-            const val id = 19
-            const val offset = 14.0
-            const val inverted = true
-        }
 
-        val simArmLength = inchesToMeters(10.0)
-        const val minAngle = -PI / 2
-        const val maxAngle = PI / 2
-        const val armMass = 1.0
-        const val momentOfInertia = 1.0
+    object encoder {
+        const val id = 19
+        const val offset = 14.0
+        const val inverted = true
     }
+
+    val simArmLength = inchesToMeters(10.0)
+    const val minAngle = -PI / 2
+    const val maxAngle = PI / 2
+    const val armMass = 1.0
+    const val momentOfInertia = 1.0
+
     object Elevator {
         val carriageMass = lbsToKilograms(27.5) // rough estimate (25-30 lbs)
         val encoderDistancePerPulse: Double = 1.0 / 2_048.0
@@ -84,10 +87,10 @@ object Constants {
     const val maxDriveAcceleration = 3.0
     const val powerPercent = 1.0
 
-    const val BRZeroAngle = -10.0-5
-    const val BLZeroAngle = -29.7+2.3
-    const val FRZeroAngle = -102.2-3.7
-    const val FLZeroAngle = -47.9+1.3
+    const val BRZeroAngle = -10.0 - 5
+    const val BLZeroAngle = -29.7 + 2.3
+    const val FRZeroAngle = -102.2 - 3.7
+    const val FLZeroAngle = -47.9 + 1.3
     const val FRDriveMotorId = 10//fr
     const val BLDriveMotorId = 11//bl
     const val FLDriveMotorId = 12//fl
@@ -132,7 +135,7 @@ object Constants {
 
         object encoder {
             const val id = 18
-            const val offset = -76.15+17+25-5-5+77//-87.49
+            const val offset = -76.15 + 17 + 25 - 5 - 5 + 77//-87.49
             const val inverted = true
         }
 
@@ -204,7 +207,7 @@ object Constants {
 
     @Suppress("unused") //TODO: Remove this suppression
     object Field2dLayout {
-//        val bounds = listOf(
+        //        val bounds = listOf(
 //            // judge side red -> judge side blue -> far side blue -> far side red
 //            Translation3d(8.25, -4.0, 0.0),
 //            Translation3d(-8.25, -4.0, 0.0),
@@ -264,6 +267,7 @@ object Constants {
 //        }
 //
         val size = Translation2d(16.5, 8.0)
+
         object Axes {
             object XInt {
                 val communityPlacementLineBlue = 1.4
@@ -273,6 +277,7 @@ object Constants {
                 val loadingZoneStartRed = 3.35
                 val loadingZoneStartBlue = size.x - loadingZoneStartRed
             }
+
             object YInt {
                 private const val platform1 = 7.45
                 private const val platform2 = 6.15
@@ -299,13 +304,15 @@ object Constants {
                     cone3Left, cube3, cone3Right
                 )
             }
+
             interface AliancePointList {
                 abstract val scoringPoints: List<Translation2d>
                 abstract val loadingZonePlatforms: List<Translation2d>
                 abstract val conePlacement: List<Translation2d>
                 abstract val cubePlacement: List<Translation2d>
             }
-            object Red: AliancePointList {
+
+            object Red : AliancePointList {
                 const val fieldOffsetMultiplier = -1.0
                 override val scoringPoints = YInt.score.map {
                     Translation2d(XInt.communityPlacementLineRed, it)
@@ -320,7 +327,8 @@ object Constants {
                     Translation2d(XInt.loadingZoneStartRed, it)
                 }
             }
-            object Blue: AliancePointList {
+
+            object Blue : AliancePointList {
                 const val fieldOffsetMultiplier = 1.0
                 override val scoringPoints = YInt.score.map {
                     Translation2d(XInt.communityPlacementLineBlue, it)
@@ -335,9 +343,11 @@ object Constants {
                     Translation2d(XInt.loadingZoneStartBlue, it)
                 }
             }
+
             fun closest(
                 to: Translation2d,
                 inIterable: Iterable<Translation2d>
             ): Translation2d? = inIterable.minByOrNull { it.getDistance(to) }
         }
     }
+}
