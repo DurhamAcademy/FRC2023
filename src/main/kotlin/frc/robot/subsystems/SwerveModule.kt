@@ -41,10 +41,11 @@ class SwerveModule(
 //        configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0)
     }
     private val turnMotor = WPI_TalonFX(turnMotorId).apply {
+        // TODO:  ctrl click on configFactory default and check if the timeout is too long
         configFactoryDefault()
-        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
-        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
-        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
+//        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
+//        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
+//        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
         configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 30.0, 35.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
     }
@@ -77,7 +78,7 @@ class SwerveModule(
         Constants.DRIVE_P,
         Constants.DRIVE_I,
         Constants.DRIVE_D,
-        TrapezoidProfile.Constraints(10.0, 1000.0)// TODO: Fix these
+        TrapezoidProfile.Constraints(25.0, 1000.0)// TODO: Fix these
     )
     private val driveFF = SimpleMotorFeedforward(Constants.driveKS, Constants.driveKV, Constants.driveKA)
 
@@ -87,8 +88,8 @@ class SwerveModule(
         Constants.ANGLE_I,
         Constants.ANGLE_D,
         TrapezoidProfile.Constraints(
-            32.0,
-            64.0
+            64.0,
+            256.0
         )// TODO: Fix these
     ).apply {
         enableContinuousInput(-Math.PI, Math.PI)
