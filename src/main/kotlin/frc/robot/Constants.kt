@@ -22,26 +22,6 @@ object Constants {
         set(value: Boolean) {
             SmartDashboard.putBoolean("Full DS Control", value)
         }
-    object wrist {
-        val maxWristLength = inchesToMeters(10.0)
-        object motor {
-            const val positionTolerance = 0.05
-            const val velocityTolerance = 0.05
-            const val id = 33
-            const val currentLimit = 40
-            const val inverted = false
-            const val gearRatio = 1.0
-            const val maxVelocity = 24.0
-            const val maxAcceleration = 6.0
-            const val kP = 20.0
-            const val kI = 0.0
-            const val kD = 0.0
-            const val kS = 1.0
-            const val kG = 12.0
-            const val kV = 1.0
-            const val kA = 1.0
-        }
-
         object encoder {
             const val id = 19
             const val offset = 14.0
@@ -361,4 +341,3 @@ object Constants {
             ): Translation2d? = inIterable.minByOrNull { it.getDistance(to) }
         }
     }
-}

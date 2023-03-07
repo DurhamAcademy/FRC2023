@@ -30,24 +30,6 @@ class Manipulator: SubsystemBase() {
         setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val leftsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, leftSolenoidForward, leftSolenoidReverse)
-    private val rightsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, rightSolenoidForward, rightSolenoidReverse)
-
-    var isOpen: Boolean?
-        get() = when (leftsolenoid.get()) {
-            Value.kForward -> false
-            Value.kReverse -> true
-            else -> null
-        }
-        set(value) {
-            val v = when (value) {
-                false -> Value.kForward
-                true -> Value.kReverse
-                else -> Value.kOff
-            }
-            leftsolenoid.set(v)
-            rightsolenoid.set(v)
-        }
 
     var motorPercentage: Double
         get() = motor.get()

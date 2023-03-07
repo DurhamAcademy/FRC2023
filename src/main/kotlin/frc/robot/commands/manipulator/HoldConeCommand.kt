@@ -10,9 +10,7 @@ class HoldConeCommand(
         addRequirements(manipulator)
     }
 
-    override fun initialize() {
-        manipulator.isOpen = false
-    }
+    //override fun initialize() {}
 
     override fun execute() {
         manipulator.motorPercentage = 0.1
