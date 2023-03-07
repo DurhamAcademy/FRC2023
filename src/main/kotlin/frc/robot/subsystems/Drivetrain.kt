@@ -197,7 +197,8 @@ class Drivetrain(
             )
             else chassisSpeeds
         val swerveModuleStates = kinematics.toSwerveModuleStates(
-            chassisSpeedsField
+            chassisSpeedsField,
+            rotAxis
         )
         SwerveDriveKinematics.desaturateWheelSpeeds(
             swerveModuleStates,
