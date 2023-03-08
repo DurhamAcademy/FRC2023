@@ -309,16 +309,16 @@ class MoveToPosition(
                     )
             }
 
-        /*
-        fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
-            run {
-                (drivetrain.poseEstimator.estimatedPosition)
-                MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0)
-                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0))
-                    .andThen(Idle(elevator, arm).withTimeout(0.5).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)))
-                    .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
-                    .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
-            }
+
+//        fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+//            run {
+//                (drivetrain.poseEstimator.estimatedPosition)
+//                MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0)
+//                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0))
+//                    .andThen(Idle(elevator, arm).withTimeout(0.5).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)))
+//                    .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
+//                    .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
+//            }
 
         fun pathBlueAdvanced(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
