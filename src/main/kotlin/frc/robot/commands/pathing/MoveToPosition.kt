@@ -259,16 +259,16 @@ class MoveToPosition(
          * Go score cone high (or switch with cube score mid)
          * Get as close to human player as possible
          */
-        fun auto3(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+        fun blueauto3(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
                 MoveToPosition(drivetrain, 1.87, 4.42, 0.0).withTimeout(1.0)
                     .andThen(SetPosition.high(elevator, arm).withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, 1.0)).withTimeout(0.5)
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0)).withTimeout(0.5)
                     .andThen(
                         MoveToPosition(drivetrain, 6.58, 4.59, 180.0).withTimeout(3.0)
                         .alongWith(
-                            Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, -1.0))
+                            IntakePositionForward(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 1.0))
                     ))
                     .andThen(
                         MoveToPosition(drivetrain, 1.89, 4.97, 0.0).withTimeout(3.0)
@@ -285,6 +285,28 @@ class MoveToPosition(
                     ))
                     .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(0.5))
 
+            }
+        fun blueauto7(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, 1.92, 4.41, 180.0).withTimeout(3.0)
+                    .alongWith(
+                       SetPosition.high(elevator, arm).withTimeout(3.0)
+                    )
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(0.5))
+                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))).withTimeout(.25)
+                    .alongWith(MoveToPosition(drivetrain, 6.58, 4.59, 0.0).withTimeout(3.0)
+                    .alongWith(
+                        IntakePositionForward(elevator, arm).alongWith(WaitCommand(0.5).andThen(SetManipulatorSpeed(manipulator, 1.0))).withTimeout(3.0)
+                        )
+                    ).andThen(
+                        MoveToPosition(drivetrain, 5.50, 2.75).withTimeout(1.5)
+                            .alongWith(
+                            SetPosition.high(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)).withTimeout(1.5)
+                            )
+                    ).andThen(
+                        MoveToPosition(drivetrain, 3.85, 2.75).withTimeout(1.5).andThen(MoveToPosition(drivetrain, 3.88, 2.75)).withTimeout(.25)
+                    )
             }
 
         /*
