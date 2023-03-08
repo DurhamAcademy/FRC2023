@@ -111,13 +111,13 @@ class RobotContainer {
                 // opens the manipulator
                 openManipulator
                     .whileTrue(
-                        SetManipulatorSpeed(manipulator, 0.0, true)
+                        SetManipulatorSpeed(manipulator, 0.0)
                     )
 
                 // assign the close manipulator trigger to the command that
                 // closes the manipulator
                 closeManipulator
-                    .whileTrue(SetManipulatorSpeed(manipulator,1.0, false))
+                    .whileTrue(SetManipulatorSpeed(manipulator,1.0))
 
                 toggleManipulator
                     .toggleOnFalse(
@@ -288,9 +288,9 @@ class RobotContainer {
     val auto
     get() =
         ConditionalCommand(
-            MoveToPosition.pathRed(drivetrain, elevator, arm, manipulator),
+            MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator),
             ConditionalCommand(
-                MoveToPosition.pathBlue(drivetrain, elevator, arm, manipulator),
+                MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator),
                 PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
                 { Game.alliance == DriverStation.Alliance.Blue}
             ),
