@@ -26,4 +26,8 @@ class SetArmToAngle(
     override fun isFinished(): Boolean {
         return false
     }
+
+    fun resetArm(){
+        arm.setArmPosition(0.0)
+    }
 }
