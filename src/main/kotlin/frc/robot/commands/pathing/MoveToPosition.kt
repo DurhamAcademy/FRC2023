@@ -263,7 +263,7 @@ class MoveToPosition(
                                         .withTimeout(1.5)
                                     )
                             )
-                        // withtimeout of total deploy time
+                        // withTimeout of total deploy time
                             .withTimeout(1.75)
                         //and then move to the should have intaked position
                             .andThen(MoveToPosition(drivetrain,6.66,0.93).withTimeout(2.0))
