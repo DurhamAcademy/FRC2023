@@ -241,7 +241,7 @@ class MoveToPosition(
             }
 
         /**
-         * Auto 2: Place, pick up, and then get on charge station
+         * Auto 4: Place, pick up, and then get on charge station
          */
         fun blueauto2(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
