@@ -221,33 +221,39 @@ class MoveToPosition(
                 (drivetrain.poseEstimator.estimatedPosition)
                     SetPosition.high(elevator, arm)
                         .withTimeout(3.0)
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
-                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)))
             }
 
+        /**
+         * Score cube high
+         * Go get cone (or switch for cube)
+         * Go score cone high (or switch with cube score mid)
+         * Get as close to human player as possible
+         */
         fun humanPlayerPathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
                 MoveToPosition(drivetrain, 1.87, 4.42, 0.0).withTimeout(1.0)
                     .andThen(SetPosition.high(elevator, arm).withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true)).withTimeout(0.5)
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0)).withTimeout(0.5)
                     .andThen(
                         MoveToPosition(drivetrain, 6.58, 4.59, 180.0).withTimeout(3.0)
                         .alongWith(
-                            Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, -1.0, true))
+                            Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, -1.0))
                     ))
                     .andThen(
                         MoveToPosition(drivetrain, 1.89, 4.97, 0.0).withTimeout(3.0)
                         .alongWith(
                             SetPosition.high(elevator, arm)
                             .alongWith(
-                                SetManipulatorSpeed(manipulator, 0.0, true)
+                                SetManipulatorSpeed(manipulator, 0.0)
                     )))
-                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true).withTimeout(0.5))
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(0.5))
                     .andThen(
                         MoveToPosition(drivetrain, 6.48, 5.00, 180.0).withTimeout(1.2)
                         .alongWith(
-                            SetManipulatorSpeed(manipulator, 0.0, true)
+                            SetManipulatorSpeed(manipulator, 0.0)
                     ))
                     .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(0.5))
 
@@ -257,8 +263,8 @@ class MoveToPosition(
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
                 MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0)
-                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true).withTimeout(1.0))
-                    .andThen(Idle(elevator, arm).withTimeout(0.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm).withTimeout(0.5).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)))
                     .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
             }
@@ -271,10 +277,10 @@ class MoveToPosition(
                     SetPosition.high(elevator, arm)
                         .withTimeout(3.0)
                     //eject cube
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
                     // stop manipulator and move to idle
                     .andThen(
-                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0, true))
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))
                             // while this is happening, wait and then begin movement to fit position 1
                             .alongWith(WaitCommand(0.5)
                                 .andThen(MoveToPosition(drivetrain, 3.22, 0.73,45.0).withTimeout(1.5))
@@ -287,7 +293,7 @@ class MoveToPosition(
                             // while moving, deploy
                             .alongWith(
                                 IntakePositionForward(elevator, arm)
-                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0, true)
+                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0)
                                         .withTimeout(1.5)
                                     )
                             )
@@ -297,7 +303,7 @@ class MoveToPosition(
                             .andThen(MoveToPosition(drivetrain,6.66,0.93).withTimeout(2.0))
                     )
                     .andThen(
-                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.1, false).withTimeout(5.0))
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.1).withTimeout(5.0))
                         // start moving back
                             .alongWith(WaitCommand(0.5)
                                 .andThen(MoveToPosition(drivetrain, 4.8, .66,0.0).withTimeout(1.75))
@@ -308,7 +314,7 @@ class MoveToPosition(
                     //place
                     .andThen(SetPosition.high(elevator, arm)
                         .withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
                     .withTimeout(15.0)
 
             }
@@ -321,10 +327,10 @@ class MoveToPosition(
                     SetPosition.high(elevator, arm)
                         .withTimeout(3.0)
                     //eject cube
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
                     // stop manipulator and move to idle
                     .andThen(
-                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0, true))
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))
                             // while this is happening, wait and then begin movement to fit position 1
                             .alongWith(WaitCommand(0.5)
                                 .andThen(MoveToPosition(drivetrain, flipped(3.22), 0.73,45.0).withTimeout(1.5))
@@ -337,7 +343,7 @@ class MoveToPosition(
                             // while moving, deploy
                             .alongWith(
                                 IntakePositionForward(elevator, arm)
-                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0, true)
+                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0)
                                         .withTimeout(1.5)
                                     )
                             )
@@ -347,7 +353,7 @@ class MoveToPosition(
                             .andThen(MoveToPosition(drivetrain, flipped(6.66),0.93).withTimeout(2.0))
                     )
                     .andThen(
-                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.1, false).withTimeout(5.0))
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.1).withTimeout(5.0))
                             // start moving back
                             .alongWith(WaitCommand(0.5)
                                 .andThen(MoveToPosition(drivetrain, flipped(4.8), .66,0.0).withTimeout(1.75))
@@ -358,7 +364,7 @@ class MoveToPosition(
                     //place
                     .andThen(SetPosition.high(elevator, arm)
                         .withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0, true).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
                     .withTimeout(15.0)
 
             }
