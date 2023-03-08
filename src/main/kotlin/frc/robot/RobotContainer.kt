@@ -22,8 +22,6 @@ import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.alltogether.*
 import frc.robot.commands.arm.SetArmToAngle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
-import frc.robot.commands.wrist.LevelWrist
-import frc.robot.commands.wrist.SetWristAngle
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.*
@@ -50,11 +48,11 @@ class RobotContainer {
     val manipulator = Manipulator()
     val elevator = Elevator(this)
     val arm = Arm()
-    val wrist = Wrist(arm).apply {
-        defaultCommand = LevelWrist(
-            this, arm, toRadians(60.0)
-        )
-    }
+//    val wrist = Wrist(arm).apply {
+//        defaultCommand = LevelWrist(
+//            this, arm, toRadians(60.0)
+//        )
+//    }
 
 //    val powerDistributionHub = PowerDistribution(0, kRev)
 
@@ -94,20 +92,20 @@ class RobotContainer {
 
                 // assign the wrist 90 trigger to the command that
                 // moves the wrist to 90 degrees
-                testWrist90
-                    .whileTrue(
-                        SetWristAngle(wrist, PI / 2)
-                    )
-                testWrist0
-                    .whileTrue(
-                        //                    OpenManipulator(manipulator)
-                        //                        .andThen(
-                        SetManipulatorSpeed(manipulator, -0.1)//)
-                    )
-                testWristNeg90
-                    .whileTrue(
-                        SetWristAngle(wrist, -PI / 2)
-                    )
+//                testWrist90
+//                    .whileTrue(
+//                        SetWristAngle(wrist, PI / 2)
+//                    )
+//                testWrist0
+//                    .whileTrue(
+//                        //                    OpenManipulator(manipulator)
+//                        //                        .andThen(
+//                        SetManipulatorSpeed(manipulator, -0.1)//)
+//                    )
+//                testWristNeg90
+//                    .whileTrue(
+//                        SetWristAngle(wrist, -PI / 2)
+//                    )
 
                 // assign the open manipulator trigger to the command that
                 // opens the manipulator
@@ -137,7 +135,7 @@ class RobotContainer {
                 // idle
                 idleConfiguration
                     .whileTrue(SetPosition.idle(this@RobotContainer))
-                    .onFalse(HoldPosition(elevator, arm, wrist))
+                    .onFalse(HoldPosition(elevator, arm))
 
                 // assign l1
                 placeLvl1
@@ -149,20 +147,20 @@ class RobotContainer {
                 placeLvl2
                     .whileTrue(
                         SetPosition.setpoint(PlacePoint.Level2, this@RobotContainer)
-                    ).onFalse(HoldPosition(elevator, arm, wrist))
+                    ).onFalse(HoldPosition(elevator, arm))
 
                 // assign l3
                 placeLvl3
                     .whileTrue(
                         SetPosition.setpoint(PlacePoint.Level3, this@RobotContainer)
-                    ).onFalse(HoldPosition(elevator, arm, wrist))
+                    ).onFalse(HoldPosition(elevator, arm))
 
                 // assign intake
                 lowIntake
                     .whileTrue(
-                        IntakePositionForward(elevator, arm, wrist)
+                        IntakePositionForward(elevator, arm)
                             .withManipulator(manipulator)
-                    ).onFalse(HoldPosition(elevator, arm, wrist))
+                    ).onFalse(HoldPosition(elevator, arm))
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
@@ -170,30 +168,30 @@ class RobotContainer {
 
                 highIntake
                     .whileTrue(
-                        SetPosition.humanPlayer(elevator, arm, wrist).alongWith(CollectObject(manipulator))
+                        SetPosition.humanPlayer(elevator, arm).alongWith(CollectObject(manipulator))
                             // previous setposition command was finishing before the race would actually work
                     )
 
-                moveToClosestHPS
-                    .whileTrue(
-                        MoveToPosition.snapToScoring(
-                            drivetrain,
-                            {
-                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.platforms.toList()
-                            },
-                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
-                        )
-                    )
-                moveToClosestScoreStation
-                    .whileTrue(
-                        MoveToPosition.snapToScoring(
-                            drivetrain,
-                            {
-                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.score.toList()
-                            },
-                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
-                        )
-                    )
+//                moveToClosestHPS
+//                    .whileTrue(
+//                        MoveToPosition.snapToScoring(
+//                            drivetrain,
+//                            {
+//                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.platforms.toList()
+//                            },
+//                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
+//                        )
+//                    )
+//                moveToClosestScoreStation
+//                    .whileTrue(
+//                        MoveToPosition.snapToScoring(
+//                            drivetrain,
+//                            {
+//                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.score.toList()
+//                            },
+//                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
+//                        )
+//                    )
 
                 xbox!!.povDown().onTrue(
                     InstantCommand ({
@@ -258,41 +256,41 @@ class RobotContainer {
     }
     var isLimpHeld = false
     var isLimp = false
-    val limpCommand = RunCommand({
-        arm.armMotor.idleMode = CANSparkMax.IdleMode.kCoast
-        wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kCoast
-        elevator.elevatorMotor.setNeutralMode(NeutralMode.Coast)
-        isLimp = true
-    }, arm, wrist, elevator)
-        .ignoringDisable(true)
-        .handleInterrupt {
-            arm.armMotor.idleMode = CANSparkMax.IdleMode.kBrake
-            wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kBrake
-            elevator.elevatorMotor.setNeutralMode(NeutralMode.Brake)
-        }
-    val limpTrigger: Trigger =
-        Trigger {
-            Game.TEST && RobotController.getUserButton()
-        }.apply {
-            this
-                .onTrue(InstantCommand({ isLimpHeld = true },NoSubsystem))
-                .debounce(0.25).whileTrue(
-                    limpCommand
-                )
-        }
-    val limpLongButton = Trigger {RobotController.getUserButton() && !Game.COMPETITION}
-        .run {
-            this.onTrue(InstantCommand({ isLimpHeld = true },NoSubsystem))
-                .debounce(5.0)
-                .whileTrue(
-                    limpCommand
-                )        }
+//    val limpCommand = RunCommand({
+//        arm.armMotor.idleMode = CANSparkMax.IdleMode.kCoast
+//        wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kCoast
+//        elevator.elevatorMotor.setNeutralMode(NeutralMode.Coast)
+//        isLimp = true
+//    }, arm, wrist, elevator)
+//        .ignoringDisable(true)
+//        .handleInterrupt {
+//            arm.armMotor.idleMode = CANSparkMax.IdleMode.kBrake
+//            wrist.wristMotor.idleMode = CANSparkMax.IdleMode.kBrake
+//            elevator.elevatorMotor.setNeutralMode(NeutralMode.Brake)
+//        }
+//    val limpTrigger: Trigger =
+//        Trigger {
+//            Game.TEST && RobotController.getUserButton()
+//        }.apply {
+//            this
+//                .onTrue(InstantCommand({ isLimpHeld = true },NoSubsystem))
+//                .debounce(0.25).whileTrue(
+//                    limpCommand
+//                )
+//        }
+//    val limpLongButton = Trigger {RobotController.getUserButton() && !Game.COMPETITION}
+////        .run {
+////            this.onTrue(InstantCommand({ isLimpHeld = true },NoSubsystem))
+////                .debounce(5.0)
+////                .whileTrue(
+////                    limpCommand
+////                )        }
     val auto
     get() =
         ConditionalCommand(
-            MoveToPosition.pathRed(drivetrain, elevator, arm, wrist, manipulator),
+            MoveToPosition.pathRed(drivetrain, elevator, arm, manipulator),
             ConditionalCommand(
-                MoveToPosition.pathBlue(drivetrain, elevator, arm, wrist, manipulator),
+                MoveToPosition.pathBlue(drivetrain, elevator, arm, manipulator),
                 PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
                 { Game.alliance == DriverStation.Alliance.Blue}
             ),

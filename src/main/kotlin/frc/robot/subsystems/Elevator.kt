@@ -110,10 +110,8 @@ class Elevator(
                 val bottomLimit = 0.1
                 val armLength = Constants.arm.length
                 // use arm angle to determine elevator height
-                val wristAngle = robotContainer.wrist.position
                 val armAngle = robotContainer.arm.armPosition
-                val armHeight = armLength * sin((PI/2)-armAngle) +
-                        Constants.wrist.maxWristLength * sin((PI/2)-(armAngle+wristAngle))
+                val armHeight = armLength * sin((PI/2)-armAngle)
                 val elevatorMaxHeight = topLimit - armHeight
 
                 field = field.coerceAtMost(elevatorMaxHeight)

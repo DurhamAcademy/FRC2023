@@ -26,12 +26,11 @@ object Solver {
     fun getWristPose(
         elevatorHeight: Double,
         armAngle: Double,
-        wristAngle: Double
     ) {
         val armX = armLength * cos(armAngle)
         val armY = 0.0
         val armZ = elevatorHeight + armLength * sin(armAngle)
-        val wristPitch = armAngle + wristAngle
+        val wristPitch = armAngle
         wristCoords[0] = armX + wristLength * cos(wristPitch)
         wristCoords[1] = armY
         wristCoords[2] = armZ + wristLength * sin(wristPitch)
@@ -50,7 +49,6 @@ object Solver {
         getWristPose(
             robotContainer!!.elevator.height,
             robotContainer!!.arm.armPosition,
-            robotContainer!!.wrist.position
         )
     }
 }
