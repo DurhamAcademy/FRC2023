@@ -216,6 +216,31 @@ class MoveToPosition(
         const val yP = 2.25
         const val xP = 2.25
 
+        /**
+         * Auto 1: Just place game piece
+         * Use if drivetrain is not working
+         * IS UNIVERSAL
+         */
+        fun blueauto1(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                //(drivetrain.poseEstimator.estimatedPosition)
+                SetPosition.high(elevator, arm).withTimeout(1.0)
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)))
+                    .withTimeout(15.0)
+            }
+
+        /**
+         * Auto 2: Place, pick up, and then get on charge station
+         */
+        fun blueauto2(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, 2.0, 1.05, 180.0).withTimeout(2.0)
+                    //.andThen()
+            }
+
+        /*
         fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
@@ -225,6 +250,9 @@ class MoveToPosition(
                     .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
             }
 
+         */
+
+        /*
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
@@ -234,6 +262,12 @@ class MoveToPosition(
                     .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
             }
+
+         */
+
+
+
+        /*
 
         fun pathBlueAdvanced(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
@@ -285,6 +319,9 @@ class MoveToPosition(
 
             }
 
+         */
+
+        /*
         fun pathRedAdvanced(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
@@ -334,6 +371,8 @@ class MoveToPosition(
                     .withTimeout(15.0)
 
             }
+
+         */
 
         fun snapToYValue(
             drivetrain: Drivetrain,
