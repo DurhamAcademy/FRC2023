@@ -133,11 +133,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/FIELD": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/elevcmd": {
         "window": {
           "visible": true
@@ -250,7 +245,7 @@
               "autoFit": true
             }
           ],
-          "height": 0,
+          "height": 518,
           "series": [
             {
               "color": [
