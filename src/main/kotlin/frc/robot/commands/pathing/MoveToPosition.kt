@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.kyberlib.math.units.extensions.radians
 import frc.robot.Constants
+import frc.robot.autovals
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
@@ -245,8 +246,10 @@ class MoveToPosition(
         fun blueauto2(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
-                MoveToPosition(drivetrain, 2.0, 1.05, 180.0).withTimeout(2.0)
-                //.andThen()
+                MoveToPosition(drivetrain,2.0, 1.05, 180.0)
+                    .alongWith(SetPosition.high(elevator, arm).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(MoveToPosition(drivetrain, 2549879238457.0, 2.0 , 180.0))
             }
 
         /**
@@ -284,6 +287,7 @@ class MoveToPosition(
 
             }
 
+        /*
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
@@ -393,6 +397,8 @@ class MoveToPosition(
                     .withTimeout(15.0)
 
             }
+            
+         */
 
         fun snapToYValue(
             drivetrain: Drivetrain,
