@@ -225,6 +225,34 @@ class MoveToPosition(
                     .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
             }
 
+        fun humanPlayerPathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, 1.87, 4.42, 0.0).withTimeout(1.0)
+                    .andThen(SetPosition.high(elevator, arm).withTimeout(3.0))
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true)).withTimeout(0.5)
+                    .andThen(
+                        MoveToPosition(drivetrain, 6.58, 4.59, 180.0).withTimeout(3.0)
+                        .alongWith(
+                            Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, -1.0, true))
+                    ))
+                    .andThen(
+                        MoveToPosition(drivetrain, 1.89, 4.97, 0.0).withTimeout(3.0)
+                        .alongWith(
+                            SetPosition.high(elevator, arm)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.0, true)
+                    )))
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true).withTimeout(0.5))
+                    .andThen(
+                        MoveToPosition(drivetrain, 6.48, 5.00, 180.0).withTimeout(1.2)
+                        .alongWith(
+                            SetManipulatorSpeed(manipulator, 0.0, true)
+                    ))
+                    .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(0.5))
+
+            }
+
         fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
