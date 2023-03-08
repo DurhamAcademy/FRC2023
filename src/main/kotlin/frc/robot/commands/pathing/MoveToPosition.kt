@@ -467,15 +467,3 @@ class MoveToPosition(
 
     }
 }
-
-//this function should be used when copying and pasting an auto function, and you need to flip the x-coordinates.
-fun flipped(x: Double): Double {
-    val newX: Double
-    if(x<8.3)
-        newX=8.3+(8.3-x)
-    else
-        newX=8.3-(x-8.3)
-
-    return newX
-}
-
