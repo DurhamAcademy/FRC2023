@@ -128,9 +128,7 @@ class Elevator(
     private var lastTime = 0.0
     override fun periodic() {
         // limits
-        if(limitSwitch.get()){
-            this.height = (Constants.Elevator.limits.topLimit)
-        }
+        bottomLimitSwitch()
         // set motor voltage
         setMotorVoltage(
             motorPid.calculate(
@@ -183,5 +181,11 @@ class Elevator(
             elevatorSim.hasHitUpperLimit()
         )
         // just set the motor voltage to the control scheme's output
+    }
+
+    fun bottomLimitSwitch(){
+        if(limitSwitch.get()){
+            this.height = (Constants.Elevator.limits.bottomLimit)
+        }
     }
 }
