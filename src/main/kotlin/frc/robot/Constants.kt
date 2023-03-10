@@ -11,6 +11,20 @@ import edu.wpi.first.wpilibj.util.Color
 import kotlin.math.PI
 
 object Constants {
+
+    object autoFieldPositions{
+        const val lowerX = 2.0; const val lowerY = 1.05 //first cube spot
+        const val middleX = 2.0; const val middleY = 2.75 //second cube spot
+        const val upperX = 2.0; const val upperY = 4.4 //third cube spot
+        const val onePickupX = 6.4; const val onePickupY = 0.0 //first gamepiece pickup
+        const val twoPickupX = 6.4; const val twoPickupY = 0.0 //second gamepiece pickup
+        const val threePickupX = 6.4; const val threePickupY = 0.0 //third gamepiece pickup
+        const val fourPickupX = 6.4; const val fourPickupY = 0.0 //fourth gamepiece pickup
+
+        const val taxihighX = 7.5; const val taxihighY = 6.5
+        const val taxilowX = 5.5; const val taxilowY = 0.55
+        const val chargePrepOutX = 5.5; const val chargePrepY = 2.05; const val chargePrepZoneX = 2.35;
+    }
     object leds {
         val count = 74// 74 is what chris said
     }
