@@ -2,7 +2,7 @@
   "HALProvider": {
     "Addressable LEDs": {
       "0": {
-        "columns": 37,
+        "columns": 15,
         "serpentine": true
       },
       "window": {

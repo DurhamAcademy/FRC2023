@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.kyberlib.math.units.extensions.radians
-import frc.robot.Constants
+import frc.robot.*
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
@@ -23,6 +23,15 @@ import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
 import kotlin.random.Random
+
+val Pose2d.flipped: Pose2d
+    get() = Pose2d(
+        Translation2d(
+            -(this.translation.x-8.3) + 8.3,
+            this.translation.y
+        ),
+        -rotation
+    )
 
 class MoveToPosition(
     private val drivetrain: Drivetrain,
@@ -217,6 +226,17 @@ class MoveToPosition(
         rPIDController.reset(0.0, 0.0)
     }
 
+    val flipped: MoveToPosition
+        get() = MoveToPosition(
+            drivetrain,
+            { pose().flipped },
+            velocity,
+            toleranceppos,
+            tolerancepvel,
+            tolerancerpos,
+            tolerancervel,
+            snapMode
+        )
     companion object {
         const val rP = 4.0
         const val yP = 2.25
@@ -387,7 +407,6 @@ class MoveToPosition(
                 },
                 rTolerance = 0.15
             )
-
     }
 }
 

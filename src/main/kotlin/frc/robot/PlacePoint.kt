@@ -1,17 +1,66 @@
 package frc.robot
 
+import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
+import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
+
 enum class ObjectType {
     Cone, Cube
 }
 
 enum class PlacePoint {
-    Level1, Level2, Level3
+    Level1, Level2, Level3;
+    fun asXInt(aliance: DriverStation.Alliance): Double? {
+        val offset = when (this) {
+            Level1 -> 0.0
+            Level2 -> 0.0
+            Level3 -> 0.0
+        }
+        return when (aliance) {
+            Blue -> Constants.Field2dLayout.Axes.XInt.communityPlacementLineBlue
+            Red -> Constants.Field2dLayout.Axes.XInt.communityPlacementLineRed
+            else -> null
+        }
+    }
 }
 
 enum class Row {
-    L1, M1, R1,
-    L2, M2, R2,
-    L3, M3, R3
+    LClose, MClose, RClose,
+    LMid, MMid, RMid,
+    LFar, MFar, RFar;
+    val asYInt: Double?
+        get() = Constants.Field2dLayout.Axes.YInt.score
+            .elementAtOrNull(this.ordinal)
+}
+
+enum class RowSection {
+    Close, Mid, Far;
+    fun withRowSide(rowSide: RowSide) = when (this) {
+        Close -> when (rowSide) {
+            RowSide.Left -> Row.LClose
+            RowSide.Middle -> Row.MClose
+            RowSide.Right -> Row.RClose
+        }
+        Mid -> when (rowSide) {
+            RowSide.Left -> Row.LMid
+            RowSide.Middle -> Row.MMid
+            RowSide.Right -> Row.RMid
+        }
+        Far -> when (rowSide) {
+            RowSide.Left -> Row.LFar
+            RowSide.Middle -> Row.MFar
+            RowSide.Right -> Row.RFar
+        }
+
+        else -> {
+            throw IllegalArgumentException("RowSection $this is not supported")}
+    }
+}
+
+enum class RowSide {
+    Left, Middle, Right;
+    fun withRowSection(rowSection: RowSection) =
+        rowSection.withRowSide(this)
 }
 
 /**
