@@ -249,6 +249,19 @@ class MoveToPosition(
                             ).withTimeout(2.0)
                     )
             }
+        fun redauto2low(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.lowerX), flipped(Constants.autoFieldPositions.lowerY), 0.0)
+                    .alongWith(SetPosition.high(elevator, arm).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(
+                        Idle(elevator, arm)
+                            .alongWith(
+                                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.taxilowX), flipped(Constants.autoFieldPositions.taxilowY), 0.0)
+                            ).withTimeout(2.0)
+                    )
+            }
         fun blueauto2high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
@@ -258,8 +271,20 @@ class MoveToPosition(
                     .andThen(
                         Idle(elevator, arm)
                             .alongWith(
-                                MoveToPosition(drivetrain, Constants.autoFieldPositions.taxihighX, Constants.autoFieldPositions.taxihighY , 180.0
-                                )
+                                MoveToPosition(drivetrain, Constants.autoFieldPositions.taxihighX, Constants.autoFieldPositions.taxihighY , 180.0)
+                            ).withTimeout(2.0)
+                    )
+            }
+        fun redauto2high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.upperX), flipped(Constants.autoFieldPositions.upperY), 0.0)
+                    .alongWith(SetPosition.high(elevator, arm).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(
+                        Idle(elevator, arm)
+                            .alongWith(
+                                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.taxihighX), flipped(Constants.autoFieldPositions.taxihighY), 0.0)
                             ).withTimeout(2.0)
                     )
             }
@@ -294,8 +319,29 @@ class MoveToPosition(
                         Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.5))
                     )
             }
-
-
+        fun redauto3low(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                //place game piece
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.upperX), flipped(Constants.autoFieldPositions.upperY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(1.0)).andThen(
+                        SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0)
+                    ).andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))).withTimeout(1.5)
+                    .andThen(
+                        //score mobility
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.fourPickupX), flipped(Constants.autoFieldPositions.fourPickupY), 0.0)
+                            .alongWith(
+                                IntakePositionForward(elevator, arm).withTimeout(2.0)
+                            )
+                    ).andThen(
+                        //pickup cube
+                        SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0)
+                    ).andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.5))
+                    )
+            }
         fun blueauto3high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
@@ -310,6 +356,30 @@ class MoveToPosition(
                     .andThen(
                         //score mobility
                         MoveToPosition(drivetrain, Constants.autoFieldPositions.onePickupX, Constants.autoFieldPositions.onePickupY, 180.0)
+                            .alongWith(
+                                IntakePositionForward(elevator, arm).withTimeout(2.0)
+                            )
+                    ).andThen(
+                        //pickup cube
+                        SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0)
+                    ).andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.5))
+                    )
+            }
+        fun redauto3high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                //place game piece
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.lowerX), flipped(Constants.autoFieldPositions.lowerY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(1.0)
+                    ).andThen(
+                        SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0)
+                    ).andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))).withTimeout(1.5)
+                    .andThen(
+                        //score mobility
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.onePickupX), flipped(Constants.autoFieldPositions.onePickupY), 0.0)
                             .alongWith(
                                 IntakePositionForward(elevator, arm).withTimeout(2.0)
                             )
@@ -349,6 +419,28 @@ class MoveToPosition(
                             .alongWith(Idle(elevator, arm).withTimeout(3.0))
                     )
             }
+        fun redauto4low(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                //place game piece
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.lowerX), flipped(Constants.autoFieldPositions.lowerY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(1.0)).andThen(
+                        SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0)
+                    ).andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))).withTimeout(1.5)
+                    .andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.onePickupX), flipped(Constants.autoFieldPositions.onePickupY), 0.0)
+                            .alongWith(
+                                IntakePositionForward(elevator, arm).withTimeout(1.5)
+                            )
+                    ).andThen(
+                        SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0)
+                    ).andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.chargePrepOutX), flipped(Constants.autoFieldPositions.chargePrepY), 0.0)
+                            .alongWith(Idle(elevator, arm).withTimeout(3.0))
+                    )
+            }
 
         fun blueauto4high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
@@ -372,6 +464,28 @@ class MoveToPosition(
                             .alongWith(Idle(elevator, arm).withTimeout(3.0))
                     )
             }
+        fun redauto4high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                //place game piece
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.upperX), flipped(Constants.autoFieldPositions.upperY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(1.0)).andThen(
+                        SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0)
+                    ).andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))).withTimeout(1.5)
+                    .andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.fourPickupX), flipped(Constants.autoFieldPositions.fourPickupY), 0.0)
+                            .alongWith(
+                                IntakePositionForward(elevator, arm).withTimeout(1.5)
+                            )
+                    ).andThen(
+                        SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0)
+                    ).andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.chargePrepOutX), flipped(Constants.autoFieldPositions.chargePrepY), 0.0)
+                            .alongWith(Idle(elevator, arm).withTimeout(3.0))
+                    )
+            }
 
 
         /** Auto 5:
@@ -387,6 +501,17 @@ class MoveToPosition(
                         SetPosition.high(elevator, arm).withTimeout(1.0)).andThen(
                     ).andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
                     .andThen(MoveToPosition(drivetrain, Constants.autoFieldPositions.chargePrepZoneX, Constants.autoFieldPositions.chargePrepY, 180.0)
+                        .alongWith(Idle(elevator,arm))
+                    )
+            }
+        fun redauto5mid(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run{
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.middleX), flipped(Constants.autoFieldPositions.middleY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(1.0)).andThen(
+                    ).andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.chargePrepZoneX), flipped(Constants.autoFieldPositions.chargePrepY), 0.0)
                         .alongWith(Idle(elevator,arm))
                     )
             }
@@ -412,7 +537,33 @@ class MoveToPosition(
                             )
                             //move to cube outside community
                             .alongWith(
-                                MoveToPosition(drivetrain, Constants.autoFieldPositions.fourPickupX, Constants.autoFieldPositions.fourPickupY, 0.0).withTimeout(2.0)
+                                MoveToPosition(drivetrain, Constants.autoFieldPositions.fourPickupX, Constants.autoFieldPositions.fourPickupY, 180.0).withTimeout(2.0)
+                            )
+                            .alongWith(
+                                WaitCommand(1.5).andThen(
+                                    IntakePositionForward(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 1.0))).withTimeout(2.0)
+                            )
+                    ).andThen(
+                        //TODO: Charge Station Code
+                    )
+            }
+        fun redauto6high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                //high community
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.upperX), flipped(Constants.autoFieldPositions.upperY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(3.0)
+                    )
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(
+                        Idle(elevator, arm)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.5)
+                            )
+                            //move to cube outside community
+                            .alongWith(
+                                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.fourPickupX), flipped(Constants.autoFieldPositions.fourPickupY), 0.0).withTimeout(2.0)
                             )
                             .alongWith(
                                 WaitCommand(1.5).andThen(
@@ -439,6 +590,32 @@ class MoveToPosition(
                             //move to cube outside community
                             .alongWith(
                                 MoveToPosition(drivetrain, Constants.autoFieldPositions.onePickupX, Constants.autoFieldPositions.onePickupY, 0.0).withTimeout(2.0)
+                            )
+                            .alongWith(
+                                WaitCommand(1.5).andThen(
+                                    IntakePositionForward(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 1.0))).withTimeout(2.0)
+                            )
+                    ).andThen(
+                        //TODO: Charge Station Code
+                    )
+            }
+        fun redauto6low(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                //high community
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.lowerX), flipped(Constants.autoFieldPositions.lowerY), 0.0)
+                    .alongWith(
+                        SetPosition.high(elevator, arm).withTimeout(3.0)
+                    )
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(
+                        Idle(elevator, arm)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.5)
+                            )
+                            //move to cube outside community
+                            .alongWith(
+                                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.onePickupX), flipped(Constants.autoFieldPositions.onePickupY), 0.0).withTimeout(2.0)
                             )
                             .alongWith(
                                 WaitCommand(1.5).andThen(
@@ -479,7 +656,34 @@ class MoveToPosition(
                             .alongWith(
                                 SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.2)
                             ))
-                    .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(0.5))
+                    .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(1.0))
+
+            }
+        fun redauto7high(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.upperX), flipped(Constants.autoFieldPositions.upperY), 0.0).withTimeout(1.0)
+                    .andThen(SetPosition.high(elevator, arm).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0)).withTimeout(1.0)
+                    .andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.fourPickupX), flipped(Constants.autoFieldPositions.fourPickupY), 0.0)
+                            .alongWith(
+                                IntakePositionForward(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 1.0)).withTimeout(2.0)
+                            ))
+                    .andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.upperX + .45), flipped(Constants.autoFieldPositions.upperY), 0.0)
+                            .alongWith(
+                                SetPosition.mid(elevator, arm)
+                                    .alongWith(
+                                        SetManipulatorSpeed(manipulator, 0.0).withTimeout(2.0)
+                                    )))
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0))
+                    .andThen(
+                        MoveToPosition(drivetrain, flipped(Constants.autoFieldPositions.fourPickupX), flipped(Constants.autoFieldPositions.fourPickupY), 0.0)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.0).withTimeout(1.2)
+                            ))
+                    .andThen(MoveToPosition(drivetrain, flipped(7.59), flipped(6.45), 0.0).withTimeout(1.0))
 
             }
 
