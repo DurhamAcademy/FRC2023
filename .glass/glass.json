@@ -1,0 +1,139 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "Elevator": {
+          "open": true
+        },
+        "Manipulator": {
+          "open": true
+        },
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true,
+        "wrist": {
+          "open": true
+        }
+      },
+      "photonvision": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Drivetrain/sendable": "Subsystem",
+      "/SmartDashboard/FIELD": "Field2d",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/elevcmd": "Subsystem"
+    },
+    "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/FIELD": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "Robot": {
+          "length": 0.7620000243186951,
+          "style": "Box/Image",
+          "width": 0.6603999733924866
+        },
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "C:\\Users\\frc\\PathWeaver\\Games\\2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "open": true
+    },
+    "glass@3": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
+    "photonvision@2": {
+      "open": true
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "6502"
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "height": 268,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Shuffleboard/Manipulator/IR"
+            }
+          ]
+        },
+        {
+          "height": 268,
+          "series": [
+            {
+              "color": [
+                0.9754902124404907,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Red"
+            },
+            {
+              "color": [
+                0.32156869769096375,
+                0.8666667342185974,
+                0.43379470705986023,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Green"
+            },
+            {
+              "color": [
+                0.4577854573726654,
+                0.3333333432674408,
+                0.658823549747467,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Blue"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
