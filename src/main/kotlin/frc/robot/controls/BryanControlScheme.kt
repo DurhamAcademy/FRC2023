@@ -28,10 +28,8 @@ class BryanControlScheme(
     override val highIntake = xbox.rightTrigger()
 
 //    override val toggleManipulator = xbox.povUp()
-    override val openManipulator: Trigger
+    override val toggleManipulator: Trigger
         get() = xbox.povUp()
-    override val closeManipulator: Trigger
-        get() = xbox.povDown()
 
 
     override val moveToClosestHPS: Trigger = xbox.start()

@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry
+import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget
@@ -158,6 +159,8 @@ class Drivetrain(
             }
         }
 
+        SmartDashboard.putData("huhhh", this)
+
         SmartDashboard.putNumber("gyroangle", gyro.yaw)
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
         SmartDashboard.putNumber("posex", poseEstimator.estimatedPosition.translation.x)
@@ -222,6 +225,11 @@ class Drivetrain(
             module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
         }
     }
+    var swerveModuleStates: List<SwerveModuleState>
+        get() = this.modules.map { it.currentPosition }
+        set(value) = this.modules.forEachIndexed { i, it ->
+            it.setpoint = value[i]
+        }
 
     var powerSaveMode: Int = 0
         set(value) {

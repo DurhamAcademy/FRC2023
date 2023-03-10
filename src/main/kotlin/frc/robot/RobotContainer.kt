@@ -18,6 +18,7 @@ import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
+import frc.robot.commands.TurnMotorTest
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.alltogether.*
 import frc.robot.commands.arm.SetArmToAngle
@@ -109,20 +110,10 @@ class RobotContainer {
 
                 // assign the open manipulator trigger to the command that
                 // opens the manipulator
-                openManipulator
-                    .whileTrue(
-                        SetManipulatorSpeed(manipulator, 0.0)
-                    )
 
-                // assign the close manipulator trigger to the command that
-                // closes the manipulator
-                closeManipulator
-                    .whileTrue(SetManipulatorSpeed(manipulator,1.0))
 
                 toggleManipulator
-                    .toggleOnFalse(
-                        SetManipulatorSpeed(manipulator,0.1)
-                    ).toggleOnTrue(
+                    .onTrue(
                         SetManipulatorSpeed(manipulator, 0.0)
                     )
 
@@ -142,6 +133,7 @@ class RobotContainer {
                     .whileTrue(
                         SetPosition.setpoint(PlacePoint.Level1, this@RobotContainer)
                     )
+                    println("ran manipulaot rhehe")
 
                 // assign l2
                 placeLvl2
@@ -164,7 +156,10 @@ class RobotContainer {
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
-                    .whileTrue(SetManipulatorSpeed(manipulator, -0.4)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -1.0)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
+
+                intake
+                    .whileTrue(SetManipulatorSpeed(manipulator, 1.0)).onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 highIntake
                     .whileTrue(
@@ -288,13 +283,13 @@ class RobotContainer {
     val auto
     get() =
         ConditionalCommand(
-            MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator),
+            TurnMotorTest(drivetrain),//MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator)
             ConditionalCommand(
                 MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator),
-                PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
-                { Game.alliance == DriverStation.Alliance.Blue}
+                PrintCommand("UKNOWN ALLIANCE ${Game.alliance}"),
+                {Game.alliance == DriverStation.Alliance.Blue}
             ),
-            { Game.alliance == DriverStation.Alliance.Red }
+            {Game.alliance == DriverStation.Alliance.Red}
         )
 
     fun update() {

@@ -193,9 +193,11 @@ class Elevator(
         // check if its in teleop
 //        if (RobotController.getUserButton()) setMotorVoltage(0.0)
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
-        if (!limitSwitch.get() && lastLimitSwitch) {
-//            this.height = Constants.Elevator.limitSwitch.offset
-            //fixme: uncomment this
+        if (limitSwitch.get() && !lastLimitSwitch) {
+            this.height = Constants.Elevator.limits.bottomLimit
+        }
+        if(limitSwitch.get()){
+            setpoint = this.height
         }
         lastLimitSwitch = limitSwitch.get()
     }

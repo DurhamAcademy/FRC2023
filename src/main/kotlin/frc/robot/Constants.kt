@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units.*
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 
 object Constants {
     object leds {
@@ -75,7 +76,7 @@ object Constants {
 
         object limitSwitch {
             val ElevatorLimitSwitchId: Int = 9
-            val offset: Double = Elevator.limits.bottomLimit//0.0
+            val offset: Double = Elevator.limits.bottomLimit
         }
 
         object limits {
@@ -159,7 +160,7 @@ object Constants {
         const val leftSolenoidReverse = 1
         const val rightSolenoidForward = 3
         const val rightSolenoidReverse = 2
-        const val manipulatorCurrentLimit = 20.0
+        const val manipulatorCurrentLimit = 40.0
 
         val wristToObj = inchesToMeters(8.0)
         const val confidenceThreshold = 0.75
@@ -350,4 +351,6 @@ object Constants {
             ): Translation2d? = inIterable.minByOrNull { it.getDistance(to) }
         }
     }
+    val i = (Constants.Elevator.elevatorMotor.gearRatio *
+    Constants.Elevator.sproketRadius * 2 * Math.PI).apply { println("${this} Tththththt") }
 }
