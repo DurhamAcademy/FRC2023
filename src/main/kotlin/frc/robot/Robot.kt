@@ -47,10 +47,10 @@ class Robot : TimedRobot() {
 
     override fun autonomousInit() {
         auto = robotContainer.auto
-//        auto?.schedule()
+        auto?.schedule()
     }
 
     override fun autonomousExit() {
-//        auto?.cancel()
+        auto?.cancel()
     }
 }
