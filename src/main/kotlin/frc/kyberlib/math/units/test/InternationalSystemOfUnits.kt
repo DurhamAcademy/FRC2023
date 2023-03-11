@@ -579,7 +579,7 @@ operator fun <Q : Quan<Q>> Q.rangeTo(that: Q) = object : ClosedRange<Q> {
 fun <Q : Quan<Q>> avg(a: Q, b: Q) = (a + b) / 2
 fun <Q : Quan<Q>> avg(a: Q, b: Q, c: Q) = (a + b + c) / 3
 fun <Q : Quan<Q>> avg(first: Q, vararg x: Q) = first.new(
-    (first.siValue + x.sumByDouble(Quan<Q>::siValue)) /
+    (first.siValue + x.sumOf(Quan<Q>::siValue)) /
             (1 + x.size)
 )
 

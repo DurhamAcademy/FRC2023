@@ -23,7 +23,7 @@ object SnapToPostion {
                 else this.scoringPoints
             }
         )
-    fun closestPose(drivetrain: Drivetrain): Pose2d? =
+    fun closestPose(drivetrain: Drivetrain): Pose2d =
         Pose2d(closest(drivetrain),drivetrain.poseEstimator.estimatedPosition.rotation)
 
 }

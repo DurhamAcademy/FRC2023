@@ -1,11 +1,19 @@
 package frc.robot
 
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Transform2d
+import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.trajectory.TrajectoryConfig
+import edu.wpi.first.math.trajectory.TrajectoryGenerator
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
+import edu.wpi.first.wpilibj.smartdashboard.Field2d
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -35,6 +43,8 @@ import frc.robot.utils.PlacePoint
 import frc.robot.utils.Solver
 import java.awt.Color
 import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 class RobotContainer {
     val controlSchemeA: ControlScheme = BryanControlScheme(0)//xbox)
@@ -345,7 +355,10 @@ class RobotContainer {
     val autoChooserTab = Shuffleboard.getTab("Autonomous")
     val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
 
-    val armVisualizer = drivetrain.field2d.getObject("arm")
+    val armVisual = Field2d()
+    val armLine = armVisual.getObject("arm")
+    val elevatorLine = armVisual.getObject("elevator")
+
     fun update() {
         leds.update()
 
@@ -355,6 +368,22 @@ class RobotContainer {
         SmartDashboard.putData("Arm/sendable", arm)
         SmartDashboard.putData("Manipulator/sendable", manipulator)
 
+        // put arm angle onto the simulation field by using trig to get the x
+        // coordinate and then using the transform function to offset it from
+        // the center of the robot
+        val armAngle = arm.armPosition // 0 is straight up, pi/2 is straight out
+        val armLength = 0.5 // length of the arm in meters
+        // (+1 is 1 meter forward, -1 is 1 meter back)
+        // armLen * cos(armAngle) = x
+        // armLen * sin(armAngle) = z
+        val armX = armLength * cos(armAngle)
+        val armZ = armLength * sin(armAngle)
+
+        // transform the arm position to the robot's position
+        val armPos = drivetrain.estimatedPose2d + Transform2d(
+            Translation2d(-armX, 0.0),
+            Rotation2d(if (armAngle > 0) PI else 0.0)
+        )
     }
 }
 

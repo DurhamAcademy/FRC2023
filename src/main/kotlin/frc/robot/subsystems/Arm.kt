@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.kyberlib.command.Game
 import frc.robot.Constants
 //import frc.robot.utils.armFeedforward
 //import frc.robot.utils.createArmSystemPlant
@@ -34,8 +35,8 @@ class Arm : SubsystemBase() {
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
         Constants.arm.motor.gearRatio,
-        Constants.arm.momentOfInertia,
-        Constants.arm.length,
+        Constants.arm.momentOfInertia*0.001,
+        Constants.arm.length*0.5,
         Constants.arm.minAngle,
         Constants.arm.maxAngle,
         true
@@ -72,7 +73,6 @@ class Arm : SubsystemBase() {
             .configMagnetOffset(-this + Constants.arm.encoder.offset)
 
     }
-        get() = field
         set(value) {
             field = value
             if (Preferences.containsKey("armOffset")) {
@@ -91,7 +91,7 @@ class Arm : SubsystemBase() {
         get() = toRadians(armEncoder.velocity)
     private var armSetpoint: Double? = null
     fun setArmVoltage(voltage: Double) {
-        if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
+        if (Game.sim) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
     }
 
@@ -153,7 +153,7 @@ class Arm : SubsystemBase() {
             armPosition,
             armSetpoint ?: armPosition
         )
-        var FF = armFeedForward.calculate(
+        val FF = armFeedForward.calculate(
             // convert from 0 being horizontal arm to 0 being upright
             armPosition + (PI / 2),
             armPID.setpoint.velocity
@@ -162,7 +162,7 @@ class Arm : SubsystemBase() {
         val voltage = if (armSetpoint != null) {
             FF + calculate
         } else 0.0
-        setArmVoltage(voltage.coerceIn(-4.0, 4.0))
+        setArmVoltage(voltage)
 
         // Shuffleboard stuff
         ArmMotorVoltage.setDouble(voltage)

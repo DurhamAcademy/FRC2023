@@ -89,7 +89,7 @@ class MoveToPosition(
             9.0
         )
     ).also {
-        it.reset(drivetrain.estimatedPose2d.translation.x, drivetrain.estimatedVelocity.translation.x)
+        it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val yPIDController = ProfiledPIDController(
@@ -98,7 +98,7 @@ class MoveToPosition(
             9.0
         )
     ).also {
-        it.reset(drivetrain.estimatedPose2d.translation.y, drivetrain.estimatedVelocity.translation.y)
+        it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val rPIDController = ProfiledPIDController(
@@ -109,7 +109,7 @@ class MoveToPosition(
         it.enableContinuousInput(-PI, PI)
         it.reset(
             drivetrain.estimatedPose2d.rotation.radians,
-            drivetrain.estimatedVelocity.rotation.radians
+            0.0
         )
         it.setTolerance(tolerancerpos, tolerancervel)
     }
@@ -121,11 +121,11 @@ class MoveToPosition(
         if (snapMode) pose = {
             (SnapToPostion.closestPose(drivetrain) ?: pose) as Pose2d
         }
-        xPIDController.reset(drivetrain.estimatedPose2d.translation.x,0.0)
-        yPIDController.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
-        rPIDController.reset(drivetrain.estimatedPose2d.rotation.radians, 0.0)
+        xPIDController.reset(drivetrain.estimatedPose2d.translation.x, drivetrain.estimatedVelocity.translation.x)
+        yPIDController.reset(drivetrain.estimatedPose2d.translation.y, drivetrain.estimatedVelocity.translation.y)
+        rPIDController.reset(drivetrain.estimatedPose2d.rotation.radians, drivetrain.estimatedVelocity.rotation.radians)
 
-        visualization.setPose(pose())
+        visualization.pose = pose()
     }
 
     // on command start and every time the command is executed, calculate the
@@ -134,7 +134,7 @@ class MoveToPosition(
         val current = drivetrain.estimatedPose2d
         val desired = pose()
 
-        visualization.setPose(desired)
+        visualization.pose = desired
 
         // log the current position and the desired position
         SmartDashboard.putNumber("curr-x", current.translation.x)
@@ -485,6 +485,7 @@ class MoveToPosition(
                 },
                 rTolerance = 0.15
             )
+
     }
 }
 //this function should be used when copying and pasting an auto function, and you need to flip the x-coordinates.

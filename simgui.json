@@ -2,7 +2,7 @@
   "HALProvider": {
     "Addressable LEDs": {
       "0": {
-        "columns": 3,
+        "columns": 75,
         "serpentine": true
       },
       "window": {
@@ -44,36 +44,6 @@
         "header": {
           "open": true
         }
-      },
-      "Talon FX[10]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[12]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[16]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[16]/Fwd Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[16]/Integrated Sensor": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX[16]/Rev Limit": {
-        "header": {
-          "open": true
-        }
       }
     },
     "PowerDistributions": {
@@ -84,15 +54,6 @@
       }
     },
     "RoboRIO": {
-      "5V Rail": {
-        "open": true
-      },
-      "6V Rail": {
-        "open": true
-      },
-      "RoboRIO Input": {
-        "open": true
-      },
       "window": {
         "visible": true
       }
@@ -190,6 +151,7 @@
       "/SmartDashboard/Elevator/sendable": "Subsystem",
       "/SmartDashboard/FIELD": "Field2d",
       "/SmartDashboard/Manipulator/sendable": "Subsystem",
+      "/SmartDashboard/arm visual": "Field2d",
       "/SmartDashboard/elevcmd": "Subsystem",
       "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/huh?": "Command",
@@ -221,12 +183,31 @@
           "visible": true
         }
       },
+      "/SmartDashboard/arm visual": {
+        "arm": {
+          "style": "Line"
+        },
+        "elevator": {
+          "style": "Line"
+        }
+      },
       "/SmartDashboard/elevcmd": {
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/field": {
+        "Robot": {
+          "weight": 1.0
+        },
+        "arm": {
+          "arrowSize": 100,
+          "arrowWeight": 0.10000000149011612,
+          "length": 0.10000000149011612,
+          "style": "Hidden",
+          "width": 0.10000000149011612
+        },
+        "image": "/Users/24wilber/Documents/Code/FRC2023/field/2023-field.png",
         "window": {
           "visible": true
         }
@@ -240,9 +221,13 @@
       }
     },
     "SmartDashboard": {
-      "arm": {
+      "drivetrain": {
         "open": true
-      }
+      },
+      "field": {
+        "open": true
+      },
+      "open": true
     },
     "combined": true,
     "createNonCanonical": true,
@@ -337,7 +322,7 @@
               "autoFit": true
             }
           ],
-          "height": 83,
+          "height": 129,
           "series": [
             {
               "color": [
@@ -377,7 +362,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

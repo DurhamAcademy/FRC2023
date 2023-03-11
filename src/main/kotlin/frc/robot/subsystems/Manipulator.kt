@@ -103,23 +103,23 @@ class Manipulator: SubsystemBase() {
     val motorCurrent = tab.add("Motor Current", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
-        .getEntry()
+        .entry
     val colorRed = tab.add("Red", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
     val colorGreen = tab.add("Green", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
     val colorBlue = tab.add("Blue", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
     val colorIR = tab.add("IR", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
 
 
     override fun periodic() {

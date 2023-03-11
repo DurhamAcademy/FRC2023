@@ -76,7 +76,7 @@ object Constants {
 
         object limitSwitch {
             val ElevatorLimitSwitchId: Int = 9
-            val offset: Double = Elevator.limits.bottomLimit
+            val offset: Double = limits.bottomLimit
         }
 
         object limits {
@@ -307,10 +307,10 @@ object Constants {
             }
 
             interface AliancePointList {
-                abstract val scoringPoints: List<Translation2d>
-                abstract val loadingZonePlatforms: List<Translation2d>
-                abstract val conePlacement: List<Translation2d>
-                abstract val cubePlacement: List<Translation2d>
+                val scoringPoints: List<Translation2d>
+                val loadingZonePlatforms: List<Translation2d>
+                val conePlacement: List<Translation2d>
+                val cubePlacement: List<Translation2d>
             }
 
             object Red : AliancePointList {
@@ -356,6 +356,6 @@ object Constants {
         val id = 1
     }
 
-    val i = (Constants.Elevator.elevatorMotor.gearRatio *
-    Constants.Elevator.sproketRadius * 2 * Math.PI).apply { println("${this} Tththththt") }
+    val i = (Elevator.elevatorMotor.gearRatio *
+    Elevator.sproketRadius * 2 * Math.PI).apply { println("${this} Tththththt") }
 }
