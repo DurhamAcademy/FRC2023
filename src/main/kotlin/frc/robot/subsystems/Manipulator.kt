@@ -5,20 +5,13 @@ import com.revrobotics.CANSparkMaxLowLevel
 import com.revrobotics.ColorMatch
 import com.revrobotics.ColorSensorV3
 import edu.wpi.first.math.filter.LinearFilter
-import edu.wpi.first.wpilibj.DoubleSolenoid
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value
 import edu.wpi.first.wpilibj.I2C
-import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.manipulator.leftSolenoidForward
-import frc.robot.Constants.manipulator.leftSolenoidReverse
 import frc.robot.Constants.manipulator.motorId
-import frc.robot.Constants.manipulator.rightSolenoidForward
-import frc.robot.Constants.manipulator.rightSolenoidReverse
-import frc.robot.GamePiece
+import frc.robot.utils.GamePiece
 import kotlin.math.pow
 import frc.robot.Constants.manipulator as ManipConsts
 

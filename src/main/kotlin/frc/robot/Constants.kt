@@ -351,6 +351,11 @@ object Constants {
             ): Translation2d? = inIterable.minByOrNull { it.getDistance(to) }
         }
     }
+
+    object PDH {
+        val id = 1
+    }
+
     val i = (Constants.Elevator.elevatorMotor.gearRatio *
     Constants.Elevator.sproketRadius * 2 * Math.PI).apply { println("${this} Tththththt") }
 }

@@ -5,12 +5,11 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.Constants
-import frc.robot.PlacePoint
+import frc.robot.utils.PlacePoint
 import frc.robot.RobotContainer
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
-import kotlin.math.absoluteValue
 import kotlin.math.sin
 
 class SetPosition(
