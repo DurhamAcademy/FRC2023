@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.kyberlib.math.units.extensions.radians
 import frc.robot.Constants
+import frc.robot.RobotContainer
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
@@ -134,6 +135,8 @@ class MoveToPosition(
         SmartDashboard.putNumber("des-x", desired.translation.x)
         SmartDashboard.putNumber("des-y", desired.translation.y)
         SmartDashboard.putNumber("des-r", desired.rotation.radians)
+
+        //SmartDashboard.putBoolean("auto", )
 
 
         // calculate the speeds needed to get to the desired position
@@ -868,3 +871,29 @@ fun flipped(x: Double): Double {
 
     return newX
 }
+fun selectAuto() {
+    val auto1 = false
+    val auto2 = false
+    val auto3 = false
+    val auto4 = false
+    val auto5 = false
+    val auto6 = false
+    val auto7 = false
+
+    val high = false
+    val mid = false
+    val low = false
+
+    SmartDashboard.putBoolean("auto1", auto1)
+    SmartDashboard.putBoolean("auto2", auto2)
+    SmartDashboard.putBoolean("auto3", auto3)
+    SmartDashboard.putBoolean("auto4", auto4)
+    SmartDashboard.putBoolean("auto5", auto5)
+    SmartDashboard.putBoolean("auto6", auto6)
+    SmartDashboard.putBoolean("auto7", auto7)
+
+    SmartDashboard.putBoolean("high", high)
+    SmartDashboard.putBoolean("low", low)
+    SmartDashboard.putBoolean("mid", mid)
+}
+

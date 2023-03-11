@@ -288,17 +288,150 @@ class RobotContainer {
                 .whileTrue(
                     limpCommand
                 )        }
-    val auto
+    val auto1
     get() =
         ConditionalCommand(
-            MoveToPosition.blueauto2low(drivetrain, elevator, arm, manipulator),
+            MoveToPosition.auto1(drivetrain, elevator, arm, manipulator),
             ConditionalCommand(
-                MoveToPosition.blueauto2low(drivetrain, elevator, arm, manipulator),
+                MoveToPosition.auto1(drivetrain, elevator, arm, manipulator),
                 PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
                 { Game.alliance == DriverStation.Alliance.Blue}
             ),
             { Game.alliance == DriverStation.Alliance.Red }
         )
+
+    val auto2low
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto2low(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.blueauto2low(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto2high
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto2high(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.redauto2high(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto3low
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto3low(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.blueauto3low(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto3high
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto3high(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.redauto3high(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto4low
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto4low(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.blueauto4low(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto4high
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto4high(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.redauto4high(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto5
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto5mid(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.blueauto3low(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto6low
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto6low(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.blueauto6low(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+    val auto6high
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto6high(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.redauto6high(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
+//    val auto7low
+//        get() =
+//            ConditionalCommand(
+//                MoveToPosition.redauto7low(drivetrain, elevator, arm, manipulator),
+//                ConditionalCommand(
+//                    MoveToPosition.blueauto7low(drivetrain, elevator, arm, manipulator),
+//                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+//                    { Game.alliance == DriverStation.Alliance.Blue}
+//                ),
+//                { Game.alliance == DriverStation.Alliance.Red }
+//            )
+
+    val auto7
+        get() =
+            ConditionalCommand(
+                MoveToPosition.redauto7high(drivetrain, elevator, arm, manipulator),
+                ConditionalCommand(
+                    MoveToPosition.redauto7high(drivetrain, elevator, arm, manipulator),
+                    PrintCommand("UNKOWN ALLIANCE ${Game.alliance}"),
+                    { Game.alliance == DriverStation.Alliance.Blue}
+                ),
+                { Game.alliance == DriverStation.Alliance.Red }
+            )
+
 
     val armVisualizer = drivetrain.field2d.getObject("arm")
     fun update() {
