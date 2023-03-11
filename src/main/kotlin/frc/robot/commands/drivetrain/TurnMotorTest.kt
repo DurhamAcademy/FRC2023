@@ -1,15 +1,11 @@
-package frc.robot.commands
+package frc.robot.commands.drivetrain
 
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.SwerveModuleState
-import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.controls.TestingControlScheme
 import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.SwerveModule
 import kotlin.math.PI
 import kotlin.math.floor
 
@@ -26,7 +22,7 @@ class TurnMotorTest(
         SmartDashboard.putData("huh?", this)
         time = Timer.getFPGATimestamp()
         drivetrain.swerveModuleStates = drivetrain.modules.map {
-            SwerveModuleState(0.0, Rotation2d( floor((time / (PI * 2)) % .9999999999999999) *4.0))
+            SwerveModuleState(0.0, Rotation2d(floor((time / (PI * 2)) % .9999999999999999) * 4.0))
         }
     }
 

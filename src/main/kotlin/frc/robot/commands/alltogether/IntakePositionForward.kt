@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
-import frc.robot.utils.Solver
-import kotlin.math.PI
 
 class IntakePositionForward(
     private val elevator: Elevator,

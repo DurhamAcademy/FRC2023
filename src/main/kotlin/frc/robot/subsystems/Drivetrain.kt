@@ -19,7 +19,7 @@ import frc.kyberlib.command.Game
 import frc.robot.Constants
 import frc.robot.PhotonCameraWrapper
 import frc.robot.RobotContainer
-import frc.robot.commands.DriveCommand
+import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.controls.ControlScheme
 import java.lang.Math.PI
 

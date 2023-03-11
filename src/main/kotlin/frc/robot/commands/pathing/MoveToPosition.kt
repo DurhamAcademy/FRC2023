@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
-import frc.robot.commands.manipulator.SetManipulatorSpeed
+import frc.robot.commands.SetManipulatorSpeed
 import frc.robot.subsystems.*
 import kotlin.math.PI
 import kotlin.math.absoluteValue
@@ -374,7 +374,8 @@ class MoveToPosition(
                             // while moving, deploy
                             .alongWith(
                                 IntakePositionForward(elevator, arm)
-                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0)
+                                    .alongWith(
+                                        SetManipulatorSpeed(manipulator, 1.0)
                                         .withTimeout(1.5)
                                     )
                                     // withTimeout of total deploy time
@@ -424,7 +425,8 @@ class MoveToPosition(
                             // while moving, deploy
                             .alongWith(
                                 IntakePositionForward(elevator, arm)
-                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0)
+                                    .alongWith(
+                                        SetManipulatorSpeed(manipulator, 1.0)
                                         .withTimeout(1.5)
                                     )
                             )

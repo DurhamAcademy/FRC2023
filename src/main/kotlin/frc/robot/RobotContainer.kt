@@ -1,11 +1,8 @@
 package frc.robot
 
-import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.trajectory.TrajectoryConfig
-import edu.wpi.first.math.trajectory.TrajectoryGenerator
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
@@ -13,7 +10,6 @@ import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -24,14 +20,14 @@ import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
-import frc.robot.commands.ElevatorTestDown
-import frc.robot.commands.ElevatorTestUp
+import frc.robot.commands.elevator.ElevatorTestDown
+import frc.robot.commands.elevator.ElevatorTestUp
 import frc.robot.commands.alltogether.CollectObject
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.arm.SetArmToAngle
-import frc.robot.commands.manipulator.SetManipulatorSpeed
+import frc.robot.commands.SetManipulatorSpeed
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ControlScheme
@@ -40,7 +36,6 @@ import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.PlacePoint
-import frc.robot.utils.Solver
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -51,10 +46,6 @@ class RobotContainer {
     val controlSchemeB: ControlScheme = BryanControlScheme(1)//xbox)
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
-
-    init {
-        Solver.robotContainer = this
-    }
 
     val drivetrain = Drivetrain(
         controlSchemeA,
