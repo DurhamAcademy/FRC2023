@@ -76,6 +76,13 @@
         }
       }
     },
+    "PowerDistributions": {
+      "1": {
+        "PowerDistribution[1]": {
+          "open": true
+        }
+      }
+    },
     "RoboRIO": {
       "5V Rail": {
         "open": true
@@ -126,16 +133,29 @@
       "/LiveWindow/Ungrouped/PIDController[32]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[33]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[34]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[35]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[36]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[37]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[38]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[39]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[40]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[41]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[42]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[43]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[44]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[45]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[46]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[47]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[48]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[49]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[50]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[51]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[52]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[53]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[54]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[55]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[60]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[61]": "PIDController",
@@ -164,9 +184,14 @@
       "/LiveWindow/Ungrouped/Talon FX [16]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [17]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [32]": "Motor Controller",
+      "/Shuffleboard/Autonomous/Autonomous": "String Chooser",
+      "/SmartDashboard/Arm/sendable": "Subsystem",
       "/SmartDashboard/Drivetrain/sendable": "Subsystem",
+      "/SmartDashboard/Elevator/sendable": "Subsystem",
       "/SmartDashboard/FIELD": "Field2d",
+      "/SmartDashboard/Manipulator/sendable": "Subsystem",
       "/SmartDashboard/elevcmd": "Subsystem",
+      "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/huh?": "Command",
       "/SmartDashboard/huhhh": "Subsystem"
     },
@@ -176,17 +201,32 @@
           "visible": true
         }
       },
+      "/LiveWindow/Ungrouped/Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Shuffleboard/Autonomous/Autonomous": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Drivetrain/sendable": {
         "window": {
           "visible": true
         }
       },
-      "/SmartDashboard/elevcmd": {
+      "/SmartDashboard/FIELD": {
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/elevcmd": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/field": {
         "window": {
           "visible": true
         }
@@ -209,8 +249,7 @@
     "photonvision": {
       "OV9281": {
         "open": true
-      },
-      "open": true
+      }
     },
     "precision": 4,
     "properties": true,

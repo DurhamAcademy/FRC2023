@@ -11,9 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
-import frc.kyberlib.math.units.extensions.radians
-import frc.robot.Constants
-import frc.robot.autovals
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
@@ -22,7 +19,6 @@ import frc.robot.subsystems.*
 import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
-import kotlin.random.Random
 
 val Pose2d.flipped: Pose2d
     get() = Pose2d(
@@ -93,7 +89,7 @@ class MoveToPosition(
             9.0
         )
     ).also {
-        it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
+        it.reset(drivetrain.estimatedPose2d.translation.x, drivetrain.estimatedVelocity.translation.x)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val yPIDController = ProfiledPIDController(
@@ -102,16 +98,19 @@ class MoveToPosition(
             9.0
         )
     ).also {
-        it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
+        it.reset(drivetrain.estimatedPose2d.translation.y, drivetrain.estimatedVelocity.translation.y)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val rPIDController = ProfiledPIDController(
         Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            PI / 3.0, PI / 1.0
+            PI / 1.0, PI*2
         )
     ).also {
         it.enableContinuousInput(-PI, PI)
-        it.reset(drivetrain.estimatedPose2d.rotation.radians, 0.0)
+        it.reset(
+            drivetrain.estimatedPose2d.rotation.radians,
+            drivetrain.estimatedVelocity.rotation.radians
+        )
         it.setTolerance(tolerancerpos, tolerancervel)
     }
 
@@ -256,7 +255,7 @@ class MoveToPosition(
          * Auto 1: Only places game piece
          * Use if swerve broken
          */
-        fun blueauto1(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+        fun swerveBrokenAuto(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
             //(drivetrain.poseEstimator.estimatedPosition)
                 SetPosition.high(elevator, arm).withTimeout(1.0)
@@ -274,7 +273,7 @@ class MoveToPosition(
                 MoveToPosition(drivetrain,2.0, 1.05, 180.0)
                     .alongWith(SetPosition.high(elevator, arm).withTimeout(1.0))
                     .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
-                    .andThen(MoveToPosition(drivetrain, 2549879238457.0, 2.0 , 180.0))
+                    .andThen(MoveToPosition(drivetrain, 0.0, 2.0 , 180.0))
             }
 
         /**
@@ -289,7 +288,7 @@ class MoveToPosition(
                 (drivetrain.estimatedPose2d)
                 MoveToPosition(drivetrain, 1.87, 4.42, 0.0).withTimeout(1.0)
                     .andThen(SetPosition.high(elevator, arm).withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0)).withTimeout(0.5)
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(0.5))
                     .andThen(
                         MoveToPosition(drivetrain, 6.58, 4.59, 180.0).withTimeout(3.0)
                         .alongWith(
@@ -300,13 +299,13 @@ class MoveToPosition(
                         .alongWith(
                             SetPosition.high(elevator, arm)
                             .alongWith(
-                                SetManipulatorSpeed(manipulator, 0.0)
+                                SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)
                     )))
                     .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(0.5))
                     .andThen(
                         MoveToPosition(drivetrain, 6.48, 5.00, 180.0).withTimeout(1.2)
                         .alongWith(
-                            SetManipulatorSpeed(manipulator, 0.0)
+                            SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)
                     ))
                     .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(0.5))
 

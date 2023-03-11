@@ -1,29 +1,23 @@
 package frc.robot
 
-import com.ctre.phoenix.motorcontrol.NeutralMode
-import com.revrobotics.CANSparkMax
-import edu.wpi.first.math.trajectory.Trajectory
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
+import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
-import edu.wpi.first.wpilibj.Preferences
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
-import frc.kyberlib.math.units.Pose2d
-import frc.kyberlib.math.units.extensions.degrees
-import frc.kyberlib.math.units.extensions.meters
-import frc.kyberlib.math.units.extensions.radians
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
-import frc.robot.commands.TurnMotorTest
 import frc.robot.commands.alltogether.CollectObject
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
@@ -37,8 +31,6 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
-import frc.robot.utils.GamePiece
-import frc.robot.utils.NoSubsystem
 import frc.robot.utils.PlacePoint
 import frc.robot.utils.Solver
 import java.awt.Color
@@ -244,37 +236,23 @@ class RobotContainer {
         get() = when {
             !DriverStation.isDSAttached() -> LightStatus.NoDriverStation
             Game.disabled -> {
-                if (Game.COMPETITION) {
-                    if (Game.alliance == DriverStation.Alliance.Red) {
-                        LightStatus.DisabledFMSRed
-                    } else if (Game.alliance == DriverStation.Alliance.Blue) {
-                        LightStatus.DisabledFMSBlue
-                    } else {
-                        LightStatus.DisabledNoFMS
-                    }
-                } else {
-                    LightStatus.DisabledNoFMS
-                }
+                if (Game.COMPETITION) when (Game.alliance) {
+                    Red -> LightStatus.DisabledFMSRed
+                    Blue -> LightStatus.DisabledFMSBlue
+                    else -> LightStatus.DisabledNoFMS
+                } else LightStatus.DisabledNoFMS
             }
             Game.STOPPED -> LightStatus.EStopped
-            Game.AUTO -> if (Game.COMPETITION) {
-                if (Game.alliance == DriverStation.Alliance.Red) {
-                    LightStatus.AutoFMSRed
-                } else if (Game.alliance == DriverStation.Alliance.Blue) {
-                    LightStatus.AutoFMSBlue
-                } else {
-                    LightStatus.AutoNoFMS
-                }
-            } else {
-                LightStatus.AutoNoFMS
-            }
+            Game.AUTO -> if (Game.COMPETITION) when (Game.alliance) {
+                Red -> LightStatus.AutoFMSRed
+                Blue -> LightStatus.AutoFMSBlue
+                else -> LightStatus.AutoNoFMS
+            } else LightStatus.AutoNoFMS
             Game.OPERATED -> if (Game.COMPETITION) {
-                if (Game.alliance == DriverStation.Alliance.Red) {
-                    LightStatus.TeleopFMSRed
-                } else if (Game.alliance == DriverStation.Alliance.Blue) {
-                    LightStatus.TeleopFMSBlue
-                } else {
-                    LightStatus.TeleopNoFMS
+                when (Game.alliance) {
+                    Red -> LightStatus.TeleopFMSRed
+                    Blue -> LightStatus.TeleopFMSBlue
+                    else -> LightStatus.TeleopNoFMS
                 }
             } else {
                 LightStatus.TeleopNoFMS
@@ -314,7 +292,7 @@ class RobotContainer {
         val teleopNoFMS =
             AnimationCylon(
                 (
-                        if (Game.alliance == DriverStation.Alliance.Red)
+                        if (Game.alliance == Red)
                             allianceRed
                         else
                             allianceBlue
@@ -346,21 +324,37 @@ class RobotContainer {
     }
 
     val auto: Command
-    get() =
-        ConditionalCommand(
-            MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator),
+    get() = autoChooser.selected
+
+    // auto chooser
+    val autoChooser = SendableChooser<Command>().apply {
+        setDefaultOption("1", ConditionalCommand(
+            MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator),
             ConditionalCommand(
-                MoveToPosition.blueauto1(drivetrain, elevator, arm, manipulator),
+                MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator),
                 PrintCommand("UKNOWN ALLIANCE ${Game.alliance}"),
-                {Game.alliance == DriverStation.Alliance.Blue}
+                {Game.alliance == Blue }
             ),
-            {Game.alliance == DriverStation.Alliance.Red}
-        )
+            {Game.alliance == Red }
+        ))
+        addOption("1", MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator))
+        addOption("2", MoveToPosition.blueauto2(drivetrain, elevator, arm, manipulator))
+        addOption("3", MoveToPosition.blueauto3(drivetrain, elevator, arm, manipulator))
+    }
+    // shuffleboard auto chooser
+    val autoChooserTab = Shuffleboard.getTab("Autonomous")
+    val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
 
     val armVisualizer = drivetrain.field2d.getObject("arm")
     fun update() {
         leds.update()
+
+        // send subsystems to SmartDashboard
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
+        SmartDashboard.putData("Elevator/sendable", elevator)
+        SmartDashboard.putData("Arm/sendable", arm)
+        SmartDashboard.putData("Manipulator/sendable", manipulator)
+
     }
 }
 

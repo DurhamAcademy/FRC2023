@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
+import frc.kyberlib.math.units.transform
 import frc.robot.Constants
 import frc.robot.PhotonCameraWrapper
 import frc.robot.RobotContainer
@@ -123,10 +124,12 @@ class Drivetrain(
         get() = if (!Game.sim) {
             poseEstimator.estimatedPosition
         } else {
-            simEstimatedPose2d ?: Pose2d()
+            simEstimatedPose2d
         }
 
-    var estimatedVelocity = Transform2d()
+    private var lastPose2d = Pose2d()
+    val estimatedVelocity: Transform2d
+        get() = lastPose2d.relativeTo(estimatedPose2d).transform
 
     val field2d = Field2d().apply {
         this.robotPose = estimatedPose2d
@@ -141,6 +144,7 @@ class Drivetrain(
      */
     override fun periodic() {
         // This method will be called once per scheduler run
+
 
         // pose estimator handles odometry too
         poseEstimator.update(
@@ -188,6 +192,9 @@ class Drivetrain(
         field2d.robotPose = estimatedPose2d
         // push to shuffleboard
         SmartDashboard.putData("field", field2d)
+
+        // update the last pose
+        lastPose2d = estimatedPose2d
     }
 
     private var lastPose = Pose2d()
@@ -268,13 +275,6 @@ class Drivetrain(
         get() = this.modules.map { it.currentPosition }
         set(value) = this.modules.forEachIndexed { i, it ->
             it.setpoint = value[i]
-        }
-
-        // use oldPose to calculate the estimated velocity
-        estimatedVelocity = Transform2d(
-            estimatedPose2d.translation.minus(lastPose.translation),
-            Rotation2d.fromDegrees(estimatedPose2d.rotation.degrees - lastPose.rotation.degrees)
-        )
     }
     var powerSaveMode: Int = 0
         set(value) {
