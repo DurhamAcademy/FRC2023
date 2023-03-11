@@ -214,7 +214,7 @@ class MoveToPosition(
     override fun isFinished(): Boolean {
         // stop when the robot is within 0.1 meters of the desired position
         return drivetrain.estimatedPose2d.minus(Pose2d(pose().translation, Rotation2d())).translation.norm < toleranceppos
-                && drivetrain.estimatedPose2d.rotation.minus(Rotation2d(pose().rotation.radians)).radians < tolerancerpos
+                && drivetrain.estimatedPose2d.rotation.minus(Rotation2d(pose().rotation.radians)).radians.absoluteValue < tolerancerpos
     }
 
     override fun end(interrupted: Boolean) {
@@ -286,28 +286,34 @@ class MoveToPosition(
         fun blueauto3(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.estimatedPose2d)
-                MoveToPosition(drivetrain, 1.87, 4.42, 0.0).withTimeout(1.0)
+                MoveToPosition(drivetrain, 1.87+.5, 4.42, 0.0)
                     .andThen(SetPosition.high(elevator, arm).withTimeout(3.0))
                     .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(0.5))
+                    .andThen(MoveToPosition(drivetrain, 5.5, 4.75, 0.0))
                     .andThen(
-                        MoveToPosition(drivetrain, 6.58, 4.59, 180.0).withTimeout(3.0)
-                        .alongWith(
-                            IntakePositionForward(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 1.0))
-                    ))
+                        MoveToPosition(drivetrain, 5.5, 4.75, 180.0)
+                            .alongWith(
+                                IntakePositionForward(elevator, arm).withTimeout(3.0)
+                                    .alongWith(SetManipulatorSpeed(manipulator, 1.0).withTimeout(0.5))
+                            )
+                    )
                     .andThen(
-                        MoveToPosition(drivetrain, 1.89, 4.97, 0.0).withTimeout(3.0)
+                        MoveToPosition(drivetrain, 6.58, 4.59, 180.0)
+                    )
+                    .andThen(
+                        MoveToPosition(drivetrain, 1.89, 4.97, 0.0)
                         .alongWith(
-                            SetPosition.high(elevator, arm)
+                            SetPosition.high(elevator, arm).withTimeout(3.0)
                             .alongWith(
                                 SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)
                     )))
                     .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(0.5))
                     .andThen(
-                        MoveToPosition(drivetrain, 6.48, 5.00, 180.0).withTimeout(1.2)
+                        MoveToPosition(drivetrain, Pose2d(Translation2d(4.48, 5.00), Rotation2d()), velocity = Transform2d(Translation2d(1.0, 1.0), Rotation2d()))
                         .alongWith(
-                            SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)
+                            SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.1)
                     ))
-                    .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0).withTimeout(0.5))
+                    .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0))
 
             }
         fun blueauto7(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
