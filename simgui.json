@@ -50,6 +50,11 @@
           "open": true
         }
       },
+      "Talon FX[12]": {
+        "header": {
+          "open": true
+        }
+      },
       "Talon FX[16]": {
         "header": {
           "open": true
@@ -91,7 +96,10 @@
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/SwerveModule": "Subsystem",
       "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDController[108]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[109]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[110]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
@@ -119,11 +127,31 @@
       "/LiveWindow/Ungrouped/PIDController[33]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[34]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[40]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[41]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[42]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[43]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[44]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[48]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[49]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[50]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[60]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[61]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[62]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[72]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[73]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[74]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[84]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[85]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[86]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[96]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[97]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[98]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/Pigeon 2 [0]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
@@ -153,7 +181,7 @@
           "visible": true
         }
       },
-      "/SmartDashboard/FIELD": {
+      "/SmartDashboard/elevcmd": {
         "window": {
           "visible": true
         }

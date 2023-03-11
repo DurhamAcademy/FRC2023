@@ -1,5 +1,8 @@
 package frc.robot
 
+import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.revrobotics.CANSparkMax
+import edu.wpi.first.math.trajectory.Trajectory
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
@@ -13,6 +16,10 @@ import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
+import frc.kyberlib.math.units.Pose2d
+import frc.kyberlib.math.units.extensions.degrees
+import frc.kyberlib.math.units.extensions.meters
+import frc.kyberlib.math.units.extensions.radians
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.ElevatorTestDown
 import frc.robot.commands.ElevatorTestUp
@@ -350,6 +357,7 @@ class RobotContainer {
             {Game.alliance == DriverStation.Alliance.Red}
         )
 
+    val armVisualizer = drivetrain.field2d.getObject("arm")
     fun update() {
         leds.update()
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
