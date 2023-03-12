@@ -385,7 +385,7 @@ class RobotContainer {
         // coordinate and then using the transform function to offset it from
         // the center of the robot
         val armAngle = arm.armPosition // 0 is straight up, pi/2 is straight out
-        val armLength = 0.5 // length of the arm in meters
+        val armLength = 1.047 // length of the arm in meters
         // (+1 is 1 meter forward, -1 is 1 meter back)
         // armLen * cos(armAngle) = x
         // armLen * sin(armAngle) = z
@@ -394,7 +394,7 @@ class RobotContainer {
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(
-            Translation2d(-armX, 0.0),
+            Translation2d(-armX - 0.176, 0.0),
             Rotation2d(if (armAngle > 0) PI else 0.0)
         )
 

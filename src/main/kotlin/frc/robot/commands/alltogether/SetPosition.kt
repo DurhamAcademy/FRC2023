@@ -10,6 +10,7 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.PlacePoint
+import kotlin.math.absoluteValue
 import kotlin.math.sin
 
 class SetPosition(
@@ -18,6 +19,7 @@ class SetPosition(
     val armPosition: Double,
     val elevatorPosition: Double,
     val wristPosition: Double,
+    val stopAtEnd: Boolean = true
 ) : CommandBase() {
     constructor(robotContainer: RobotContainer,
                 armPosition: Double,
@@ -32,53 +34,63 @@ class SetPosition(
     fun withManipulator(manipulator: Manipulator) =
         this.raceWith(CollectObject(manipulator))
     companion object {
-        fun setpoint(placePoint: PlacePoint, elevator: Elevator, arm: Arm) =
+        fun setpoint(placePoint: PlacePoint, elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) =
             when (placePoint) {
-                PlacePoint.Level1 -> low(elevator, arm)
-                PlacePoint.Level2 -> mid(elevator, arm)
-                PlacePoint.Level3 -> high(elevator, arm)
+                PlacePoint.Level1 -> low(elevator, arm, stopAtEnd)
+                PlacePoint.Level2 -> mid(elevator, arm, stopAtEnd)
+                PlacePoint.Level3 -> high(elevator, arm, stopAtEnd)
             }
-        fun setpoint(placePoint: PlacePoint, robotContainer: RobotContainer) = setpoint(
+
+        fun setpoint(placePoint: PlacePoint, robotContainer: RobotContainer, stopAtEnd: Boolean = false) = setpoint(
             placePoint,
             robotContainer.elevator,
-            robotContainer.arm
+            robotContainer.arm,
+            stopAtEnd
         )
-        fun high(elevator: Elevator, arm: Arm) = SetPosition(
+
+        fun high(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,
             arm,
             1.4,
             frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0),
-            Math.toRadians(-30.0)
+            Math.toRadians(-30.0),
+            stopAtEnd
         )
-        fun mid(elevator: Elevator, arm: Arm) = SetPosition(
+
+        fun mid(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,
             arm,
             1.4,
             inchesToMeters(38.0),
-            Math.toRadians(-30.0)
+            Math.toRadians(-30.0),
+            stopAtEnd
         )
-        fun low(elevator: Elevator, arm: Arm) = SetPosition(
+
+        fun low(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,
             arm,
             degreesToRadians(150.0),
             frc.robot.constants.elevator.limits.topLimit,
-            Math.toRadians(-10.0)
+            Math.toRadians(-10.0),
+            stopAtEnd
         )
 
-        fun humanPlayer(elevator: Elevator, arm: Arm) = SetPosition(
+        fun humanPlayer(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,
             arm,
             1.4,
             1.3 - inchesToMeters(11.0),
-            Math.toRadians(-5.0)
+            Math.toRadians(-5.0),
+            stopAtEnd
         )
 
-        fun idle(elevator: Elevator, arm: Arm): Command = SetPosition(
+        fun idle(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false): Command = SetPosition(
             elevator,
             arm,
             0.0,
             frc.robot.constants.elevator.limits.bottomLimit,
-            Math.toRadians(0.0)
+            Math.toRadians(0.0),
+            stopAtEnd
         )
     }
     init {
@@ -117,6 +129,6 @@ class SetPosition(
     }
 
     //double-check the arm position thing
-    override fun isFinished(): Boolean = false // need to keep command running so wrist goes to right spot
+    override fun isFinished(): Boolean = stopAtEnd && (arm.armPosition - armPosition).absoluteValue < 0.1
 
 }

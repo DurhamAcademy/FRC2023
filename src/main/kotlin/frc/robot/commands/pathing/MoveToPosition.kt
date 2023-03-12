@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.robot.commands.SetManipulatorSpeed
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
@@ -89,8 +90,8 @@ class MoveToPosition(
 
     val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            6.0,
-            9.0
+            7.0,
+            10.0
         )
     ).also {
         it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
@@ -98,8 +99,8 @@ class MoveToPosition(
     }
     val yPIDController = ProfiledPIDController(
         Companion.yP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            6.0,
-            9.0
+            7.0,
+            10.0
         )
     ).also {
         it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
@@ -292,35 +293,50 @@ class MoveToPosition(
                 (drivetrain.estimatedPose2d)
                 MoveToPosition(drivetrain, 1.87 + .5, 4.42, 0.0)
                     .deadlineWith(SetPosition.idle(elevator, arm))
-                    .andThen(SetPosition.high(elevator, arm).withTimeout(3.0))
+                    .andThen(SetPosition.high(elevator, arm, true).withTimeout(3.0))
                     .andThen(
                         SetManipulatorSpeed(manipulator, -1.0)
-                            .withTimeout(0.5)
+                            .withTimeout(0.25)
                     )// place cube
                     .andThen(
                         // move to intake new cube, but dont rotate drivetrain
                         // until we are close to the cube to prevent tipping,
                         // damage to the arm, and collisions with the wall
-                        MoveToPosition(drivetrain, 5.5, 4.75, 0.0)
-                            .deadlineWith(
+                        MoveToPosition(
+                            drivetrain,
+                            {
+                                Pose2d(
+                                    5.25,
+                                    if (((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) > 0.5) 4.75 else 4.625,
+                                    Rotation2d(
+                                        if (drivetrain.estimatedPose2d.x > 3.5) PI
+                                        else 0.0
+                                    )
+                                )
+                            },
+                        )
+                            .alongWith(
                                 SetPosition.idle(elevator, arm)
                                     .alongWith(SetManipulatorSpeed(manipulator, 0.0))
-                            )
-                    )
-                    .andThen(
-                        // rotate to face the cube and deploy the arm to intake
-                        MoveToPosition(drivetrain, 5.75, 4.625, 180.0)
-                            .alongWith(
-                                WaitCommand(1.0)
+                                    .until {
+                                        ((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) < 1.0
+                                    }
                                     .andThen(
-                                        IntakePositionForward(elevator, arm)
-                                            .withTimeout(3.0)
+                                        WaitUntilCommand {
+                                            ((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) < 1.0
+                                        }
+                                            .andThen(
+                                                IntakePositionForward(elevator, arm, true)
+                                                    .withTimeout(3.0)
+                                            )
                                     )
                             )
                             // start moving to intake the cube and keep arm
                             // deployed until moving is done
                             .andThen(
-                                MoveToPosition(drivetrain, 6.5, 4.625, 180.0)
+                                MoveToPosition(
+                                    drivetrain, 6.0, 4.625, 180.0
+                                )
                                     .deadlineWith(
                                         IntakePositionForward(elevator, arm)
                                             .alongWith(SetManipulatorSpeed(manipulator, 1.0))
@@ -335,33 +351,58 @@ class MoveToPosition(
                             .alongWith(SetPosition.idle(elevator, arm))
                             .withTimeout(3.0)
                             .deadlineWith(
-                                MoveToPosition(drivetrain, 1.89 + 1, 4.6, 180.0)
+                                MoveToPosition(drivetrain, {
+                                    Pose2d(
+                                        2.7,
+                                        4.6,//if (drivetrain.estimatedPose2d.run {this.x > 5.0}) 4.6 else 4.425,
+                                        if (arm.armPosition.absoluteValue > 0.5) Rotation2d(PI) else Rotation2d()
+                                    )
+                                })
                             )
                     )
                     .andThen(
-                        MoveToPosition(drivetrain, 1.89 + 1, 4.59, 0.0)
+                        MoveToPosition(drivetrain,
+                            {
+                                Pose2d(
+                                    2.7,
+                                    if (drivetrain.estimatedPose2d.x > 5.0) 4.6 else 4.425,
+                                    if (arm.armPosition.absoluteValue > 0.5) Rotation2d(PI) else Rotation2d()
+                                )
+                            })
                             .deadlineWith(
                                 SetManipulatorSpeed(manipulator, 0.1)
                                     .alongWith(SetPosition.idle(elevator, arm))
                             )
                     )
                     .andThen(
-                        MoveToPosition(drivetrain, 1.89 + 1, 4.6, 0.0)
-                            .andThen(MoveToPosition(drivetrain, 1.89 + .5, 4.42, 0.0))
+                        MoveToPosition(drivetrain, 1.89 + .5, 4.42, 0.0)
                             .alongWith(
                                 SetPosition.high(elevator, arm).withTimeout(3.0)
                                     .alongWith(
-                                        SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)
+                                        SetManipulatorSpeed(manipulator, 0.1).withTimeout(0.5)
                                     )
                             )
                     )
                     .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(0.5))
                     .andThen(
-                        MoveToPosition(drivetrain, Pose2d(Translation2d(4.48, 5.00), Rotation2d()), velocity = Transform2d(Translation2d(1.0, 1.0), Rotation2d()))
-                        .alongWith(
-                            SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.1)
-                    ))
-                    .andThen(MoveToPosition(drivetrain, 7.59, 6.45, 180.0))
+                        MoveToPosition(
+                            drivetrain,
+                            Pose2d(Translation2d(4.48, 5.00), Rotation2d()),
+                            velocity = Transform2d(Translation2d(1.0, 1.0), Rotation2d())
+                        )
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.1)
+                            )
+                            .deadlineWith(
+                                SetPosition.idle(elevator, arm)
+                            )
+                    )
+                    .andThen(
+                        MoveToPosition(drivetrain, 7.59, 6.45, 180.0)
+                            .deadlineWith(
+                                SetPosition.idle(elevator, arm)
+                            )
+                    )
 
             }
         fun blueauto7(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
