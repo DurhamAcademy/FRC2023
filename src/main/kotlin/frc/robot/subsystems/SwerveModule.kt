@@ -16,9 +16,10 @@ import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants
-import frc.robot.Constants.DRIVE_GEAR_RATIO
-import frc.robot.Constants.WHEEL_CIRCUMFRENCE
+import frc.robot.constants.Constants
+import frc.robot.constants.Constants.DRIVE_GEAR_RATIO
+import frc.robot.constants.Constants.WHEEL_CIRCUMFRENCE
+import kotlin.math.PI
 
 class SwerveModule(
     driveMotorId: Int,
@@ -66,8 +67,8 @@ class SwerveModule(
     val turnEncoderEntry = tab.add("$mname Turn Encoder", 0.0).entry
 
     // motor sets
-    val driveMotorSetEntry = tab.add("$mname Drive Motor Set", 0.0).entry
-    val turnMotorSetEntry = tab.add("$mname Turn Motor Set", 0.0).entry
+    val driveMotorVoltageEntry = tab.add("$mname Drive Motor Voltage", 0.0).entry
+    val turnMotorVoltageEntry = tab.add("$mname Turn Motor Voltage", 0.0).entry
 
     // location/angle
     val positionEntry = tab.add("$mname Position", 0.0).entry
@@ -88,8 +89,8 @@ class SwerveModule(
         Constants.ANGLE_I,
         Constants.ANGLE_D,
         TrapezoidProfile.Constraints(
-            64.0,
-            256.0
+            PI * 4,
+            PI * 8
         )// TODO: Fix these
     ).apply {
         enableContinuousInput(-Math.PI, Math.PI)
@@ -147,27 +148,35 @@ class SwerveModule(
                 ))
             }
         }
-    private fun setMotorSpeed(drive: Double, angle: Double) {
+    private fun setMotorVoltage(drive: Double, angle: Double) {
         driveMotor.setVoltage(drive)
         turnMotor.setVoltage(angle)
-        // SmartDashboard
-        driveMotorSetEntry.setDouble(drive)
-        turnMotorSetEntry.setDouble(angle)
+
+        // Shuffleboard
+        driveMotorVoltageEntry.setDouble(drive)
+        turnMotorVoltageEntry.setDouble(angle)
     }
 
     fun move() {
         val drivePower =
-            drivePid.calculate(currentPosition.speedMetersPerSecond, setpoint.speedMetersPerSecond) + driveFF.calculate(
+            drivePid.calculate(
+                currentPosition.speedMetersPerSecond,
+                setpoint.speedMetersPerSecond
+            ) + driveFF.calculate(
                 drivePid.setpoint.position,
                 drivePid.setpoint.velocity
             )
-        SmartDashboard.putNumber("drivetrain/posset", drivePid.setpoint.position)
-        SmartDashboard.putNumber("drivetrain/posvel", drivePid.setpoint.velocity)
+        val lastVel = anglePid.setpoint.velocity
+        val t = .02//Timer.getFPGATimestamp()
         val anglePower = -(anglePid.calculate(
             degreesToRadians(this.turnEncoder.absolutePosition),
             setpoint.angle.radians
-        ) + angleFF.calculate(anglePid.setpoint.velocity))
-        setMotorSpeed(drivePower, anglePower)
+        ) + angleFF.calculate(
+            lastVel,
+            anglePid.setpoint.velocity,
+            t// - Timer.getFPGATimestamp()
+        ))
+        setMotorVoltage(drivePower, anglePower)
     }
 
     override fun periodic() {

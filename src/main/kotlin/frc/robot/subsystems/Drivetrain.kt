@@ -3,6 +3,7 @@ package frc.robot.subsystems
 import com.ctre.phoenix.sensors.Pigeon2
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator
+import edu.wpi.first.math.filter.SlewRateLimiter
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
@@ -16,10 +17,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
-import frc.robot.Constants
 import frc.robot.PhotonCameraWrapper
 import frc.robot.RobotContainer
 import frc.robot.commands.drivetrain.DriveCommand
+import frc.robot.constants.Constants
+import frc.robot.constants.drivetrain
 import frc.robot.controls.ControlScheme
 import java.lang.Math.PI
 
@@ -90,7 +92,10 @@ class Drivetrain(
         Constants.BRTurnEncoderId,
         "backRight",
 
-        Translation2d(-Constants.MODULE_DISTANCE_X / 2, -Constants.MODULE_DISTANCE_Y / 2),
+        Translation2d(
+            -Constants.MODULE_DISTANCE_X / 2,
+            -Constants.MODULE_DISTANCE_Y / 2
+        ),
         angleZero = Constants.BRZeroAngle,
     )
     val modules = listOf(frontLeft, frontRight, backLeft, backRight)
@@ -240,6 +245,11 @@ class Drivetrain(
 
     private var simQueuedForce = Transform2d()
 
+
+    val xSlewRateLimiter = SlewRateLimiter(drivetrain.maxAcceleration)
+    val ySlewRateLimiter = SlewRateLimiter(drivetrain.maxAcceleration)
+    val rotSlewRateLimiter = SlewRateLimiter(drivetrain.maxAngularAcceleration)
+
     /**
      * drive the robot using the specified chassis speeds
      *
@@ -253,7 +263,7 @@ class Drivetrain(
     ) {
         val chassisSpeedsField =
             if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
-                chassisSpeeds,
+                chassisSpeeds.slewLimited(xSlewRateLimiter, ySlewRateLimiter, rotSlewRateLimiter),
                 estimatedPose2d.rotation
             )
             else chassisSpeeds
@@ -321,11 +331,12 @@ class Drivetrain(
             module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
         }
     }
+
     var swerveModuleStates: List<SwerveModuleState>
         get() = this.modules.map { it.currentPosition }
-        set(value) = this.modules.forEachIndexed { i, it ->
-            it.setpoint = value[i]
-    }
+        set(value) = value.forEachIndexed { i, it ->
+            modules[i].setpoint = it
+        }
     var powerSaveMode: Int = 0
         set(value) {
             field = value
@@ -356,3 +367,14 @@ class Drivetrain(
 
 }
 
+fun ChassisSpeeds.slewLimited(
+    xSlewRateLimiter: SlewRateLimiter,
+    ySlewRateLimiter: SlewRateLimiter,
+    rotSlewRateLimiter: SlewRateLimiter,
+): ChassisSpeeds {
+    return ChassisSpeeds(
+        xSlewRateLimiter.calculate(this.vxMetersPerSecond),
+        ySlewRateLimiter.calculate(this.vyMetersPerSecond),
+        rotSlewRateLimiter.calculate(this.omegaRadiansPerSecond)
+    )
+}

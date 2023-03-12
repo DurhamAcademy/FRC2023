@@ -117,6 +117,10 @@
       "/LiveWindow/Ungrouped/PIDController[53]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[54]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[55]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[56]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[57]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[58]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[59]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[60]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[61]": "PIDController",
@@ -178,22 +182,12 @@
           "visible": true
         }
       },
-      "/SmartDashboard/FIELD": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/arm visual": {
         "arm": {
           "style": "Line"
         },
         "elevator": {
           "style": "Line"
-        }
-      },
-      "/SmartDashboard/elevcmd": {
-        "window": {
-          "visible": true
         }
       },
       "/SmartDashboard/field": {

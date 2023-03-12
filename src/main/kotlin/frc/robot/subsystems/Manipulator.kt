@@ -10,17 +10,17 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.manipulator.motorId
+import frc.robot.constants.manipulator.motorId
 import frc.robot.utils.GamePiece
 import kotlin.math.pow
-import frc.robot.Constants.manipulator as ManipConsts
+import frc.robot.constants.manipulator as ManipConsts
 
 
 class Manipulator: SubsystemBase() {
 
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
         setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
-        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
+//        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
         idleMode = CANSparkMax.IdleMode.kBrake
     }
 

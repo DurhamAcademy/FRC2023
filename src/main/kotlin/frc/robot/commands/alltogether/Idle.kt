@@ -1,7 +1,6 @@
 package frc.robot.commands.alltogether
 
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.Constants
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 
@@ -14,7 +13,7 @@ class Idle(
     }
 
     override fun execute() {
-        elevator.setpoint = Constants.Elevator.limits.bottomLimit
+        elevator.setpoint = frc.robot.constants.elevator.limits.bottomLimit
         arm.setArmPosition(0.0)
     }
 

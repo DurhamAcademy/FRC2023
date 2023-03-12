@@ -4,12 +4,12 @@ import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.Constants
-import frc.robot.utils.PlacePoint
 import frc.robot.RobotContainer
+import frc.robot.constants.FieldConstants
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
+import frc.robot.utils.PlacePoint
 import kotlin.math.sin
 
 class SetPosition(
@@ -47,7 +47,7 @@ class SetPosition(
             elevator,
             arm,
             1.4,
-            Constants.Elevator.limits.topLimit - inchesToMeters(2.0),
+            frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0),
             Math.toRadians(-30.0)
         )
         fun mid(elevator: Elevator, arm: Arm) = SetPosition(
@@ -61,22 +61,23 @@ class SetPosition(
             elevator,
             arm,
             degreesToRadians(150.0),
-            Constants.Elevator.limits.topLimit,
+            frc.robot.constants.elevator.limits.topLimit,
             Math.toRadians(-10.0)
         )
+
         fun humanPlayer(elevator: Elevator, arm: Arm) = SetPosition(
             elevator,
             arm,
             1.4,
-            1.3- inchesToMeters(11.0),
+            1.3 - inchesToMeters(11.0),
             Math.toRadians(-5.0)
         )
 
-        fun idle(robotContainer: RobotContainer): Command = SetPosition(
-            robotContainer.elevator,
-            robotContainer.arm,
+        fun idle(elevator: Elevator, arm: Arm): Command = SetPosition(
+            elevator,
+            arm,
             0.0,
-            Constants.Elevator.limits.bottomLimit,
+            frc.robot.constants.elevator.limits.bottomLimit,
             Math.toRadians(0.0)
         )
     }
@@ -89,9 +90,9 @@ class SetPosition(
         // change this to 48 inches
         //I think i did but double check this
         arm.setArmPosition(armPosition)
-        val topLimit = Constants.FieldConstants.heightLimit
+        val topLimit = FieldConstants.heightLimit
         val bottomLimit = 0.1
-        val armLength = Constants.arm.length
+        val armLength = frc.robot.constants.arm.length
         // use arm angle to determine elevator height
         val armAngle = arm.armPosition
         val armHeight = armLength * sin(armAngle)

@@ -20,15 +20,17 @@ import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
-import frc.robot.commands.elevator.ElevatorTestDown
-import frc.robot.commands.elevator.ElevatorTestUp
+import frc.robot.commands.SetManipulatorSpeed
 import frc.robot.commands.alltogether.CollectObject
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.arm.SetArmToAngle
-import frc.robot.commands.SetManipulatorSpeed
+import frc.robot.commands.elevator.ElevatorTestDown
+import frc.robot.commands.elevator.ElevatorTestUp
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.constants.Field2dLayout
+import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.Arm
@@ -56,7 +58,7 @@ class RobotContainer {
     val elevator = Elevator(this)
     val arm = Arm()
 
-    val pdh = PowerDistribution(Constants.PDH.id, kRev)
+    val pdh = PowerDistribution(PDH.id, kRev)
 
     init {
         arrayOf(controlSchemeA, controlSchemeB).forEachIndexed { i, it ->
@@ -126,7 +128,7 @@ class RobotContainer {
 
                 // idle
                 idleConfiguration
-                    .whileTrue(SetPosition.idle(this@RobotContainer))
+                    .whileTrue(SetPosition.idle(elevator, arm))
                     .onFalse(HoldPosition(elevator, arm))
 
                 // assign l1
@@ -176,9 +178,16 @@ class RobotContainer {
                         MoveToPosition.snapToScoring(
                             drivetrain,
                             {
-                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.platforms.toList()
+                                return@snapToScoring Field2dLayout.Axes.YInt.platforms.toList()
                             },
-                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
+                            {
+                                return@snapToScoring if (Game.alliance == DriverStation.Alliance.Blue)
+                                    listOf(PI, -PI)
+                                else if (Game.alliance == DriverStation.Alliance.Red)
+                                    listOf(0.0, 2 * PI, -2 * PI)
+                                else
+                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                            }
                         )
                     )
                 moveToClosestScoreStation
@@ -186,9 +195,16 @@ class RobotContainer {
                         MoveToPosition.snapToScoring(
                             drivetrain,
                             {
-                                return@snapToScoring Constants.Field2dLayout.Axes.YInt.score.toList()
+                                return@snapToScoring Field2dLayout.Axes.YInt.score.toList()
                             },
-                            {return@snapToScoring listOf(-2*PI, -PI, 0.0, PI, 2*PI)}
+                            {
+                                return@snapToScoring if (Game.alliance == DriverStation.Alliance.Blue)
+                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                else if (Game.alliance == DriverStation.Alliance.Red)
+                                    listOf(PI, -PI)
+                                else
+                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                            }
                         )
                     )
 
@@ -258,9 +274,10 @@ class RobotContainer {
             } else {
                 LightStatus.TeleopNoFMS
             }
+
             else -> LightStatus.unknown
         }
-    val leds = KLEDStrip(9, Constants.leds.count).apply {
+    val leds = KLEDStrip(9, frc.robot.constants.leds.count).apply {
         val coral = Color(255, 93, 115)
         val coneColor = Color(255, 255, 0)
         val cubeColor = Color(123, 0, 255)
@@ -297,8 +314,9 @@ class RobotContainer {
                             allianceRed
                         else
                             allianceBlue
-                        )*0.5,
-                5, 2.0.seconds, true)
+                        ),
+                5, 2.0.seconds, true
+            )
             {lightStatus == LightStatus.TeleopNoFMS}
         val teleopFMSRed =
             AnimationSparkle(allianceRed)
@@ -316,7 +334,8 @@ class RobotContainer {
             { lightStatus == LightStatus.unknown || lightStatus == LightStatus.TeleopNoFMS }
 
 
-        val chain = KLEDRegion(0, Constants.leds.count,
+        val chain = KLEDRegion(
+            0, frc.robot.constants.leds.count,
             noFMSDisabled, fmsRedDisabled, fmsBlueDisabled, eStopped,
             autoNoFMS, autoFMSRed, autoFMSBlue, noDriverStation, teleopNoFMS,
             teleopFMSRed, teleopFMSBlue, nothing
@@ -342,6 +361,7 @@ class RobotContainer {
         addOption("2", MoveToPosition.blueauto2(drivetrain, elevator, arm, manipulator))
         addOption("3", MoveToPosition.blueauto3(drivetrain, elevator, arm, manipulator))
     }
+
     // shuffleboard auto chooser
     val autoChooserTab = Shuffleboard.getTab("Autonomous")
     val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
@@ -350,12 +370,14 @@ class RobotContainer {
     val armLine = armVisual.getObject("arm")
     val elevatorLine = armVisual.getObject("elevator")
 
+    val armFieldPosition = drivetrain.field2d.getObject("arm")
+
     fun update() {
         leds.update()
 
         // send subsystems to SmartDashboard
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
-        SmartDashboard.putData("Elevator/sendable", elevator)
+        SmartDashboard.putData("elevator/sendable", elevator)
         SmartDashboard.putData("Arm/sendable", arm)
         SmartDashboard.putData("Manipulator/sendable", manipulator)
 
@@ -367,14 +389,17 @@ class RobotContainer {
         // (+1 is 1 meter forward, -1 is 1 meter back)
         // armLen * cos(armAngle) = x
         // armLen * sin(armAngle) = z
-        val armX = armLength * cos(armAngle)
-        val armZ = armLength * sin(armAngle)
+        val armX = armLength * sin(armAngle)
+        val armZ = armLength * cos(armAngle)
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(
             Translation2d(-armX, 0.0),
             Rotation2d(if (armAngle > 0) PI else 0.0)
         )
+
+        // put the arm position on the field
+        armFieldPosition.pose = armPos
     }
 }
 

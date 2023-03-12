@@ -3,7 +3,7 @@ package frc.robot.utils
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
-import frc.robot.Constants
+import frc.robot.constants.Field2dLayout
 
 enum class ObjectType {
     Cone, Cube
@@ -18,8 +18,8 @@ enum class PlacePoint {
             Level3 -> 0.0
         }
         return when (aliance) {
-            Blue -> Constants.Field2dLayout.Axes.XInt.communityPlacementLineBlue
-            Red -> Constants.Field2dLayout.Axes.XInt.communityPlacementLineRed
+            Blue -> Field2dLayout.Axes.XInt.communityPlacementLineBlue
+            Red -> Field2dLayout.Axes.XInt.communityPlacementLineRed
             else -> null
         }
     }
@@ -30,7 +30,7 @@ enum class Row {
     LMid, MMid, RMid,
     LFar, MFar, RFar;
     val asYInt: Double?
-        get() = Constants.Field2dLayout.Axes.YInt.score
+        get() = Field2dLayout.Axes.YInt.score
             .elementAtOrNull(this.ordinal)
 }
 
