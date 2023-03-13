@@ -9,7 +9,7 @@ import frc.robot.constants.FieldConstants
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
-import frc.robot.utils.PlacePoint
+import frc.robot.utils.grid.PlacmentLevel
 import kotlin.math.absoluteValue
 import kotlin.math.sin
 
@@ -34,15 +34,15 @@ class SetPosition(
     fun withManipulator(manipulator: Manipulator) =
         this.raceWith(CollectObject(manipulator))
     companion object {
-        fun setpoint(placePoint: PlacePoint, elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) =
-            when (placePoint) {
-                PlacePoint.Level1 -> low(elevator, arm, stopAtEnd)
-                PlacePoint.Level2 -> mid(elevator, arm, stopAtEnd)
-                PlacePoint.Level3 -> high(elevator, arm, stopAtEnd)
+        fun setpoint(placmentLevel: PlacmentLevel, elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) =
+            when (placmentLevel) {
+                PlacmentLevel.Level1 -> low(elevator, arm, stopAtEnd)
+                PlacmentLevel.Level2 -> mid(elevator, arm, stopAtEnd)
+                PlacmentLevel.Level3 -> high(elevator, arm, stopAtEnd)
             }
 
-        fun setpoint(placePoint: PlacePoint, robotContainer: RobotContainer, stopAtEnd: Boolean = false) = setpoint(
-            placePoint,
+        fun setpoint(placmentLevel: PlacmentLevel, robotContainer: RobotContainer, stopAtEnd: Boolean = false) = setpoint(
+            placmentLevel,
             robotContainer.elevator,
             robotContainer.arm,
             stopAtEnd

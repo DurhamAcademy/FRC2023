@@ -34,7 +34,7 @@ val Pose2d.flipped: Pose2d
         -rotation
     )
 
-class MoveToPosition(
+open class MoveToPosition(
     private val drivetrain: Drivetrain,
     /**
      * The desired position of the robot (in meters)
@@ -309,7 +309,7 @@ class MoveToPosition(
                                     5.25,
                                     if (((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) > 0.5) 4.75 else 4.625,
                                     Rotation2d(
-                                        if (drivetrain.estimatedPose2d.x > 3.5) PI
+                                        if (drivetrain.estimatedPose2d.x > 3.5 || arm.armPosition.absoluteValue < 0.5) PI
                                         else 0.0
                                     )
                                 )
@@ -317,7 +317,7 @@ class MoveToPosition(
                         )
                             .alongWith(
                                 SetPosition.idle(elevator, arm)
-                                    .alongWith(SetManipulatorSpeed(manipulator, 0.0))
+                                    .alongWith(SetManipulatorSpeed(manipulator, 0.0)).withTimeout(3.0)
                                     .until {
                                         ((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) < 1.0
                                     }
@@ -372,6 +372,7 @@ class MoveToPosition(
                             .deadlineWith(
                                 SetManipulatorSpeed(manipulator, 0.1)
                                     .alongWith(SetPosition.idle(elevator, arm))
+                                    .withTimeout(3.0)
                             )
                     )
                     .andThen(
@@ -394,13 +395,13 @@ class MoveToPosition(
                                 SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.1)
                             )
                             .deadlineWith(
-                                SetPosition.idle(elevator, arm)
+                                SetPosition.idle(elevator, arm).withTimeout(3.0)
                             )
                     )
                     .andThen(
                         MoveToPosition(drivetrain, 7.59, 6.45, 180.0)
                             .deadlineWith(
-                                SetPosition.idle(elevator, arm)
+                                SetPosition.idle(elevator, arm).withTimeout(3.0)
                             )
                     )
 

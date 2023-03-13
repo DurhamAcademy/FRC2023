@@ -39,7 +39,7 @@ object elevator {
     }
 
     object limitSwitch {
-        val ElevatorLimitSwitchId: Int = 9
+        val ElevatorLimitSwitchId: Int = 0
         val offset: Double = limits.bottomLimit
     }
 

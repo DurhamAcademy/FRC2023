@@ -37,7 +37,7 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
-import frc.robot.utils.PlacePoint
+import frc.robot.utils.grid.PlacmentLevel
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -134,20 +134,20 @@ class RobotContainer {
                 // assign l1
                 placeLvl1
                     .whileTrue(
-                        SetPosition.setpoint(PlacePoint.Level1, this@RobotContainer)
+                        SetPosition.setpoint(PlacmentLevel.Level1, this@RobotContainer)
                     )
                     println("ran manipulaot rhehe")
 
                 // assign l2
                 placeLvl2
                     .whileTrue(
-                        SetPosition.setpoint(PlacePoint.Level2, this@RobotContainer)
+                        SetPosition.setpoint(PlacmentLevel.Level2, this@RobotContainer)
                     ).onFalse(HoldPosition(elevator, arm))
 
                 // assign l3
                 placeLvl3
                     .whileTrue(
-                        SetPosition.setpoint(PlacePoint.Level3, this@RobotContainer)
+                        SetPosition.setpoint(PlacmentLevel.Level3, this@RobotContainer)
                     ).onFalse(HoldPosition(elevator, arm))
 
                 // assign intake

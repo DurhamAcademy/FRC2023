@@ -51,8 +51,7 @@ class PhotonCameraWrapper {
                 photonPoseEstimator!!.update()
             else Optional.empty()
         } else if (photonCamera.latestResult.targets.size == 1) {
-            if (photonCamera.latestResult.targets
-                    .minOf { it.poseAmbiguity } < 0.2
+            if (photonCamera.latestResult.bestTarget.poseAmbiguity < 0.4
             )
                 photonPoseEstimator!!.update()
             else Optional.empty()
