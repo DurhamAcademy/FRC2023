@@ -26,6 +26,7 @@ import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.arm.SetArmToAngle
+import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ElevatorTestDown
 import frc.robot.commands.elevator.ElevatorTestUp
 import frc.robot.commands.pathing.MoveToPosition
@@ -207,6 +208,9 @@ class RobotContainer {
                             }
                         )
                     )
+
+                autoBalance
+                    .whileTrue(AutoBalance(drivetrain))
 
 //                if (i == 0) {//warn: this is a hack VERY VERY BAD
 //                    //fixme dont do this
