@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d
 
 @Suppress("unused") //TODO: Remove this suppression
 object Field2dLayout {
+    const val xCenter = 8.0
     //        val bounds = listOf(
 //            // judge side red -> judge side blue -> far side blue -> far side red
 //            Translation3d(8.25, -4.0, 0.0),
