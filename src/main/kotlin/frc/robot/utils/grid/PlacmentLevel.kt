@@ -3,9 +3,11 @@ package frc.robot.utils.grid
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import frc.robot.constants.Field2dLayout.Axes
+import java.security.InvalidParameterException
 
 object GridConstants {
     const val centerDistX: Double = 6.894576//feetToMeters(22.625)
@@ -79,9 +81,10 @@ fun getPlacementTransform(
     val allianceMultiplier = when (alliance) {
         Blue -> Axes.Blue.fieldOffsetMultiplier
         Red -> Axes.Red.fieldOffsetMultiplier
-        else ->
+        else -> 0.0
     }
     val x = GridConstants.centerX + (GridConstants.centerDistX * allianceMultiplier) + level.depth
     val y = side.offset + group.offset
     val z = level.height
+    return Translation3d(x,y,z)//fixme BADDD PLEASE FIX
 }
