@@ -63,6 +63,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/SwerveModule": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[0]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[108]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[109]": "PIDController",
@@ -191,9 +192,6 @@
         },
         "elevator": {
           "style": "Line"
-        },
-        "window": {
-          "visible": true
         }
       },
       "/SmartDashboard/field": {

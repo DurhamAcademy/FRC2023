@@ -54,7 +54,7 @@ class Arm : SubsystemBase() {
         0.5,
         TrapezoidProfile.Constraints(
             3.0,
-            1.0
+            2.5
         )
     ).apply {
         setTolerance(
