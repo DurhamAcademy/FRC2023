@@ -84,7 +84,7 @@ object BuildingBlocks {
             }
         )
     }
-    fun GoToPlacementPoint(
+    fun goToPlacementPoint(
         drivetrain: Drivetrain,
         level: PlacmentLevel,
         group: PlacementGroup,
@@ -101,7 +101,14 @@ object BuildingBlocks {
                 Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
             }
         }
-        val placementX: () -> Double = { xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul) }
+        val placementX: () -> Double = {
+            when(level){
+                //TODO fill in values (replace 5.2)
+                PlacmentLevel.Level1 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
+                PlacmentLevel.Level2 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
+                PlacmentLevel.Level3 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
+            }
+        }
         val placementY: () -> Double = {
             if(isInGridZone()) group.offset - side.offset
             else if(abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue

@@ -5,6 +5,7 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.constants.FieldConstants
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
@@ -31,8 +32,7 @@ class SetPosition(
         elevatorPosition,
         wristPosition
     )
-    fun withManipulator(manipulator: Manipulator) =
-        this.raceWith(CollectObject(manipulator))
+
     companion object {
         fun setpoint(placmentLevel: PlacmentLevel, elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) =
             when (placmentLevel) {

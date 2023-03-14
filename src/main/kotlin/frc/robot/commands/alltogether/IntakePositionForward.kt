@@ -3,6 +3,7 @@ package frc.robot.commands.alltogether
 import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj2.command.CommandBase
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
@@ -12,9 +13,6 @@ class IntakePositionForward(
     private val arm: Arm,
     val stopAtEnd: Boolean = true
 ) : CommandBase() {
-    fun withManipulator(manipulator: Manipulator) =
-        this
-            .raceWith(CollectObject(manipulator))
 
     init {
         addRequirements(elevator, arm)
