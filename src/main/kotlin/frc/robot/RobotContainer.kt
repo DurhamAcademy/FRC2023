@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
@@ -400,6 +401,7 @@ class RobotContainer {
         // armLen * sin(armAngle) = z
         val armX = armLength * sin(armAngle)
         val armZ = armLength * cos(armAngle)
+        if(armZ + elevator.height > inchesToMeters(76.0)){ elevator.setpoint = inchesToMeters(76.0) - armZ }
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(

@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
@@ -21,6 +22,7 @@ import frc.robot.constants.FieldConstants
 import frc.robot.constants.arm
 import frc.robot.constants.elevator
 import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.sin
 
 class Elevator(
@@ -28,6 +30,7 @@ class Elevator(
 ) : SubsystemBase() {
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
+    val armLength = 1.047
     val elevatorMotor = WPI_TalonFX(
         elevator.elevatorMotor.ElevatorMotorId
     ).apply {
@@ -211,6 +214,17 @@ class Elevator(
                 )
             )
         }
+        setMotorVoltage(
+            motorPid.calculate(
+                height,
+                if(robotContainer != null) setpoint.coerceAtMost(
+                    inchesToMeters(76.0) - (armLength * cos(robotContainer.arm.armPosition))
+                )
+                else setpoint
+            ) + feedforward.calculate(
+                motorPid.setpoint.velocity,
+            )
+        )
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 
@@ -219,10 +233,10 @@ class Elevator(
         // check if its in teleop
 //        if (RobotController.getUserButton()) setMotorVoltage(0.0)
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
-        if (limitSwitchPressed != lastLimitSwitch) {
+        if (limitSwitch.get() != lastLimitSwitch) {
             this.height = elevator.limits.bottomLimit
         }
-        lastLimitSwitch = limitSwitchPressed
+        lastLimitSwitch = limitSwitch.get()
     }
 
     override fun simulationPeriodic() {
@@ -252,6 +266,4 @@ class Elevator(
         )
         // just set the motor voltage to the control scheme's output
     }
-
-
 }
