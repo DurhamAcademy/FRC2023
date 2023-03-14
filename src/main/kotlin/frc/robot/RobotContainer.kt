@@ -358,7 +358,7 @@ class RobotContainer {
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
         addOption("1", GoToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone))
-        addOption("2", GoToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Middle, PlacementSide.Cube))
+        addOption("2", GoToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube))
         addOption("3", leaveCommunityZone(drivetrain, arm))
     }
 
