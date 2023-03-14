@@ -15,7 +15,7 @@ class KLEDRegion(val start: Int, val end: Int, vararg val animations: LEDAnimati
         }
         fun optimizedComposite(mutableBuffer: Array<Color>, time: Time, regions: List<KLEDRegion>) {
             for (region in regions) {
-                val b = region.getBuffer(time) ?: continue
+                val b = region.getBuffer(time)
                 for (i in b.indices) {
                     if (b[i].alpha < 255 && region.transparent) {
                         mutableBuffer[region.start + i] = Color(

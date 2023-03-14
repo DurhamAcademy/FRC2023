@@ -5,49 +5,24 @@ import com.revrobotics.CANSparkMaxLowLevel
 import com.revrobotics.ColorMatch
 import com.revrobotics.ColorSensorV3
 import edu.wpi.first.math.filter.LinearFilter
-import edu.wpi.first.wpilibj.DoubleSolenoid
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value
 import edu.wpi.first.wpilibj.I2C
-import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants.manipulator.leftSolenoidForward
-import frc.robot.Constants.manipulator.leftSolenoidReverse
-import frc.robot.Constants.manipulator.motorId
-import frc.robot.Constants.manipulator.rightSolenoidForward
-import frc.robot.Constants.manipulator.rightSolenoidReverse
-import frc.robot.GamePiece
+import frc.robot.constants.manipulator.motorId
+import frc.robot.utils.GamePiece
 import kotlin.math.pow
-import frc.robot.Constants.manipulator as ManipConsts
+import frc.robot.constants.manipulator as ManipConsts
 
 
 class Manipulator: SubsystemBase() {
 
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
         setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
-        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
+//        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val leftsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, leftSolenoidForward, leftSolenoidReverse)
-    private val rightsolenoid = DoubleSolenoid(PneumaticsModuleType.REVPH, rightSolenoidForward, rightSolenoidReverse)
-
-    var isOpen: Boolean?
-        get() = when (leftsolenoid.get()) {
-            Value.kForward -> false
-            Value.kReverse -> true
-            else -> null
-        }
-        set(value) {
-            val v = when (value) {
-                false -> Value.kForward
-                true -> Value.kReverse
-                else -> Value.kOff
-            }
-            leftsolenoid.set(v)
-            rightsolenoid.set(v)
-        }
 
     var motorPercentage: Double
         get() = motor.get()
@@ -128,23 +103,23 @@ class Manipulator: SubsystemBase() {
     val motorCurrent = tab.add("Motor Current", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
-        .getEntry()
+        .entry
     val colorRed = tab.add("Red", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
     val colorGreen = tab.add("Green", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
     val colorBlue = tab.add("Blue", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
     val colorIR = tab.add("IR", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 1.0))
-        .getEntry()
+        .entry
 
 
     override fun periodic() {

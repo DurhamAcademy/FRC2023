@@ -1,0 +1,10 @@
+[
+  {
+    "name": "/Preferences/armOffset",
+    "type": "double",
+    "value": -5.0,
+    "properties": {
+      "persistent": true
+    }
+  }
+]
