@@ -64,8 +64,8 @@ object BuildingBlocks {
         val rotationAlliance: () -> Rotation2d = {
             if(arm.armPosition.absoluteValue < 0.5){
                 when(alliance()){
-                    Red -> Rotation2d.fromDegrees(180.0)
-                    Blue -> Rotation2d.fromDegrees(0.0)
+                    Red -> Rotation2d.fromDegrees(0.0)
+                    Blue -> Rotation2d.fromDegrees(180.0)
                     Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                 }
             }
