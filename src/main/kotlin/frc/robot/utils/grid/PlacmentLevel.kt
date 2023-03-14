@@ -37,25 +37,25 @@ enum class PlacmentLevel(val depth: Double, val height: Double) {
  */
 enum class PlacementGroup(val offset: Double) {
     /** The group of game pieces that are closest to the judging table. */
-    Closest(inchesToMeters(42.0)),
+    Closest(inchesToMeters(42.0 + 16)),
     /** The group of game pieces that are farthest from the judging table. */
-    Farthest(inchesToMeters(174.0)),
+    Farthest(inchesToMeters(174.0 + 2)),
     /** The group of game pieces that are in front of the charging station. */
-    Middle(inchesToMeters(108.0)),
+    Middle(inchesToMeters(108.0 + 9)),
 }
 
 enum class PlacementSide(val offset: Double) {
     /**
      * The cone placement area closest to the judging table in a group.
      */
-    CloseCone(inchesToMeters(-22.0)),
+    CloseCone(inchesToMeters(22.0)),
     /** The cube placement area, in between the two cone placement areas and in
      * the middle of the group.
      */
     Cube(0.0),
     /** The cone placement area farthest from the judging table in a group.
      */
-    FarCone(inchesToMeters(22.0)),
+    FarCone(inchesToMeters(-22.0)),
 }
 
 /**

@@ -20,7 +20,7 @@ import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
-import frc.robot.commands.SetManipulatorSpeed
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.alltogether.CollectObject
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
@@ -32,6 +32,7 @@ import frc.robot.commands.elevator.ElevatorTestUp
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.GoToPlacementPoint
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -356,10 +357,9 @@ class RobotContainer {
 
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
-        setDefaultOption("1", GoToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Middle, PlacementSide.Cube))
-        addOption("1", GoToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Middle, PlacementSide.Cube))
-        addOption("2", MoveToPosition.blueauto2(drivetrain, elevator, arm, manipulator))
-        addOption("3", MoveToPosition.blueauto3(drivetrain, elevator, arm, manipulator))
+        addOption("1", GoToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone))
+        addOption("2", GoToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Middle, PlacementSide.Cube))
+        addOption("3", leaveCommunityZone(drivetrain))
     }
 
     // shuffleboard auto chooser
