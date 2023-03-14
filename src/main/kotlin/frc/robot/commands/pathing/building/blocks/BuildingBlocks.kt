@@ -19,14 +19,14 @@ import kotlin.math.abs
 import frc.robot.constants.RobotProportions.length as robotLength
 
 object BuildingBlocks {
-    fun LeaveCommunityZone(
+    fun leaveCommunityZone(
         drivetrain: Drivetrain,
         alliance: DriverStation.Alliance = DriverStation.getAlliance()
     ){
-        val clearUp = 0.0
-        val clearDown = 0.0
-        val exitPoint = 0.0
-        val middleX = 0.0
+        val clearUp = 4.675
+        val clearDown = 1.169
+        val exitPoint = 9.0
+        val middleX = 3.485
         val clearRoute: () -> Boolean = {
             drivetrain.estimatedPose2d.y == clearUp || drivetrain.estimatedPose2d.y == clearDown
         }
@@ -72,6 +72,8 @@ object BuildingBlocks {
         side: PlacementSide,
         alliance: () -> DriverStation.Alliance = {Game.alliance}
     ): MoveToPosition {
+        val upperYValue = 4.675
+        val lowerYValue = 1.169
         val chargeLimit: () -> Double = { xCenter + (((robotLength / 2) + 4.8) * alliance().xMul) }
         val isInGridZone: () -> Boolean = {
             drivetrain.estimatedPose2d.x < chargeLimit()
@@ -79,7 +81,8 @@ object BuildingBlocks {
         val placementX: () -> Double = { xCenter + (((robotLength / 2) + 6.15) * alliance().xMul) }
         val placementY: () -> Double = {
             if(isInGridZone()) group.offset + side.offset
-            else drivetrain.estimatedPose2d.y //TODO fix so it snaps to a position
+            else if(abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
+            else upperYValue
         }
         return MoveToPosition(
             drivetrain,
