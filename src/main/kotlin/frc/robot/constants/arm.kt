@@ -12,9 +12,9 @@ object arm {
         const val gearRatio = 1 / 170.67
         const val maxVelocity = 1.0
         const val maxAcceleration = 1.0
-        const val kP = 2.6426
+        const val kP = 3.0
         const val kI = 0.0
-        const val kD = 1.2626
+        const val kD = 0.5
 
         const val kS = 0.086989
         const val kG = 0.42677
@@ -28,7 +28,7 @@ object arm {
         const val inverted = true
     }
 
-    val length = Units.inchesToMeters(30.31)
+    val length = Units.inchesToMeters(48.0)
     val maxAngle = Units.degreesToRadians(130.0 - 5.0)
     val minAngle = Units.degreesToRadians(-155.0 + 5.0)
     const val armMass = 4.76//lbsToKilograms(10.5)

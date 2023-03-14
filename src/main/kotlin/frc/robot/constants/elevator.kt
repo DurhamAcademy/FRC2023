@@ -30,8 +30,8 @@ object elevator {
             val kD: Double = 3.0//9.4036
 
             object TrapezoidProfile {
-                val maxVelocity: Double = 1.1
-                val maxAcceleration: Double = 5.0
+                val maxVelocity: Double = 1.0
+                val maxAcceleration: Double = 1.0
             }
         }
 

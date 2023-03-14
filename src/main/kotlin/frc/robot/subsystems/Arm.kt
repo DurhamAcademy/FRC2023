@@ -49,12 +49,12 @@ class Arm : SubsystemBase() {
         configSensorDirection(arm.encoder.inverted)
     }
     val armPID = ProfiledPIDController(
-        5.0,
-        0.0,
-        0.5,
+        arm.motor.kP,
+        arm.motor.kI,
+        arm.motor.kD,
         TrapezoidProfile.Constraints(
-            3.0,
-            2.5
+            arm.motor.maxVelocity,
+            arm.motor.maxAcceleration
         )
     ).apply {
         setTolerance(

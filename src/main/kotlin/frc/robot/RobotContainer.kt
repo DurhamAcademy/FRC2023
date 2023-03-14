@@ -58,8 +58,8 @@ class RobotContainer {
         this
     )
     val manipulator = Manipulator()
-    val elevator = Elevator(this)
     val arm = Arm()
+    val elevator = Elevator(this, arm)
 
     val pdh = PowerDistribution(PDH.id, kRev)
 
@@ -143,7 +143,6 @@ class RobotContainer {
                     .whileTrue(
                         SetPosition.setpoint(PlacmentLevel.Level1, this@RobotContainer)
                     )
-                    println("ran manipulaot rhehe")
 
                 // assign l2
                 placeLvl2
@@ -161,17 +160,23 @@ class RobotContainer {
                 lowIntake
                     .whileTrue(
                         IntakePositionForward(elevator, arm)
-                            .withManipulator(manipulator)
-                    ).onFalse(HoldPosition(elevator, arm))
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 1.0)
+                            )
+                    ).onFalse(HoldPosition(elevator, arm)
+                        .alongWith(
+                            SetManipulatorSpeed(manipulator, 0.1)
+                        )
+                    )
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
-                    .whileTrue(SetManipulatorSpeed(manipulator, -1.0))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -0.15))
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 intake
                     .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 highIntake
                     .whileTrue(

@@ -3,6 +3,7 @@ package frc.robot.commands.alltogether
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
+import frc.robot.commands.SetManipulatorSpeed
 import frc.robot.subsystems.Manipulator
 
 class CollectObject(
@@ -20,20 +21,11 @@ class CollectObject(
     }
 
     override fun execute() {
-        if (debounce.calculate(manipulator.inColorRange == true)) {//
-            manipulator.motorPercentage = 0.1
-        } else if (manipulator.sensorConnected) {
-            manipulator.motorPercentage = 1.0
-            // close manipulator if distance is lower than 0.05
-        } else {
-            manipulator.motorPercentage = 1.0
-        }
+        SetManipulatorSpeed(manipulator, 1.0)
     }
 
     override fun end(interrupted: Boolean) {
-        if (!manipulator.sensorConnected)
-        manipulator.motorPercentage = 0.25
-        0
+        SetManipulatorSpeed(manipulator, .1)
     }
 
     override fun isFinished(): Boolean = false

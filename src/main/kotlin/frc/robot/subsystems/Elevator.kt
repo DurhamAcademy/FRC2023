@@ -26,7 +26,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class Elevator(
-    val robotContainer: RobotContainer?
+    val robotContainer: RobotContainer?,
+    val armController: Arm
 ) : SubsystemBase() {
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
@@ -110,26 +111,6 @@ class Elevator(
                 elevator.limits.bottomLimit,
                 elevator.limits.topLimit
             )
-            if (robotContainer != null) {
-                val topLimit = FieldConstants.heightLimit
-                val bottomLimit = 0.1
-                val armLength = arm.length
-                // use arm angle to determine elevator height
-                val armAngle = robotContainer.arm.armPosition
-                val armHeight = armLength * sin((PI/2)-armAngle)
-                val elevatorMaxHeight = topLimit - armHeight
-
-                field = field.coerceAtMost(elevatorMaxHeight)
-                field = field.coerceAtLeast(elevator.limits.bottomLimit)
-//                if ((wristAngle.absoluteValue >= PI/4) && (armAngle >= .35)) {
-//                    // if the wrist is not upright and the arm is close to it,
-//                    field = field.coerceAtLeast(
-//                        Constants.Elevator.limits.bottomLimit
-//                                + inchesToMeters(10.0)
-//                    )
-//                }
-
-            }
         }
 
     fun setMotorVoltage(voltage: Double) {
@@ -186,8 +167,9 @@ class Elevator(
             )
         )
         .entry
-
     var zeroElevator = false
+    val overHeight
+        get() = height > (inchesToMeters(76.0) - (arm.length * cos(armController.armPosition)))
 
     override fun periodic() {
         SmartDashboard.putData("elevcmd", this)
@@ -208,23 +190,23 @@ class Elevator(
             setMotorVoltage(
                 motorPid.calculate(
                     height,
-                    setpoint
+                    TrapezoidProfile.State(
+                        setpoint.coerceAtMost(
+                            inchesToMeters(60.0) - (armLength * cos(armController.armPosition))
+                        ).coerceAtLeast(
+                            elevator.limits.bottomLimit
+                        ),
+                        0.0
+                    ),
+                    TrapezoidProfile.Constraints(
+                        elevator.elevatorMotor.PID.TrapezoidProfile.maxVelocity,
+                        (if(overHeight) 2 else 1) * elevator.elevatorMotor.PID.TrapezoidProfile.maxAcceleration
+                    )
                 ) + feedforward.calculate(
                     motorPid.setpoint.velocity,
                 )
             )
         }
-        setMotorVoltage(
-            motorPid.calculate(
-                height,
-                if(robotContainer != null) setpoint.coerceAtMost(
-                    inchesToMeters(76.0) - (armLength * cos(robotContainer.arm.armPosition))
-                )
-                else setpoint
-            ) + feedforward.calculate(
-                motorPid.setpoint.velocity,
-            )
-        )
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 
