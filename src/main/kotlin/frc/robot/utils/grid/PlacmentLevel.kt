@@ -59,14 +59,14 @@ enum class PlacementSide(val offset: Double) {
 }
 
 /**
- * This function can calculate the position of all placent points on the field.
+ * This function can calculate the position of all placement points on the field.
  * It specifies the alliance, and if you are placing on the left, right,
  * or center of the group. ( left, right are for cones, center is for cubes )
  * It also specifies the level of the field.
  * It can calculate the transform from the placement specifications to the
  * odometry.
  *
- * @param level the level of the field.
+ * @param level the level of the field (ie: placement level).
  * @param group the group of the field.
  * @param side the side of the group.
  */
