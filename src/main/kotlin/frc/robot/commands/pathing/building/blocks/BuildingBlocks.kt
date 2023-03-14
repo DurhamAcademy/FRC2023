@@ -9,23 +9,24 @@ import frc.kyberlib.command.Game
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.Field2dLayout.xCenter
+import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
 import java.security.InvalidParameterException
-import java.util.function.BinaryOperator
-import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import frc.robot.constants.RobotProportions.length as robotLength
 
 object BuildingBlocks {
     fun leaveCommunityZone(
         drivetrain: Drivetrain,
+        arm: Arm,
         alliance: () -> DriverStation.Alliance = {Game.alliance}
     ): Command? {
-        val clearUp = 4.675
-        val clearDown = 1.169
+        val clearUp = 4.675 //Y value above charge station
+        val clearDown = 1.169//Y value below charge station
         val exitPoint: () -> Double ={
             when(alliance()){
                 Red -> 9.0
@@ -60,11 +61,16 @@ object BuildingBlocks {
             }
             //TODO charge station
         }
-        val rotationAlliance: () -> Double = {
-            when(alliance()){
-                Red -> 180.0
-                Blue -> 0.0
-                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+        val rotationAlliance: () -> Rotation2d = {
+            if(arm.armPosition.absoluteValue < 0.5){
+                when(alliance()){
+                    Red -> Rotation2d.fromDegrees(180.0)
+                    Blue -> Rotation2d.fromDegrees(0.0)
+                    Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                }
+            }
+            else{
+                drivetrain.estimatedPose2d.rotation
             }
         }
         return MoveToPosition(
@@ -73,7 +79,7 @@ object BuildingBlocks {
                 Pose2d(
                     placementX(),
                     placementY(),
-                    Rotation2d.fromDegrees(rotationAlliance())
+                    rotationAlliance()
                 )
             }
         )
