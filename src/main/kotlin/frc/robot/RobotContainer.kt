@@ -30,6 +30,8 @@ import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ElevatorTestDown
 import frc.robot.commands.elevator.ElevatorTestUp
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.GoToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -38,6 +40,8 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
+import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
 import java.awt.Color
 import kotlin.math.PI
@@ -352,16 +356,8 @@ class RobotContainer {
 
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
-        setDefaultOption("1", ConditionalCommand(
-            MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator),
-            ConditionalCommand(
-                MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator),
-                PrintCommand("UKNOWN ALLIANCE ${Game.alliance}"),
-                {Game.alliance == Blue }
-            ),
-            {Game.alliance == Red }
-        ))
-        addOption("1", MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator))
+        setDefaultOption("1", GoToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Middle, PlacementSide.Cube))
+        addOption("1", GoToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Middle, PlacementSide.Cube))
         addOption("2", MoveToPosition.blueauto2(drivetrain, elevator, arm, manipulator))
         addOption("3", MoveToPosition.blueauto3(drivetrain, elevator, arm, manipulator))
     }
