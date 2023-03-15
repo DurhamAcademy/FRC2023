@@ -228,12 +228,6 @@ class Elevator(
     override fun simulationPeriodic() {
         if (RobotBase.isSimulation()) {
             elevatorSim.update(0.02)
-            // simulate the limit switch
-            if (elevatorSim.hasHitLowerLimit()) {
-//                limitSwitchBoolean.set(true)
-            } else {
-//                limitSwitchBoolean.set(false)
-            }
         }
         SmartDashboard.putNumber("elevator Height", height)
         SmartDashboard.putNumber("elevator Setpoint", setpoint)

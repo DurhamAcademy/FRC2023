@@ -37,7 +37,16 @@ class KLEDRegion(val start: Int, val end: Int, vararg val animations: LEDAnimati
             if(animation.condition()) {
                 // get buffer
                 val buffer = animation.getBuffer(time, length)
-                val b = if(reversed) buffer.reversed() else buffer
+                if (buffer.size != length) {
+                    throw IllegalStateException(
+                        "Buffer size must be equal to region length\n" +
+                                "Buffer size: ${buffer.size}\n" +
+                                "Region length: $length" +
+                                "Animation: ${animation.javaClass.simpleName}" +
+                                "Region: $start - $end"
+                    )
+                }
+                val b = if (reversed) buffer.reversed() else buffer
                 if (!animation.enableTransparency) {
                     return b.map { color ->
                         Color(
@@ -49,10 +58,14 @@ class KLEDRegion(val start: Int, val end: Int, vararg val animations: LEDAnimati
                 }
 
                 // apply buffer
-                for (i in b.indices) {
+                b.forEachIndexed { i, _ ->
                     if (b[i].alpha < 255) {
                         mutableBuffer[start + i] = Color(
-                            (b[i].red / 255F) * (b[i].alpha / 255F) + (mutableBuffer[start + i].red / 255F) * (1 - b[i].alpha / 255F),
+                            (
+                                    b[i].red / 255F) * (b[i].alpha / 255F)
+                                    +
+                                    (mutableBuffer[start + i].red / 255F) *
+                                    (1 - b[i].alpha / 255F),
                             (b[i].green / 255F) * (b[i].alpha / 255F) + (mutableBuffer[start + i].green / 255F) * (1 - b[i].alpha / 255F),
                             (b[i].blue / 255F) * (b[i].alpha / 255F) + (mutableBuffer[start + i].blue / 255F) * (1 - b[i].alpha / 255F)
                         )
