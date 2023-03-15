@@ -10,9 +10,9 @@ object elevator {
     object elevatorMotor {
         object Feedforward {
             val kG: Double = 0.092925
-            val kS = 0.19138
-            val kV = 11.47
-            val kA = 0.14208
+            val kS = 0.16
+            val kV = 11.477
+            val kA = 0.18208
         }
 
         object tolerance {
@@ -25,12 +25,12 @@ object elevator {
         val gearRatio: Double = 1 / 10.51
 
         object PID {
-            val kP = 8.0//892.53
+            val kP = 55.0//892.53
             val kI = 0.0
             val kD: Double = 3.0//9.4036
 
             object TrapezoidProfile {
-                val maxVelocity: Double = 0.1
+                val maxVelocity: Double = 1.1
                 val maxAcceleration: Double = 5.0
             }
         }

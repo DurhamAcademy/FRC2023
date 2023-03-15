@@ -44,4 +44,5 @@ abstract class ControlScheme {
     open val moveToClosestHPS: Trigger = Trigger { false }
     open val moveToClosestScoreStation: Trigger = Trigger { false }
 
+    open val autoBalance: Trigger = Trigger { false }
 }
