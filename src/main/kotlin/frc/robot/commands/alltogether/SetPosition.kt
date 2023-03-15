@@ -19,7 +19,7 @@ class SetPosition(
     val armPosition: Double,
     val elevatorPosition: Double,
     val wristPosition: Double,
-    val stopAtEnd: Boolean = true
+    val stopAtEnd: Boolean = true,
 ) : CommandBase() {
     constructor(robotContainer: RobotContainer,
                 armPosition: Double,

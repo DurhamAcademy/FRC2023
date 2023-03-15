@@ -3,12 +3,15 @@ package frc.robot.commands.balance
 import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
+import frc.kyberlib.math.units.Div
+import frc.kyberlib.math.units.KUnit
+import frc.kyberlib.math.units.Radian
+import frc.kyberlib.math.units.Second
+import frc.kyberlib.math.units.extensions.*
 import frc.robot.subsystems.Drivetrain
-import kotlin.math.absoluteValue
-import kotlin.math.atan
-import kotlin.math.sqrt
-import kotlin.math.tan
+import kotlin.math.*
 
 class AutoBalance(
     val drivetrain: Drivetrain
@@ -17,52 +20,46 @@ class AutoBalance(
         addRequirements(drivetrain)
     }
 
-    // inclination = atan(sqrt(tan^2(roll)+tan^2(pitch)))
-    val drivetrainGlobalPitch: Double
-        get() = atan(sqrt(Math.pow(tan(drivetrain.gyro.pitch), 2.0) + Math.pow(tan(drivetrain.gyro.roll), 2.0)))
-    val lastDrivetrainGlobalPitch: Double = drivetrainGlobalPitch
-    val lastTime: Double = Timer.getFPGATimestamp()
-    var globalPitchVelocity = 0.0
+    val currentPitch: Angle
+        get() = drivetrain.gyro.pitch.degrees
+    val currentRoll: Angle
+        get() = drivetrain.gyro.roll.degrees
+    val currentYaw: Angle
+        get() = drivetrain.gyro.yaw.degrees
 
-    // the formula for getting the direction of inclination given the pitch and
-    // roll is:
-    // heading = atan(tan(pitch)/cos(roll))
-//    val autoTab = Shuffleboard.getTab("Autonomous")
-//    val currentPitchHeadingEntry = autoTab.add("Current Pitch Heading", 0.0)
-//        .withWidget(BuiltInWidgets.kGraph)
-//        .withProperties(mapOf("min" to -1.0, "max" to 1.0))
-//        .entry
-//    val pitchHeadingEntry = autoTab.add("Pitch Heading", 0.0)
-//        .withWidget(BuiltInWidgets.kGraph)
-//        .withProperties(mapOf("min" to -1.0, "max" to 1.0))
-//        .entry
-//    val pitchVelocityEntry = autoTab.add("Pitch Velocity", 0.0)
-//        .withWidget(BuiltInWidgets.kGraph)
-//        .withProperties(mapOf("min" to -1.0, "max" to 1.0))
-//        .entry
-    val currentPitchHeading: Double
-        get() = atan(tan(drivetrain.gyro.pitch) / Math.cos(drivetrain.gyro.roll))
+    // inclination is the angle between the robot's x,y plane and the ground.
+    // given the pitch and roll, we can calculate the inclination of the robot
+    // using the following formula:
+    // inclination = arctan(pitch / sqrt(1 - pitch^2) * cos(roll) + roll * sin(roll))
+    val currentInclination: Angle
+        get() = atan2(
+            currentPitch.radians,
+            sqrt(1 - currentPitch.radians.pow(2)) * cos(currentRoll.radians) + currentRoll.radians * sin(currentRoll.radians)
+        ).radians
+    val lastInclination = currentInclination
+    val lastTime = Timer.getFPGATimestamp().seconds
+    val globalPitchVelocity: KUnit<Div<Radian, Second>>
+        get() = (currentInclination - lastInclination) /
+                (Timer.getFPGATimestamp().seconds - lastTime)
+
+
     val debouncer = Debouncer(0.05)
     override fun execute() {
-        val currentDrivetrainGlobalPitch = drivetrainGlobalPitch
-        globalPitchVelocity =
-            (currentDrivetrainGlobalPitch - lastDrivetrainGlobalPitch) /
-                    (Timer.getFPGATimestamp() - lastTime)
-
         drivetrain.drive(
             ChassisSpeeds(
-                if (currentPitchHeading > 0) -0.2 else .2,
+                -1.0,
                 0.0,
                 0.0
             ),
             true
         )
 
-//        currentPitchHeadingEntry.setDouble(currentPitchHeading)
-//        pitchHeadingEntry.setDouble(currentPitchHeading)
-//        pitchVelocityEntry.setDouble(globalPitchVelocity)
+        SmartDashboard.putNumber("currentPitchHeading", currentPitch.degrees)
+        SmartDashboard.putNumber("globalPitchVelocity", globalPitchVelocity.degreesPerSecond)
+        SmartDashboard.putNumber("drivetrainGlobalPitch", lastInclination.degrees)
+        SmartDashboard.putNumber("drivetrainGlobalPitch", currentInclination.degrees)
     }
 
     override fun isFinished(): Boolean =
-        debouncer.calculate(globalPitchVelocity.absoluteValue > 0.05)
+        debouncer.calculate(globalPitchVelocity.absoluteValue.degreesPerSecond > 10)
 }

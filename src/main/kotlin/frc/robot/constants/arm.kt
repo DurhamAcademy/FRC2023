@@ -24,7 +24,7 @@ object arm {
 
     object encoder {
         const val id = 18
-        const val offset = -170.2441528786//-76.15 + 17 + 25 - 5 - 5 + 77//-87.49
+        const val offset = 6.15//-76.15 + 17 + 25 - 5 - 5 + 77//-87.49
         const val inverted = true
     }
 
