@@ -1,5 +1,6 @@
 package frc.robot.commands.pathing
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
@@ -11,19 +12,29 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
-import frc.kyberlib.math.units.extensions.radians
-import frc.robot.Constants
-import frc.robot.commands.alltogether.Idle
-import frc.robot.commands.alltogether.SetPosition
-import frc.robot.commands.manipulator.CloseManipulator
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.robot.commands.manipulator.SetManipulatorSpeed
-import frc.robot.subsystems.*
+import frc.robot.commands.alltogether.Idle
+import frc.robot.commands.alltogether.IntakePositionForward
+import frc.robot.commands.alltogether.SetPosition
+import frc.robot.subsystems.Arm
+import frc.robot.subsystems.Drivetrain
+import frc.robot.subsystems.Elevator
+import frc.robot.subsystems.Manipulator
 import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
-import kotlin.random.Random
 
-class MoveToPosition(
+val Pose2d.flipped: Pose2d
+    get() = Pose2d(
+        Translation2d(
+            -(this.translation.x-8.3) + 8.3,
+            this.translation.y
+        ),
+        -rotation
+    )
+
+open class MoveToPosition(
     private val drivetrain: Drivetrain,
     /**
      * The desired position of the robot (in meters)
@@ -33,9 +44,9 @@ class MoveToPosition(
      * The desired velocity of the robot (in meters per second)
      */
     private val velocity: Transform2d = Transform2d(),
-    private val toleranceppos: Double = 0.1,
+    private val toleranceppos: Double = 0.025,
     private val tolerancepvel: Double = 0.1,
-    private val tolerancerpos: Double = 0.025,
+    private val tolerancerpos: Double = 0.01,
     private val tolerancervel: Double = 0.1,
     private val snapMode: Boolean = false
 ) : CommandBase() {
@@ -79,48 +90,56 @@ class MoveToPosition(
 
     val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            4.0,
-            3.0
+            7.0,
+            10.0
         )
     ).also {
-        it.reset(drivetrain.poseEstimator.estimatedPosition.translation.x, 0.0)
+        it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val yPIDController = ProfiledPIDController(
         Companion.yP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            4.0,
-            3.0
+            7.0,
+            10.0
         )
     ).also {
-        it.reset(drivetrain.poseEstimator.estimatedPosition.translation.y, 0.0)
+        it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val rPIDController = ProfiledPIDController(
         Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            PI / 2, PI / 1.5
+            PI / 1.0, PI*2
         )
     ).also {
         it.enableContinuousInput(-PI, PI)
-        it.reset(drivetrain.poseEstimator.estimatedPosition.rotation.radians, 0.0)
+        it.reset(
+            drivetrain.estimatedPose2d.rotation.radians,
+            0.0
+        )
         it.setTolerance(tolerancerpos, tolerancervel)
     }
 
-    val start = drivetrain.poseEstimator.estimatedPosition
+    val start = drivetrain.estimatedPose2d
 
+    val visualization = drivetrain.field2d.getObject("MoveToPosition")
     override fun initialize() {
         if (snapMode) pose = {
-            (SnapToPostion.closestPose(drivetrain) ?: pose) as Pose2d
+            SnapToPostion.closestPose(drivetrain)
         }
-        xPIDController.reset(drivetrain.poseEstimator.estimatedPosition.translation.x,0.0)
-        yPIDController.reset(drivetrain.poseEstimator.estimatedPosition.translation.y, 0.0)
-        rPIDController.reset(drivetrain.poseEstimator.estimatedPosition.rotation.radians, 0.0)
+        xPIDController.reset(drivetrain.estimatedPose2d.translation.x, drivetrain.estimatedVelocity.translation.x)
+        yPIDController.reset(drivetrain.estimatedPose2d.translation.y, drivetrain.estimatedVelocity.translation.y)
+        rPIDController.reset(drivetrain.estimatedPose2d.rotation.radians, drivetrain.estimatedVelocity.rotation.radians)
+
+        visualization.pose = pose()
     }
 
     // on command start and every time the command is executed, calculate the
 
     override fun execute() {
-        val current = drivetrain.poseEstimator.estimatedPosition
+        val current = drivetrain.estimatedPose2d
         val desired = pose()
+
+        visualization.pose = desired
 
         // log the current position and the desired position
         SmartDashboard.putNumber("curr-x", current.translation.x)
@@ -199,8 +218,8 @@ class MoveToPosition(
 
     override fun isFinished(): Boolean {
         // stop when the robot is within 0.1 meters of the desired position
-        return drivetrain.poseEstimator.estimatedPosition.minus(Pose2d(pose().translation, Rotation2d())).translation.norm < toleranceppos
-                && drivetrain.poseEstimator.estimatedPosition.rotation.minus(Rotation2d(pose().rotation.radians)).radians < tolerancerpos
+        return drivetrain.estimatedPose2d.minus(Pose2d(pose().translation, Rotation2d())).translation.norm < toleranceppos
+                && drivetrain.estimatedPose2d.rotation.minus(Rotation2d(pose().rotation.radians)).radians.absoluteValue < tolerancerpos
     }
 
     override fun end(interrupted: Boolean) {
@@ -211,12 +230,49 @@ class MoveToPosition(
         rPIDController.reset(0.0, 0.0)
     }
 
+    val flipped: MoveToPosition
+        get() = MoveToPosition(
+            drivetrain,
+            { pose().flipped },
+            velocity,
+            toleranceppos,
+            tolerancepvel,
+            tolerancerpos,
+            tolerancervel,
+            snapMode
+        )
     companion object {
         const val rP = 4.0
         const val yP = 2.25
         const val xP = 2.25
+    /*
+        fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                    SetPosition.high(elevator, arm)
+                        .withTimeout(3.0)
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)))
+            }
 
-        fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
+     */
+        /**
+         * Auto 1: Only places game piece
+         * Use if swerve broken
+         */
+        fun swerveBrokenAuto(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+            //(drivetrain.poseEstimator.estimatedPosition)
+                SetPosition.high(elevator, arm).withTimeout(1.0)
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)))
+                    .withTimeout(15.0)
+            }
+
+        /**
+         * Auto 4: Place, pick up, and then get on charge station
+         */
+        fun blueauto2(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
                 CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 14.66-(2*(14.66-8.3)), 0.0).withTimeout(1.0))
@@ -235,32 +291,276 @@ class MoveToPosition(
                     .andThen(Idle(elevator, arm, wrist).alongWith(SetManipulatorSpeed(manipulator, 0.0, true)))
                     */
             }
-        fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, wrist: Wrist, manipulator: Manipulator) =
+
+        /**
+         * auto3
+         * Score cube high
+         * Go get cone (or switch for cube)
+         * Go score cone high (or switch with cube score mid)
+         * Get as close to human player as possible
+         */
+        fun blueauto3(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.estimatedPose2d)
+                MoveToPosition(drivetrain, 1.87 + .5, 4.42, 0.0)
+                    .deadlineWith(SetPosition.idle(elevator, arm))
+                    .andThen(SetPosition.high(elevator, arm, true).withTimeout(3.0))
+                    .andThen(
+                        SetManipulatorSpeed(manipulator, -1.0)
+                            .withTimeout(0.25)
+                    )// place cube
+                    .andThen(
+                        // move to intake new cube, but dont rotate drivetrain
+                        // until we are close to the cube to prevent tipping,
+                        // damage to the arm, and collisions with the wall
+                        MoveToPosition(
+                            drivetrain,
+                            {
+                                Pose2d(
+                                    5.25,
+                                    if (true) 1.5 else 2.5,
+                                    Rotation2d(
+                                        if (drivetrain.estimatedPose2d.x > 3.5 || arm.armPosition.absoluteValue < 0.5) PI
+                                        else 0.0
+                                    )
+                                )
+                            },
+                        )
+                            .alongWith(
+                                SetPosition.idle(elevator, arm)
+                                    .alongWith(SetManipulatorSpeed(manipulator, 0.0)).withTimeout(3.0)
+                                    .until {
+                                        ((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) < 1.0
+                                    }
+                                    .andThen(
+                                        WaitUntilCommand {
+                                            ((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) < 1.0
+                                        }
+                                            .andThen(
+                                                IntakePositionForward(elevator, arm, true)
+                                                    .withTimeout(3.0)
+                                            )
+                                    )
+                            )
+                            // start moving to intake the cube and keep arm
+                            // deployed until moving is done
+                            .andThen(
+                                MoveToPosition(
+                                    drivetrain, 6.0, 4.625, 180.0
+                                )
+                                    .deadlineWith(
+                                        IntakePositionForward(elevator, arm)
+                                            .alongWith(SetManipulatorSpeed(manipulator, 1.0))
+                                    )
+                            )
+                    )
+                    // start idling and moving back to the placement zone at the
+                    // same time but dont rotate drivetrain until the arm is
+                    // back in the idle position
+                    .andThen(
+                        SetManipulatorSpeed(manipulator, 0.1)
+                            .alongWith(SetPosition.idle(elevator, arm))
+                            .withTimeout(3.0)
+                            .deadlineWith(
+                                MoveToPosition(drivetrain, {
+                                    Pose2d(
+                                        2.7,
+                                        4.6,//if (drivetrain.estimatedPose2d.run {this.x > 5.0}) 4.6 else 4.425,
+                                        if (arm.armPosition.absoluteValue > 0.5) Rotation2d(PI) else Rotation2d()
+                                    )
+                                })
+                            )
+                    )
+                    .andThen(
+                        MoveToPosition(drivetrain,
+                            {
+                                Pose2d(
+                                    2.7,
+                                    if (drivetrain.estimatedPose2d.x > 5.0) 4.6 else 4.425,
+                                    if (arm.armPosition.absoluteValue > 0.5) Rotation2d(PI) else Rotation2d()
+                                )
+                            })
+                            .deadlineWith(
+                                SetManipulatorSpeed(manipulator, 0.1)
+                                    .alongWith(SetPosition.idle(elevator, arm))
+                                    .withTimeout(3.0)
+                            )
+                    )
+                    .andThen(
+                        MoveToPosition(drivetrain, 1.89 + .5, 4.42, 0.0)
+                            .alongWith(
+                                SetPosition.high(elevator, arm).withTimeout(3.0)
+                                    .alongWith(
+                                        SetManipulatorSpeed(manipulator, 0.1).withTimeout(0.5)
+                                    )
+                            )
+                    )
+                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(0.5))
+                    .andThen(
+                        MoveToPosition(
+                            drivetrain,
+                            Pose2d(Translation2d(4.48, 5.00), Rotation2d()),
+                            velocity = Transform2d(Translation2d(1.0, 1.0), Rotation2d())
+                        )
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.1)
+                            )
+                            .deadlineWith(
+                                SetPosition.idle(elevator, arm).withTimeout(3.0)
+                            )
+                    )
+                    .andThen(
+                        MoveToPosition(drivetrain, 7.59, 6.45, 180.0)
+                            .deadlineWith(
+                                SetPosition.idle(elevator, arm).withTimeout(3.0)
+                            )
+                    )
+
+            }
+        fun blueauto7(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
             run {
                 (drivetrain.poseEstimator.estimatedPosition)
-                CloseManipulator(manipulator).andThen(MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0))
-                    .andThen(SetPosition.high(elevator, arm, wrist)
+                MoveToPosition(drivetrain, 1.92, 4.41, 180.0).withTimeout(3.0)
+                    .alongWith(
+                       SetPosition.high(elevator, arm).withTimeout(3.0)
+                    )
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(0.5))
+                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))).withTimeout(.25)
+                    .alongWith(MoveToPosition(drivetrain, 6.58, 4.59, 0.0).withTimeout(3.0)
+                    .alongWith(
+                        IntakePositionForward(elevator, arm).alongWith(WaitCommand(0.5).andThen(SetManipulatorSpeed(manipulator, 1.0))).withTimeout(3.0)
+                        )
+                    ).andThen(
+                        MoveToPosition(drivetrain, 5.50, 2.75).withTimeout(1.5)
+                            .alongWith(
+                            SetPosition.high(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)).withTimeout(1.5)
+                            )
+                    ).andThen(
+                        MoveToPosition(drivetrain, 3.85, 2.75).withTimeout(1.5).andThen(MoveToPosition(drivetrain, 3.88, 2.75)).withTimeout(.25)
+                    )
+             }
+
+
+//        fun pathRed(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+//            run {
+//                (drivetrain.poseEstimator.estimatedPosition)
+//                MoveToPosition(drivetrain, 14.66, 1.05, 180.0).withTimeout(1.0)
+//                    .andThen(SetManipulatorSpeed(manipulator, 1.0).withTimeout(1.0))
+//                    .andThen(Idle(elevator, arm).withTimeout(0.5).alongWith(SetManipulatorSpeed(manipulator, 0.0).withTimeout(0.5)))
+//                    .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
+//                    .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
+//            }
+
+        fun pathBlueAdvanced(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.estimatedPose2d)
+                // start
+                    // move arm into position
+                    SetPosition.high(elevator, arm)
+                        .withTimeout(3.0)
+                    //eject cube
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(3.0))
+                    // stop manipulator and move to idle
+                    .andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))
+                            // while this is happening, wait and then begin movement to fit position 1
+                            .alongWith(WaitCommand(0.5))
+                                .andThen(MoveToPosition(drivetrain, 3.22, 0.73,45.0).withTimeout(6.0))
+                                .andThen(MoveToPosition(drivetrain, 4.8,.66, 180.0).withTimeout(6.5))
+                            ).withTimeout(12.6)
+                    // move into deploy position and deploy
+                    .andThen(
+                        MoveToPosition(drivetrain, 5.72, 0.93, 180.0)
+                            // while moving, deploy
+                            .alongWith(
+                                IntakePositionForward(elevator, arm)
+                                    .alongWith(
+                                        SetManipulatorSpeed(manipulator, 1.0)
+                                            .withTimeout(1.5)
+                                    )
+                                    // withTimeout of total deploy time
+                                    .withTimeout(1.75)
+                            )
+                            //and then move to the should have intaked position
+                            .andThen(MoveToPosition(drivetrain, 6.66, 0.93))
+                    )
+                        .andThen(
+                            Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.1))
+                                // start moving back
+                                .alongWith(WaitCommand(0.5))
+                                .andThen(MoveToPosition(drivetrain, 4.8, .66, 0.0))
+                                .andThen(MoveToPosition(drivetrain, 1.95, 1.05, 0.0))
+                                .andThen(MoveToPosition(drivetrain, 1.87, 1.05, 0.0))
+                        ).withTimeout(15.0)
+                        //place
+                        .andThen(SetPosition.high(elevator, arm).withTimeout(1.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+            }
+
+        fun pathRedAdvanced(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
+            run {
+                (drivetrain.poseEstimator.estimatedPosition)
+                // start
+                    // move arm into position
+                    SetPosition.high(elevator, arm)
+                        .withTimeout(3.0)
+                    //eject cube
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    // stop manipulator and move to idle
+                    .andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0))
+                            // while this is happening, wait and then begin movement to fit position 1
+                            .alongWith(WaitCommand(0.5)
+                                .andThen(MoveToPosition(drivetrain, flipped(3.22), 0.73,45.0).withTimeout(1.5))
+                                .andThen(MoveToPosition(drivetrain, flipped(4.8),.66, 180.0).withTimeout(1.5))
+                            ).withTimeout(3.6)
+                    )
+                    // move into deploy position and deploy
+                    .andThen(
+                        MoveToPosition(drivetrain, flipped(5.72), 0.94, 180.0).withTimeout(1.0)
+                            // while moving, deploy
+                            .alongWith(
+                                IntakePositionForward(elevator, arm)
+                                    .alongWith(
+                                        SetManipulatorSpeed(manipulator, 1.0)
+                                        .withTimeout(1.5)
+                                    )
+                            )
+                            // withtimeout of total depoy time
+                            .withTimeout(1.75)
+                            //and then move to the should have intaked position
+                            .andThen(MoveToPosition(drivetrain, flipped(6.66),0.93).withTimeout(2.0))
+                    )
+                    .andThen(
+                        Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.1).withTimeout(5.0))
+                            // start moving back
+                            .alongWith(WaitCommand(0.5)
+                                .andThen(MoveToPosition(drivetrain, flipped(4.8), .66,0.0).withTimeout(1.75))
+                                .andThen(MoveToPosition(drivetrain, flipped(1.95), 1.05, 0.0).withTimeout(3.5))
+                                .andThen(MoveToPosition(drivetrain, flipped(1.87),1.05, 0.0).withTimeout(1.0))
+                            ).withTimeout(6.0)
+                    )
+                    //place
+                    .andThen(SetPosition.high(elevator, arm)
                         .withTimeout(3.0))
-                    .andThen(SetManipulatorSpeed(manipulator, 1.0, true).withTimeout(1.0))
-                    .andThen(Idle(elevator, arm, wrist).withTimeout(1.5).alongWith(SetManipulatorSpeed(manipulator, 0.0, true).withTimeout(0.5)))
-                    .andThen(MoveToPosition(drivetrain, 14.0,1.0, 180.0).withTimeout(1.0))
-                    .andThen(MoveToPosition(drivetrain, 10.5, 1.0, 180.0).withTimeout(6.0))
+                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
+                    .withTimeout(15.0)
             }
 
         fun snapToYValue(
             drivetrain: Drivetrain,
             y: () -> Double,
             yTolerance: Double = 0.1,
-            r: () -> Rotation2d = { drivetrain.poseEstimator.estimatedPosition.rotation },
+            r: () -> Rotation2d = { drivetrain.estimatedPose2d.rotation },
             rTolerance: Double = 0.1,
         ) =
             run {
-                (drivetrain.poseEstimator.estimatedPosition)
+                (drivetrain.estimatedPose2d)
                 MoveToPosition(
                     drivetrain,
                     {
                         Pose2d(
-                            drivetrain.poseEstimator.estimatedPosition.translation.x,
+                            drivetrain.estimatedPose2d.translation.x,
                             y(),
                             r()
                         )
@@ -277,18 +577,34 @@ class MoveToPosition(
             snapToYValue(
                 drivetrain,
                 {yValues().minByOrNull { value ->
-                    (value - drivetrain.poseEstimator.estimatedPosition.y).absoluteValue
-                }?: drivetrain.poseEstimator.estimatedPosition.y},
+                    (value - drivetrain.estimatedPose2d.y).absoluteValue
+                }?: drivetrain.estimatedPose2d.y},
                 yTolerance = 0.05,
                 {
                     Rotation2d.fromRadians(
                         rotValues().minByOrNull { value ->
-                            (value.mod(PI*2) - drivetrain.poseEstimator.estimatedPosition.rotation.radians.mod(PI*2)).absoluteValue
-                        }?: drivetrain.poseEstimator.estimatedPosition.rotation.radians
+                            (
+                                    MathUtil.angleModulus(value)
+                                            -
+                                            MathUtil.angleModulus(
+                                                drivetrain.estimatedPose2d.rotation.radians
+                                            )
+                                    ).absoluteValue
+                        }?: drivetrain.estimatedPose2d.rotation.radians
                     )
                 },
                 rTolerance = 0.15
             )
 
     }
+}
+//this function should be used when copying and pasting an auto function, and you need to flip the x-coordinates.
+fun flipped(x: Double): Double {
+    val newX: Double
+    if(x<8.3)
+        newX=8.3+(8.3-x)
+    else
+        newX=8.3-(x-8.3)
+
+    return newX
 }

@@ -3,12 +3,12 @@ package frc.robot.commands.manipulator
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.robot.subsystems.Manipulator
 
-class CloseManipulator(private val manipulator: Manipulator):InstantCommand() {
+class MaintainGamepiece(private val manipulator: Manipulator): InstantCommand() {
     init {
         addRequirements(manipulator)
     }
 
     override fun execute() {
-        manipulator.isOpen= false
+        SetManipulatorSpeed(manipulator, 0.1)
     }
 }

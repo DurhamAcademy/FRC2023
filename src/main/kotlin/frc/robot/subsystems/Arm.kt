@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.Constants
+import frc.kyberlib.command.Game
+import frc.robot.constants.arm
 //import frc.robot.utils.armFeedforward
 //import frc.robot.utils.createArmSystemPlant
 import java.lang.Math.PI
@@ -23,56 +24,55 @@ import java.lang.Math.toRadians
 
 class Arm : SubsystemBase() {
     val armMotor = CANSparkMax(
-        Constants.arm.motor.id,
+        arm.motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
         restoreFactoryDefaults()
-        setSmartCurrentLimit(Constants.arm.motor.currentLimit)
-        inverted = Constants.arm.motor.inverted
+        setSmartCurrentLimit(arm.motor.currentLimit)
+        inverted = arm.motor.inverted
         this.serialNumber
     }
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
-        Constants.arm.motor.gearRatio,
-        Constants.arm.momentOfInertia,
-        Constants.arm.length,
-        Constants.arm.minAngle,
-        Constants.arm.maxAngle,
+        arm.motor.gearRatio,
+        arm.momentOfInertia * 0.001,
+        arm.length * 0.5,
+        arm.minAngle,
+        arm.maxAngle,
         true
     )
 
-    val armEncoder = CANCoder(Constants.arm.encoder.id).apply {
+    val armEncoder = CANCoder(arm.encoder.id).apply {
         configFactoryDefault()
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        configMagnetOffset(-Constants.arm.encoder.offset)
-        configSensorDirection(Constants.arm.encoder.inverted)
+        configMagnetOffset(-arm.encoder.offset)
+        configSensorDirection(arm.encoder.inverted)
     }
     val armPID = ProfiledPIDController(
-        5.0,
-        0.0,
-        0.5,
+        arm.motor.kP,
+        arm.motor.kI,
+        arm.motor.kD,
         TrapezoidProfile.Constraints(
-            3.0,
-            1.0
+            arm.motor.maxVelocity,
+            arm.motor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            Constants.arm.motor.positionTolerance,
-            Constants.arm.motor.velocityTolerance
+            arm.motor.positionTolerance,
+            arm.motor.velocityTolerance
         )
     }
     var armFeedForward = ArmFeedforward(
-        Constants.arm.motor.kS,
-        Constants.arm.motor.kG,
-        Constants.arm.motor.kV,
-        Constants.arm.motor.kA
+        arm.motor.kS,
+        arm.motor.kG,
+        arm.motor.kV,
+        arm.motor.kA
     )
     var armOffset = Preferences.getDouble("armOffset", 0.0).apply {
         this@Arm.armEncoder
-            .configMagnetOffset(-this + Constants.arm.encoder.offset)
+            .configMagnetOffset(-this + arm.encoder.offset)
 
     }
-        get() = field
         set(value) {
             field = value
             if (Preferences.containsKey("armOffset")) {
@@ -81,17 +81,17 @@ class Arm : SubsystemBase() {
                 Preferences.initDouble("armOffset", value)
             }
             this@Arm.armEncoder
-                .configMagnetOffset(-value + Constants.arm.encoder.offset)
+                .configMagnetOffset(-value + arm.encoder.offset)
         }
 
     val armPosition: Double
-        get() = if (RobotBase.isSimulation()) simArmSystem.angleRads
+        get() = if (RobotBase.isSimulation()) armPID.setpoint.position//simArmSystem.angleRads
         else toRadians(armEncoder.absolutePosition)
     val armVelocity: Double
         get() = toRadians(armEncoder.velocity)
     private var armSetpoint: Double? = null
     fun setArmVoltage(voltage: Double) {
-        if (RobotBase.isSimulation()) simArmSystem.setInputVoltage(voltage)
+        if (Game.sim) simArmSystem.setInputVoltage(voltage)
         else armMotor.setVoltage(voltage)
     }
 
@@ -106,8 +106,8 @@ class Arm : SubsystemBase() {
      */
     fun setArmPosition(position: Double) {
         armSetpoint = position.coerceIn(
-            Constants.arm.minAngle,
-            Constants.arm.maxAngle
+            arm.minAngle,
+            arm.maxAngle
         )
     }
 
@@ -140,7 +140,7 @@ class Arm : SubsystemBase() {
     val dashSetpoint = ArmTab.add("dashSetpoint", 0.0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(
-            mapOf("min" to Constants.arm.minAngle, "max" to Constants.arm.maxAngle)
+            mapOf("min" to arm.minAngle, "max" to arm.maxAngle)
         )
         .entry
 
@@ -153,7 +153,7 @@ class Arm : SubsystemBase() {
             armPosition,
             armSetpoint ?: armPosition
         )
-        var FF = armFeedForward.calculate(
+        val FF = armFeedForward.calculate(
             // convert from 0 being horizontal arm to 0 being upright
             armPosition + (PI / 2),
             armPID.setpoint.velocity
@@ -162,7 +162,7 @@ class Arm : SubsystemBase() {
         val voltage = if (armSetpoint != null) {
             FF + calculate
         } else 0.0
-        setArmVoltage(voltage.coerceIn(-4.0, 4.0))
+        setArmVoltage(voltage)
 
         // Shuffleboard stuff
         ArmMotorVoltage.setDouble(voltage)

@@ -1,7 +1,12 @@
 {
-  "Keyboard 0 Settings": {
+  "Joysticks": {
     "window": {
-      "visible": true
+      "visible": false
+    }
+  },
+  "System Joysticks": {
+    "window": {
+      "visible": false
     }
   },
   "keyboardJoysticks": [
@@ -108,5 +113,6 @@
     {
       "guid": "Keyboard0"
     }
-  ]
+  ],
+  "useEstopHotkey": true
 }
