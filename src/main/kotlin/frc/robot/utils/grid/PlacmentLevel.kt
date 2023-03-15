@@ -13,6 +13,18 @@ object GridConstants {
 }
 
 /**
+ * This enum represents the different floor game pieces and their positions
+ *
+ * @param x the x value of the object
+ * @param y the y value of the object
+ */
+enum class FloorGamePiecePosition(val x: Double, val y: Double){
+    Closest(inchesToMeters(47.36), inchesToMeters(36.19)), //x 6.934 y 36.19 in
+    MiddleClose(inchesToMeters(47.36), inchesToMeters(84.19)), // 47.36in y + 48in
+    MiddleFar(inchesToMeters(47.36), inchesToMeters(132.19)), //y 3.517
+    Farthest(inchesToMeters(47.36), inchesToMeters(180.19)), //
+}
+/**
  * This enum represents the different levels of the field.
  *
  * @param depth the distance from the metal bars at the front of the grid to
