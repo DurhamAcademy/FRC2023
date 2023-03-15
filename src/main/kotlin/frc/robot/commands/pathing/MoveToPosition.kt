@@ -307,7 +307,7 @@ open class MoveToPosition(
                             {
                                 Pose2d(
                                     5.25,
-                                    if (((drivetrain.estimatedPose2d.rotation.radians.absoluteValue - PI).absoluteValue) > 0.5) 4.75 else 4.625,
+                                    if (true) 1.5 else 2.5,
                                     Rotation2d(
                                         if (drivetrain.estimatedPose2d.x > 3.5 || arm.armPosition.absoluteValue < 0.5) PI
                                         else 0.0

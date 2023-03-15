@@ -3,7 +3,6 @@ package frc.robot.controls
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import edu.wpi.first.wpilibj2.command.button.Trigger
-import kotlin.math.absoluteValue
 
 class BryanControlScheme(
     xboxNum: Int = 0
@@ -27,11 +26,13 @@ class BryanControlScheme(
     override val lowIntake = xbox.leftTrigger()
     override val highIntake = xbox.rightTrigger()
 
-//    override val toggleManipulator = xbox.povUp()
+    //    override val toggleManipulator = xbox.povUp()
     override val toggleManipulator: Trigger
         get() = xbox.povUp()
 
 
     override val moveToClosestHPS: Trigger = xbox.start()
     override val moveToClosestScoreStation: Trigger = xbox.back()
+
+    override val autoBalance: Trigger = xbox.leftStick()
 }

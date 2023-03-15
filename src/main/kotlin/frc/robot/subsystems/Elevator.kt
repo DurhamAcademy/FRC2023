@@ -26,6 +26,8 @@ import kotlin.math.sin
 class Elevator(
     val robotContainer: RobotContainer?
 ) : SubsystemBase() {
+    val limitSwitchPressed: Boolean
+        get() = !limitSwitch.get()
     val elevatorMotor = WPI_TalonFX(
         elevator.elevatorMotor.ElevatorMotorId
     ).apply {
@@ -71,6 +73,7 @@ class Elevator(
     var simOffset: Double =
         Math.random() * (elevator.limits.topLimit -
                 elevator.limits.bottomLimit) * 5
+
     var height: Double
         get() = if (RobotBase.isSimulation())
             elevatorSim.positionMeters// + simOffset + offset
@@ -181,6 +184,8 @@ class Elevator(
         )
         .entry
 
+    var zeroElevator = false
+
     override fun periodic() {
         SmartDashboard.putData("elevcmd", this)
         currentHeightEntry.setDouble(this.height)
@@ -188,14 +193,24 @@ class Elevator(
         if (Constants.fullDSControl)
             setpoint = heightEntry.getDouble(elevator.limits.bottomLimit)
         // set motor voltage
-        setMotorVoltage(
-            motorPid.calculate(
-                height,
-                setpoint
-            ) + feedforward.calculate(
-                motorPid.setpoint.velocity,
+        if (zeroElevator) {
+            setMotorVoltage(
+                motorPid.calculate(
+                    height,
+                    TrapezoidProfile.State(-50.0, 0.0),
+                    TrapezoidProfile.Constraints(0.2, 10.0)
+                )
             )
-        )
+        } else {
+            setMotorVoltage(
+                motorPid.calculate(
+                    height,
+                    setpoint
+                ) + feedforward.calculate(
+                    motorPid.setpoint.velocity,
+                )
+            )
+        }
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 
@@ -204,10 +219,10 @@ class Elevator(
         // check if its in teleop
 //        if (RobotController.getUserButton()) setMotorVoltage(0.0)
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
-        if (limitSwitch.get() != lastLimitSwitch) {
+        if (limitSwitchPressed != lastLimitSwitch) {
             this.height = elevator.limits.bottomLimit
         }
-        lastLimitSwitch = limitSwitch.get()
+        lastLimitSwitch = limitSwitchPressed
     }
 
     override fun simulationPeriodic() {
@@ -237,4 +252,6 @@ class Elevator(
         )
         // just set the motor voltage to the control scheme's output
     }
+
+
 }

@@ -26,8 +26,10 @@ import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.arm.SetArmToAngle
+import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ElevatorTestDown
 import frc.robot.commands.elevator.ElevatorTestUp
+import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
@@ -128,7 +130,11 @@ class RobotContainer {
 
                 // idle
                 idleConfiguration
-                    .whileTrue(SetPosition.idle(elevator, arm))
+                    .whileTrue(
+                        SetPosition.idle(elevator, arm, true)
+                            .andThen(ZeroElevatorAndIdle(elevator, arm))
+                            .andThen(SetPosition.idle(elevator, arm, false))
+                    )
                     .onFalse(HoldPosition(elevator, arm))
 
                 // assign l1
@@ -207,6 +213,9 @@ class RobotContainer {
                             }
                         )
                     )
+
+                autoBalance
+                    .whileTrue(AutoBalance(drivetrain))
 
 //                if (i == 0) {//warn: this is a hack VERY VERY BAD
 //                    //fixme dont do this
