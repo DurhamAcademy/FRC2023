@@ -81,8 +81,8 @@ fun getPlacementTransform(
     val allianceMultiplier = when (alliance) {
         Blue -> Axes.Blue.fieldOffsetMultiplier
         Red -> Axes.Red.fieldOffsetMultiplier
-        else -> 0.0
-    }
+        else -> throw IllegalArgumentException("Alliance is not Blue or Red")
+    }// fixme: refactor to use alliance.mulitplier
     val x = GridConstants.centerX + (GridConstants.centerDistX * allianceMultiplier) + level.depth
     val y = side.offset + group.offset
     val z = level.height
