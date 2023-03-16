@@ -1,8 +1,8 @@
 package frc.robot.constants
 
-import frc.kyberlib.math.units.extensions.inches
+import edu.wpi.first.math.util.Units
 
 object RobotProportions {
-    val length = 96.0.inches
-    val width = 92.0.inches
+    val width: Double = Units.inchesToMeters(32.0)
+    val length: Double = Units.inchesToMeters(36.0)
 }

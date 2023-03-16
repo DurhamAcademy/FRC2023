@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
@@ -18,20 +19,19 @@ import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
-import frc.robot.commands.alltogether.CollectObject
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.arm.SetArmToAngle
 import frc.robot.commands.balance.AutoBalance
-import frc.robot.commands.elevator.ElevatorTestDown
-import frc.robot.commands.elevator.ElevatorTestUp
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToCommunityZone
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.pickupObjectFromFloor
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -60,16 +60,16 @@ class RobotContainer {
         this
     )
     val manipulator = Manipulator()
-    val elevator = Elevator(this)
     val arm = Arm()
+    val elevator = Elevator(this, arm)
 
     val pdh = PowerDistribution(PDH.id, kRev)
 
     init {
         arrayOf(controlSchemeA, controlSchemeB).forEachIndexed { i, it ->
             it.run {
-                xbox!!.a().whileTrue(ElevatorTestUp(elevator))
-                xbox!!.b().whileTrue(ElevatorTestDown(elevator))
+//                xbox!!.a().whileTrue(ElevatorTestUp(elevator))
+//                xbox!!.b().whileTrue(ElevatorTestDown(elevator))
                 // assign the go to april tag 1 trigger to the command that
                 // moves the robot to the april tag
                 testGoToAprilTag1
@@ -145,7 +145,6 @@ class RobotContainer {
                     .whileTrue(
                         SetPosition.setpoint(PlacmentLevel.Level1, this@RobotContainer)
                     )
-                    println("ran manipulaot rhehe")
 
                 // assign l2
                 placeLvl2
@@ -162,24 +161,37 @@ class RobotContainer {
                 // assign intake
                 lowIntake
                     .whileTrue(
-                        IntakePositionForward(elevator, arm)
-                            .withManipulator(manipulator)
-                    ).onFalse(HoldPosition(elevator, arm))
+                        IntakePositionForward(elevator, arm, false)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 1.0)
+                            )
+                    ).onFalse(HoldPosition(elevator, arm)
+                        .alongWith(
+                            SetManipulatorSpeed(manipulator, 0.1)
+                        )
+                    )
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
-                    .whileTrue(SetManipulatorSpeed(manipulator, -1.0))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -0.2))
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 intake
                     .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 highIntake
                     .whileTrue(
                         SetPosition.humanPlayer(elevator, arm)
-                            .alongWith(CollectObject(manipulator))
-                            // previous setposition command was finishing before the race would actually work
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 1.0)
+                            )
+                    )
+                    .onFalse(
+                        HoldPosition(elevator, arm)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.1)
+                            )
                     )
 
                 moveToClosestHPS
@@ -402,6 +414,7 @@ class RobotContainer {
         // armLen * sin(armAngle) = z
         val armX = armLength * sin(armAngle)
         val armZ = armLength * cos(armAngle)
+        if(armZ + elevator.height > inchesToMeters(76.0)){ elevator.setpoint = inchesToMeters(76.0) - armZ }
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(
