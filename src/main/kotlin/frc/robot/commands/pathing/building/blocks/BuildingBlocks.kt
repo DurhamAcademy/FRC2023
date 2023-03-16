@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
 import frc.kyberlib.command.Game
-import frc.kyberlib.math.units.extensions.meters
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
@@ -15,15 +14,11 @@ import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
-import java.security.InvalidParameterException
 import kotlin.math.*
-import kotlin.math.abs
-import kotlin.math.absoluteValue
 import frc.robot.constants.RobotProportions.length as robotLength
 
-
 object BuildingBlocks {
-    val alliance: () -> DriverStation.Alliance = { Game.alliance },
+    val alliance: () -> DriverStation.Alliance = { Game.alliance }
     val exitFalseGoalPoint: () -> Double = {
         when (alliance()) {
             Red -> 10.53
@@ -33,23 +28,21 @@ object BuildingBlocks {
     }
     val clearUp = 4.675 //Y value above charge station
     val clearDown = 1.169//Y value below charge station
-    val middleX: () -> Double ={
-        when(alliance()){
+    val exitPoint: () -> Double = {
+        xCenter + (((robotLength / 2.0) + 3.0) * -alliance().xMul)
+    }
+    val middleX: () -> Double = {
+        when (alliance()) {
             Red -> 12.0
-        val exitPoint: () -> Double = {
-            xCenter + (((robotLength / 2.0) + 3.0.meters).meters * -alliance().xMul)
-        }
-        val middleX: () -> Double = {
-            when (alliance()) {
-                Red -> 13.4
             Blue -> 2.5
             Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
         }
     }
+
     fun pickupObjectFromFloor(
         drivetrain: Drivetrain,
-        position: FloorGamePiecePosition
-    ): MoveToPosition{
+        position: FloorGamePiecePosition,
+    ): MoveToPosition {
         var firstRun = true
         var posX = 0.0
         var posY = 0.0
@@ -176,7 +169,7 @@ object BuildingBlocks {
     ): Command {
         val upperYValue = 4.675
         val lowerYValue = 1.169
-        val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 4.8.meters).meters * -alliance().xMul) }
+        val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 4.8) * -alliance().xMul) }
         val isInGridZone: () -> Boolean = {
             when (alliance()) {
                 Red -> drivetrain.estimatedPose2d.x > chargeLimit()
@@ -187,7 +180,7 @@ object BuildingBlocks {
         val placementX: () -> Double = {
             when(level){
                 //TODO fill in values (replace 5.2)
-                PlacmentLevel.Level1 -> xCenter + (((robotLength / 2.0) + 5.2.meters).meters * -alliance().xMul)
+                PlacmentLevel.Level1 -> xCenter + (((robotLength / 2.0) + 5.2) * -alliance().xMul)
                 PlacmentLevel.Level2 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
                 PlacmentLevel.Level3 -> xCenter + (((robotLength / 2) + 5.3) * -alliance().xMul)
             }
@@ -219,9 +212,9 @@ object BuildingBlocks {
         }
         val placementX: () -> Double = {
             if (isInCommunityZone())
-                xCenter + (((robotLength / 2.0) + (-5.22).meters).meters * -alliance().xMul)
+                xCenter + (((robotLength / 2.0) + (-5.22)) * -alliance().xMul)
             else
-                xCenter + (((robotLength / 2.0) + (-6.0).meters).meters * -alliance().xMul)
+                xCenter + (((robotLength / 2.0) + (-6.0)) * -alliance().xMul)
         }
         val placementY = 6.4
         return MoveToPosition(
@@ -234,7 +227,7 @@ object BuildingBlocks {
                 )
             }
         ).until {
-            drivetrain.estimatedPose2d.x < xCenter + (((robotLength / 2.0) + (-5.22).meters).meters * -alliance().xMul)
+            drivetrain.estimatedPose2d.x < (xCenter + (((robotLength / 2.0) + (-5.22)) * -alliance().xMul))
         }
     }
 }
