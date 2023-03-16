@@ -33,6 +33,7 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.pickupObjectFromFloor
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -41,6 +42,7 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
+import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
@@ -69,8 +71,8 @@ class RobotContainer {
     init {
         arrayOf(controlSchemeA, controlSchemeB).forEachIndexed { i, it ->
             it.run {
-                xbox!!.a().whileTrue(ElevatorTestUp(elevator))
-                xbox!!.b().whileTrue(ElevatorTestDown(elevator))
+//                xbox!!.a().whileTrue(ElevatorTestUp(elevator))
+//                xbox!!.b().whileTrue(ElevatorTestDown(elevator))
                 // assign the go to april tag 1 trigger to the command that
                 // moves the robot to the april tag
                 testGoToAprilTag1
@@ -162,7 +164,7 @@ class RobotContainer {
                 // assign intake
                 lowIntake
                     .whileTrue(
-                        IntakePositionForward(elevator, arm)
+                        IntakePositionForward(elevator, arm, false)
                             .alongWith(
                                 SetManipulatorSpeed(manipulator, 1.0)
                             )
@@ -174,7 +176,7 @@ class RobotContainer {
 
                 // assign outtake to set manipulator speed to -0.5
                 outtake
-                    .whileTrue(SetManipulatorSpeed(manipulator, -0.15))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -0.2))
                     .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 intake
@@ -374,7 +376,7 @@ class RobotContainer {
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
         addOption("1", goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.CloseCone))
-        addOption("2", goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube))
+        addOption("2", pickupObjectFromFloor(drivetrain, FloorGamePiecePosition.Farthest))
         addOption("3", leaveCommunityZone(drivetrain, arm))
     }
 

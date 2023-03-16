@@ -51,7 +51,7 @@ class SetPosition(
         fun high(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,
             arm,
-            1.4,
+            1.32,
             frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0),
             Math.toRadians(-30.0),
             stopAtEnd
@@ -60,7 +60,7 @@ class SetPosition(
         fun mid(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,
             arm,
-            1.4,
+            1.32,
             inchesToMeters(38.0),
             Math.toRadians(-30.0),
             stopAtEnd
