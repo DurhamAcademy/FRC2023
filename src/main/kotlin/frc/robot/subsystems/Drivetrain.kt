@@ -371,10 +371,8 @@ fun ChassisSpeeds.slewLimited(
     xSlewRateLimiter: SlewRateLimiter,
     ySlewRateLimiter: SlewRateLimiter,
     rotSlewRateLimiter: SlewRateLimiter,
-): ChassisSpeeds {
-    return ChassisSpeeds(
-        xSlewRateLimiter.calculate(this.vxMetersPerSecond),
-        ySlewRateLimiter.calculate(this.vyMetersPerSecond),
-        rotSlewRateLimiter.calculate(this.omegaRadiansPerSecond)
-    )
-}
+) = ChassisSpeeds(
+    xSlewRateLimiter.calculate(this.vxMetersPerSecond),
+    ySlewRateLimiter.calculate(this.vyMetersPerSecond),
+    rotSlewRateLimiter.calculate(this.omegaRadiansPerSecond)
+)

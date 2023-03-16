@@ -2,7 +2,6 @@ package frc.kyberlib.lighting
 
 import edu.wpi.first.wpilibj.AddressableLED
 import edu.wpi.first.wpilibj.AddressableLEDBuffer
-import edu.wpi.first.wpilibj.util.Color8Bit
 import frc.kyberlib.command.Game
 import java.awt.Color
 
@@ -25,9 +24,9 @@ class KLEDStrip(port: Int, private val length: Int) {
     }
 
     operator fun plusAssign(other: KLEDRegion) {
-        require(other.end > other.start)
-        require(other.start >= 0)
-        require(other.end <= length)
+        require(other.end > other.start, { "Region end must be greater than start" })
+        require(other.start >= 0, { "Region start must be greater than or equal to 0" })
+        require(other.end <= length, { "Region end must be less than or equal to the length of the strip" })
 
         regions.add(other)
     }

@@ -112,36 +112,32 @@ class Arm : SubsystemBase() {
     }
 
     // shuffleboard
-    val ArmTab = Shuffleboard.getTab("Arm")
-    val ArmMotorVoltage = ArmTab.add("Arm Motor Voltage", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
+    val armTab = Shuffleboard.getTab("Arm")
+    val voltageEntry = armTab.add("Arm Motor Voltage", 0.0)
+        .withWidget(BuiltInWidgets.kVoltageView)
         .withProperties(
             mapOf("min" to -12.0, "max" to 12.0)
         )
+        .withPosition(2, 0)
+        .withSize(4, 2)
         .entry
-    val ArmMotorPosition = ArmTab.add("Arm Motor Setpoint", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(
-            mapOf("min" to -1.0, "max" to 1.0)
-        )
-        .entry
-    val ArmFFMotorPosition = ArmTab.add("ArmFFMotorPosition", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(
-            mapOf("min" to -12.0, "max" to 12.0)
-        )
-        .entry
-    val ArmPIDMotorPosition = ArmTab.add("ArmPIDMotorPosition", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(
-            mapOf("min" to -12.0, "max" to 12.0)
-        )
-        .entry
-    val dashSetpoint = ArmTab.add("dashSetpoint", 0.0)
-        .withWidget(BuiltInWidgets.kNumberSlider)
+
+    val positionEntry = armTab.add("Position", 0.0)
+        .withWidget(BuiltInWidgets.kDial)
         .withProperties(
             mapOf("min" to arm.minAngle, "max" to arm.maxAngle)
         )
+        .withPosition(2, 2)
+        .withSize(4, 4)
+        .entry
+
+    val currentSetpointEntry = armTab.add("Current Setpoint", 0.0)
+        .withWidget(BuiltInWidgets.kDial)
+        .withProperties(
+            mapOf("min" to arm.minAngle, "max" to arm.maxAngle)
+        )
+        .withPosition(2, 6)
+        .withSize(4, 4)
         .entry
 
     override fun periodic() {
@@ -153,34 +149,25 @@ class Arm : SubsystemBase() {
             armPosition,
             armSetpoint ?: armPosition
         )
-        val FF = armFeedForward.calculate(
+        val feedForwardPower = armFeedForward.calculate(
             // convert from 0 being horizontal arm to 0 being upright
             armPosition + (PI / 2),
             armPID.setpoint.velocity
         )
 
         val voltage = if (armSetpoint != null) {
-            FF + calculate
+            feedForwardPower + calculate
         } else 0.0
         setArmVoltage(voltage)
 
         // Shuffleboard stuff
-        ArmMotorVoltage.setDouble(voltage)
-
-        SmartDashboard.putNumber("arm/SPVel", armPID.setpoint.velocity)
-        SmartDashboard.putNumber("arm/SPErr", armPID.setpoint.position)
-
-        ArmFFMotorPosition.setDouble(FF)
-        ArmPIDMotorPosition.setDouble(calculate)
-
-
-        // SmartDashboard stuff
-        SmartDashboard.putNumber("arm/Position", armPosition)
-        SmartDashboard.putNumber("arm/Velocity", armVelocity)
-        SmartDashboard.putNumber("arm/Setpoint", armSetpoint ?: -1000.0)
+        voltageEntry.setDouble(voltage)
+        positionEntry.setDouble(armPosition)
+        currentSetpointEntry.setDouble(armPID.setpoint.position)
     }
 
     override fun simulationPeriodic() {
         simArmSystem.update(0.02)
     }
+
 }

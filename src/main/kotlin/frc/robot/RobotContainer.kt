@@ -14,15 +14,16 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
+import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
-import frc.robot.commands.arm.SetArmToAngle
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -33,11 +34,13 @@ import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZ
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
+import frc.robot.controls.ChrisControlScheme
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
+import frc.robot.utils.GamePiece.*
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
@@ -47,13 +50,13 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class RobotContainer {
-    val controlSchemeA: ControlScheme = BryanControlScheme(0)//xbox)
-    val controlSchemeB: ControlScheme = BryanControlScheme(1)//xbox)
+    val controlScheme0: ControlScheme = ChrisControlScheme(0)
+    val controlScheme1: ControlScheme = BryanControlScheme(1)
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
 
     val drivetrain = Drivetrain(
-        controlSchemeA,
+        controlScheme0,
         cameraWrappers = listOf(cameraWrapper),
         this
     )
@@ -64,79 +67,19 @@ class RobotContainer {
     val pdh = PowerDistribution(PDH.id, kRev)
 
     init {
-        arrayOf(controlSchemeA, controlSchemeB).forEachIndexed { i, it ->
+        arrayOf(controlScheme0, controlScheme1).forEachIndexed { i, it ->
             it.run {
-//                xbox!!.a().whileTrue(ElevatorTestUp(elevator))
-//                xbox!!.b().whileTrue(ElevatorTestDown(elevator))
-                // assign the go to april tag 1 trigger to the command that
-                // moves the robot to the april tag
-                testGoToAprilTag1
-                    .whileTrue(
-                        MoveToPosition(drivetrain, 14.5, 1.0, 0.0)
-                    )
-
-                // assign the go-to zero zero trigger to the command that
-                // moves the robot to (0, 0)
-                testGoToZeroZero
-                    .whileTrue(
-                        MoveToPosition(drivetrain, 0.0, 0.0, 0.0)
-                    )
-
-                // assign the arm 90 trigger to the command that
-                // moves the arm to 90 degrees
-                testArm90
-                    .whileTrue(
-                        SetArmToAngle(arm, PI / 2)
-                    )
-                testArm0
-                    .whileTrue(
-                        SetArmToAngle(arm, 0.0)
-                    )
-                testArmNeg90
-                    .whileTrue(
-                        SetArmToAngle(arm, -PI / 2)
-                    )
-
-                // assign the wrist 90 trigger to the command that
-                // moves the wrist to 90 degrees
-//                testWrist90
-//                    .whileTrue(
-//                        SetWristAngle(wrist, PI / 2)
-//                    )
-//                testWrist0
-//                    .whileTrue(
-//                        //                    OpenManipulator(manipulator)
-//                        //                        .andThen(
-//                        SetManipulatorSpeed(manipulator, -0.1)//)
-//                    )
-//                testWristNeg90
-//                    .whileTrue(
-//                        SetWristAngle(wrist, -PI / 2)
-//                    )
-
-                // assign the open manipulator trigger to the command that
-                // opens the manipulator
-
-
                 toggleManipulator
                     .onTrue(
                         SetManipulatorSpeed(manipulator, 0.0)
                     )
 
-                // assign the grab cone trigger to the command that
-                // grabs a cone
-
-                // assign the hold cone trigger to the command that
-                // holds a cone
-
-                // idle
                 idleConfiguration
                     .whileTrue(
                         SetPosition.idle(elevator, arm, true)
                             .andThen(ZeroElevatorAndIdle(elevator, arm))
                             .andThen(SetPosition.idle(elevator, arm, false))
                     )
-                    .onFalse(HoldPosition(elevator, arm))
 
                 // assign l1
                 placeLvl1
@@ -148,37 +91,31 @@ class RobotContainer {
                 placeLvl2
                     .whileTrue(
                         SetPosition.setpoint(PlacmentLevel.Level2, this@RobotContainer)
-                    ).onFalse(HoldPosition(elevator, arm))
+                    )
 
                 // assign l3
                 placeLvl3
                     .whileTrue(
                         SetPosition.setpoint(PlacmentLevel.Level3, this@RobotContainer)
-                    ).onFalse(HoldPosition(elevator, arm))
+                    )
 
                 // assign intake
                 lowIntake
                     .whileTrue(
-                        IntakePositionForward(elevator, arm, false)
-                            .alongWith(
-                                SetManipulatorSpeed(manipulator, 1.0)
-                            )
-                    ).onFalse(HoldPosition(elevator, arm)
-                        .alongWith(
-                            SetManipulatorSpeed(manipulator, 0.1)
-                        )
+                        IntakePositionForward(elevator, arm)
+                            .alongWith(SetManipulatorSpeed(manipulator, 1.0))
                     )
 
                 // assign outtake to set manipulator speed to -0.5
-                outtake
+                spinIntakeOut
                     .whileTrue(SetManipulatorSpeed(manipulator, -0.2))
                     .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
-                intake
+                spinIntakeIn
                     .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
                     .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
-                highIntake
+                intakeHPS
                     .whileTrue(
                         SetPosition.humanPlayer(elevator, arm)
                             .alongWith(
@@ -192,7 +129,7 @@ class RobotContainer {
                             )
                     )
 
-                moveToClosestHPS
+                moveToClosestHPSAxis
                     .whileTrue(
                         MoveToPosition.snapToScoring(
                             drivetrain,
@@ -209,7 +146,8 @@ class RobotContainer {
                             }
                         )
                     )
-                moveToClosestScoreStation
+
+                moveToClosestScoreStationAxis
                     .whileTrue(
                         MoveToPosition.snapToScoring(
                             drivetrain,
@@ -217,12 +155,11 @@ class RobotContainer {
                                 return@snapToScoring Field2dLayout.Axes.YInt.score.toList()
                             },
                             {
-                                return@snapToScoring if (Game.alliance == DriverStation.Alliance.Blue)
-                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
-                                else if (Game.alliance == DriverStation.Alliance.Red)
-                                    listOf(PI, -PI)
-                                else
-                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                return@snapToScoring when (Game.alliance) {
+                                    DriverStation.Alliance.Blue -> listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                    DriverStation.Alliance.Red -> listOf(PI, -PI)
+                                    else -> listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                }
                             }
                         )
                     )
@@ -230,28 +167,14 @@ class RobotContainer {
                 autoBalance
                     .whileTrue(AutoBalance(drivetrain))
 
-//                if (i == 0) {//warn: this is a hack VERY VERY BAD
-//                    //fixme dont do this
-//                    xbox!!.povLeft().onTrue(
-//                        InstantCommand({
-//                            arm.armOffset += 5.0
-//                        }, arm).ignoringDisable(true)
-//                    )
-//                    xbox!!.povRight().onTrue(
-//                        InstantCommand({
-//                            arm.armOffset -= 5.0
-//                        }, arm).ignoringDisable(true)
-//                    )
-//                } else {
-//                    xbox!!.povLeft().onTrue(
-//                        InstantCommand({
-//                            this@RobotContainer.wantingObject =
-//                                if (this@RobotContainer.wantingObject == GamePiece.cube)
-//                                    GamePiece.cone
-//                                else GamePiece.cube
-//                        }, NoSubsystem).ignoringDisable(true)
-//                    )
-//                }
+                ledColor.onTrue(InstantCommand({
+                    when (this@RobotContainer.wantedObject) {
+                        none -> this@RobotContainer.wantedObject = cone
+                        cone -> this@RobotContainer.wantedObject = cube
+                        cube -> this@RobotContainer.wantedObject = none
+                        else -> this@RobotContainer.wantedObject = none
+                    }
+                }))
             }
         }
     }
@@ -273,32 +196,37 @@ class RobotContainer {
 
     private val lightStatus: LightStatus
         get() = when {
-            !DriverStation.isDSAttached() -> LightStatus.NoDriverStation
+            !DriverStation.isDSAttached() -> NoDriverStation
             Game.disabled -> {
                 if (Game.COMPETITION) when (Game.alliance) {
-                    Red -> LightStatus.DisabledFMSRed
-                    Blue -> LightStatus.DisabledFMSBlue
-                    else -> LightStatus.DisabledNoFMS
-                } else LightStatus.DisabledNoFMS
+                    Red -> DisabledFMSRed
+                    Blue -> DisabledFMSBlue
+                    else -> DisabledNoFMS
+                } else DisabledNoFMS
             }
-            Game.STOPPED -> LightStatus.EStopped
+
+            Game.STOPPED -> EStopped
             Game.AUTO -> if (Game.COMPETITION) when (Game.alliance) {
-                Red -> LightStatus.AutoFMSRed
-                Blue -> LightStatus.AutoFMSBlue
-                else -> LightStatus.AutoNoFMS
-            } else LightStatus.AutoNoFMS
+                Red -> AutoFMSRed
+                Blue -> AutoFMSBlue
+                else -> AutoNoFMS
+            } else AutoNoFMS
+
             Game.OPERATED -> if (Game.COMPETITION) {
                 when (Game.alliance) {
-                    Red -> LightStatus.TeleopFMSRed
-                    Blue -> LightStatus.TeleopFMSBlue
-                    else -> LightStatus.TeleopNoFMS
+                    Red -> TeleopFMSRed
+                    Blue -> TeleopFMSBlue
+                    else -> TeleopNoFMS
                 }
             } else {
-                LightStatus.TeleopNoFMS
+                TeleopNoFMS
             }
 
             else -> LightStatus.unknown
         }
+
+    var wantedObject = none
+
     val leds = KLEDStrip(9, frc.robot.constants.leds.count).apply {
         val coral = Color(255, 93, 115)
         val coneColor = Color(255, 255, 0)
@@ -310,59 +238,81 @@ class RobotContainer {
         // idle alliance animations
         val noFMSDisabled =
             AnimationRGBWave(1.0, 0.05.seconds)
-            {lightStatus == LightStatus.DisabledNoFMS}
+            { lightStatus == DisabledNoFMS }
         val fmsRedDisabled =
             AnimationPulse(allianceRed, 1.0.seconds)
-            {lightStatus == LightStatus.DisabledFMSRed}
+            { lightStatus == DisabledFMSRed }
         val fmsBlueDisabled =
             AnimationPulse(allianceBlue, 1.0.seconds)
-            {lightStatus == LightStatus.DisabledFMSBlue}
+            { lightStatus == DisabledFMSBlue }
         val eStopped =
             AnimationBlink(Color.red, 0.5.seconds)
-            {lightStatus == LightStatus.EStopped}
+            { lightStatus == EStopped }
         val autoNoFMS =
             AnimationBlink(Color.white, 0.5.seconds)
-            {lightStatus == LightStatus.AutoNoFMS}
+            { lightStatus == AutoNoFMS }
         val autoFMSRed =
             AnimationLightsaber(allianceRed)
-            {lightStatus == LightStatus.AutoFMSRed}
+            { lightStatus == AutoFMSRed }
         val autoFMSBlue =
             AnimationLightsaber(allianceBlue)
-            {lightStatus == LightStatus.AutoFMSBlue}
-        val teleopNoFMS =
+            { lightStatus == AutoFMSBlue }
+        val teleopNoFMSRed =
             AnimationCylon(
-                (
-                        if (Game.alliance == Red)
-                            allianceRed
-                        else
-                            allianceBlue
-                        ),
-                5, 2.0.seconds, true
+                allianceRed,
+                10,
+                2.0.seconds,
+                true
             )
-            {lightStatus == LightStatus.TeleopNoFMS}
+            { lightStatus == TeleopNoFMS && Game.alliance == Red }
+        val teleopNoFMSBlue =
+            AnimationCylon(
+                allianceBlue,
+                10,
+                2.0.seconds,
+                true
+            )
+            { lightStatus == TeleopNoFMS && Game.alliance == Blue }
         val teleopFMSRed =
             AnimationSparkle(allianceRed)
-            {lightStatus == LightStatus.TeleopFMSRed}
+            { lightStatus == TeleopFMSRed && wantedObject == none }
         val teleopFMSBlue =
             AnimationSparkle(allianceBlue)
-            {lightStatus == LightStatus.TeleopFMSBlue}
-
+            { lightStatus == TeleopFMSBlue && wantedObject == none }
+        val teleopCone = AnimationSolid(coneColor, true) {
+            when (lightStatus) {
+                TeleopFMSRed -> true
+                TeleopFMSBlue -> true
+                TeleopNoFMS -> true
+                else -> false
+            } && (wantedObject == cone)
+        }
+        val teleopCube = AnimationSolid(cubeColor, true) {
+            when (lightStatus) {
+                TeleopFMSRed -> true
+                TeleopFMSBlue -> true
+                TeleopNoFMS -> true
+                else -> false
+            } && (wantedObject == cube)
+        }
         val noDriverStation =
             AnimationSparkle(Color.orange)
-            {lightStatus == LightStatus.NoDriverStation}
+            { lightStatus == NoDriverStation }
 
         val nothing =
-            AnimationPulse(Color.white.withAlpha(20) *0.2, 1.0.seconds, true)
-            { lightStatus == LightStatus.unknown || lightStatus == LightStatus.TeleopNoFMS }
+            AnimationPulse(Color.white.withAlpha(20) * 0.2, 1.0.seconds, true)
+            { lightStatus == LightStatus.unknown || lightStatus == TeleopNoFMS }
 
 
-        val chain = KLEDRegion(
-            0, frc.robot.constants.leds.count,
-            noFMSDisabled, fmsRedDisabled, fmsBlueDisabled, eStopped,
-            autoNoFMS, autoFMSRed, autoFMSBlue, noDriverStation, teleopNoFMS,
-            teleopFMSRed, teleopFMSBlue, nothing
+        val body = KLEDRegion(
+            0,
+            frc.robot.constants.leds.count,
+            noFMSDisabled, fmsRedDisabled, fmsBlueDisabled, eStopped, autoNoFMS,
+            autoFMSRed, autoFMSBlue, noDriverStation, teleopCone, teleopCube,
+            teleopFMSRed, teleopFMSBlue, teleopNoFMSRed, teleopNoFMSBlue,
+            nothing,
         )
-        this += (chain)
+        this += body
     }
 
     val auto: Command
