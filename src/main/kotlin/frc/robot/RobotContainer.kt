@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
@@ -13,9 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.ConditionalCommand
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -23,12 +21,16 @@ import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.SetManipulatorSpeed
-import frc.robot.commands.alltogether.CollectObject
+import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToCommunityZone
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -39,7 +41,7 @@ import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.GamePiece.*
-import frc.robot.utils.grid.PlacmentLevel
+import frc.robot.utils.grid.*
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -57,8 +59,8 @@ class RobotContainer {
         this
     )
     val manipulator = Manipulator()
-    val elevator = Elevator(this)
     val arm = Arm()
+    val elevator = Elevator(this, arm)
 
     val pdh = PowerDistribution(PDH.id, kRev)
 
@@ -104,18 +106,25 @@ class RobotContainer {
 
                 // assign outtake to set manipulator speed to -0.5
                 spinIntakeOut
-                    .whileTrue(SetManipulatorSpeed(manipulator, -1.0))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, -0.2))
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 spinIntakeIn
                     .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 intakeHPS
                     .whileTrue(
                         SetPosition.humanPlayer(elevator, arm)
-                            .alongWith(CollectObject(manipulator))
-                            // previous setposition command was finishing before the race would actually work
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 1.0)
+                            )
+                    )
+                    .onFalse(
+                        HoldPosition(elevator, arm)
+                            .alongWith(
+                                SetManipulatorSpeed(manipulator, 0.1)
+                            )
                     )
 
                 moveToClosestHPSAxis
@@ -305,27 +314,21 @@ class RobotContainer {
     }
 
     val auto: Command
-    get() = autoChooser.selected
+        get() = autoChooser.selected
 
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
-        setDefaultOption("1", ConditionalCommand(
-            MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator),
-            ConditionalCommand(
-                MoveToPosition.swerveBrokenAuto(drivetrain, elevator, arm, manipulator),
-                PrintCommand("UKNOWN ALLIANCE ${Game.alliance}")
-            ) { Game.alliance == Blue }
-        ) { Game.alliance == Red })
         addOption(
-            "1", MoveToPosition.swerveBrokenAuto(
-                drivetrain,
-                elevator,
-                arm,
-                manipulator
-            )
+            "1",
+            goToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone)
         )
-        addOption("2", MoveToPosition.blueauto2(drivetrain, elevator, arm, manipulator))
-        addOption("3", MoveToPosition.blueauto3(drivetrain, elevator, arm, manipulator))
+        addOption(
+            "2",
+            goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+                .andThen(leaveCommunityZone(drivetrain, arm))
+                .andThen(goToCommunityZone(drivetrain))
+        )
+        addOption("3", leaveCommunityZone(drivetrain, arm))
     }
 
     // shuffleboard auto chooser
@@ -357,6 +360,7 @@ class RobotContainer {
         // armLen * sin(armAngle) = z
         val armX = armLength * sin(armAngle)
         val armZ = armLength * cos(armAngle)
+        if(armZ + elevator.height > inchesToMeters(76.0)){ elevator.setpoint = inchesToMeters(76.0) - armZ }
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(

@@ -4,9 +4,6 @@
       "0": {
         "columns": 75,
         "serpentine": true
-      },
-      "window": {
-        "visible": true
       }
     },
     "Other Devices": {
@@ -44,6 +41,9 @@
         "header": {
           "open": true
         }
+      },
+      "window": {
+        "visible": false
       }
     },
     "PowerDistributions": {
@@ -53,9 +53,9 @@
         }
       }
     },
-    "RoboRIO": {
+    "Timing": {
       "window": {
-        "visible": true
+        "visible": false
       }
     }
   },
@@ -166,22 +166,7 @@
       "/SmartDashboard/huhhh": "Subsystem"
     },
     "windows": {
-      "/FMSInfo": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/LiveWindow/Ungrouped/Scheduler": {
-        "window": {
-          "visible": true
-        }
-      },
       "/Shuffleboard/Autonomous/Autonomous": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Drivetrain/sendable": {
         "window": {
           "visible": true
         }
@@ -221,10 +206,6 @@
           "length": 0.10000000149011612,
           "style": "Hidden",
           "width": 0.10000000149011612
-        },
-        "image": "/Users/24wilber/Documents/Code/FRC2023/field/2023-field.png",
-        "window": {
-          "visible": true
         }
       }
     }
@@ -322,8 +303,7 @@
     },
     "Server": {
       "open": true
-    },
-    "visible": true
+    }
   },
   "NetworkTables View": {
     "visible": false
