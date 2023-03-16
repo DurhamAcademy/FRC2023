@@ -14,13 +14,13 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
-import frc.robot.commands.SetManipulatorSpeed
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
@@ -41,7 +41,9 @@ import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.GamePiece.*
-import frc.robot.utils.grid.*
+import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementSide
+import frc.robot.utils.grid.PlacmentLevel
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -101,7 +103,7 @@ class RobotContainer {
                 lowIntake
                     .whileTrue(
                         IntakePositionForward(elevator, arm)
-                            .withManipulator(manipulator)
+                            .alongWith(SetManipulatorSpeed(manipulator, 1.0))
                     )
 
                 // assign outtake to set manipulator speed to -0.5

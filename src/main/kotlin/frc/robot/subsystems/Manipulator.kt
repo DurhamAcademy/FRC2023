@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.commands.SetManipulatorSpeed
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.constants.manipulator.motorId
 import frc.robot.utils.GamePiece
 import kotlin.math.pow

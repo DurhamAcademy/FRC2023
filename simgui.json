@@ -177,9 +177,6 @@
         },
         "elevator": {
           "style": "Line"
-        },
-        "window": {
-          "visible": true
         }
       },
       "/SmartDashboard/field": {
@@ -206,6 +203,9 @@
           "length": 0.10000000149011612,
           "style": "Hidden",
           "width": 0.10000000149011612
+        },
+        "window": {
+          "visible": true
         }
       }
     }
