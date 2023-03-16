@@ -19,7 +19,7 @@ class IntakePositionForward(
     }
 
     override fun execute() {
-        val armAngle = degreesToRadians(115.0)
+        val armAngle = degreesToRadians(104.0)
 //        wrist.setpoint
         arm.setArmPosition(armAngle)
         //Solver.getWristPose(0.0, armAngle, armAngle - PI / 2)
