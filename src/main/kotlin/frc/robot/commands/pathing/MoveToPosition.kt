@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand
-import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.alltogether.Idle
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
@@ -224,10 +224,6 @@ open class MoveToPosition(
 
     override fun end(interrupted: Boolean) {
         drivetrain.drive(ChassisSpeeds(), true)
-        // reset the PID controllers
-        xPIDController.reset(0.0, 0.0)
-        yPIDController.reset(0.0, 0.0)
-        rPIDController.reset(0.0, 0.0)
     }
 
     val flipped: MoveToPosition
@@ -245,17 +241,6 @@ open class MoveToPosition(
         const val rP = 4.0
         const val yP = 2.25
         const val xP = 2.25
-    /*
-        fun pathBlue(drivetrain: Drivetrain, elevator: Elevator, arm: Arm, manipulator: Manipulator) =
-            run {
-                (drivetrain.poseEstimator.estimatedPosition)
-                    SetPosition.high(elevator, arm)
-                        .withTimeout(3.0)
-                    .andThen(SetManipulatorSpeed(manipulator, -1.0).withTimeout(1.0))
-                    .andThen(Idle(elevator, arm).alongWith(SetManipulatorSpeed(manipulator, 0.0)))
-            }
-
-     */
         /**
          * Auto 1: Only places game piece
          * Use if swerve broken

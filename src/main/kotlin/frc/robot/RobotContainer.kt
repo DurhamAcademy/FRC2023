@@ -19,17 +19,17 @@ import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
-import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IntakePositionForward
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.arm.SetArmToAngle
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
+import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToCommunityZone
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks.pickupObjectFromFloor
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -38,7 +38,6 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
-import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
@@ -367,12 +366,20 @@ class RobotContainer {
     }
 
     val auto: Command
-    get() = autoChooser.selected
+        get() = autoChooser.selected
 
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
-        addOption("1", goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.CloseCone))
-        addOption("2", pickupObjectFromFloor(drivetrain, FloorGamePiecePosition.Farthest))
+        addOption(
+            "1",
+            goToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone)
+        )
+        addOption(
+            "2",
+            goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+                .andThen(leaveCommunityZone(drivetrain, arm))
+                .andThen(goToCommunityZone(drivetrain))
+        )
         addOption("3", leaveCommunityZone(drivetrain, arm))
     }
 
