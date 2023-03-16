@@ -32,7 +32,6 @@ class Elevator(
     val armLength = 1.047
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
-    val armLength = 1.047
     val elevatorMotor = WPI_TalonFX(
         elevator.elevatorMotor.ElevatorMotorId
     ).apply {
