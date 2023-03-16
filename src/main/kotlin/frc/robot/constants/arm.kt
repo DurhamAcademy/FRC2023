@@ -9,26 +9,26 @@ object arm {
         const val id = 34
         const val currentLimit = 40
         const val inverted = true
-        const val gearRatio = 1 / 170.67
-        const val maxVelocity = 1.0
+        const val gearRatio = 1 / 152.65
+        const val maxVelocity = 2.0
         const val maxAcceleration = 1.0
-        const val kP = 2.6426
+        const val kP = 3.0
         const val kI = 0.0
-        const val kD = 1.2626
+        const val kD = 0.5
 
-        const val kS = 0.086989
-        const val kG = 0.42677
-        const val kV = 3.2483
-        const val kA = 0.34796
+        const val kS = 0.14018
+        const val kG = 0.40234
+        const val kV = 3.2121
+        const val kA = 0.08093
     }
 
     object encoder {
         const val id = 18
-        const val offset = 6.15//-76.15 + 17 + 25 - 5 - 5 + 77//-87.49
+        const val offset = -57.29 + 6.5 + 2.0//-76.15 + 17 + 25 - 5 - 5 + 77//-87.49
         const val inverted = true
     }
 
-    val length = Units.inchesToMeters(30.31)
+    val length = Units.inchesToMeters(48.0)
     val maxAngle = Units.degreesToRadians(130.0 - 5.0)
     val minAngle = Units.degreesToRadians(-155.0 + 5.0)
     const val armMass = 4.76//lbsToKilograms(10.5)

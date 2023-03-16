@@ -166,6 +166,11 @@
       "/SmartDashboard/huhhh": "Subsystem"
     },
     "windows": {
+      "/Shuffleboard/Autonomous/Autonomous": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/arm visual": {
         "arm": {
           "style": "Line"
