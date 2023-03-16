@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
@@ -21,13 +22,16 @@ import frc.robot.constants.FieldConstants
 import frc.robot.constants.arm
 import frc.robot.constants.elevator
 import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.sin
 
 class Elevator(
-    val robotContainer: RobotContainer?
+    val robotContainer: RobotContainer?,
+    val armController: Arm
 ) : SubsystemBase() {
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
+    val armLength = 1.047
     val elevatorMotor = WPI_TalonFX(
         elevator.elevatorMotor.ElevatorMotorId
     ).apply {
@@ -107,26 +111,6 @@ class Elevator(
                 elevator.limits.bottomLimit,
                 elevator.limits.topLimit
             )
-            if (robotContainer != null) {
-                val topLimit = FieldConstants.heightLimit
-                val bottomLimit = 0.1
-                val armLength = arm.length
-                // use arm angle to determine elevator height
-                val armAngle = robotContainer.arm.armPosition
-                val armHeight = armLength * sin((PI/2)-armAngle)
-                val elevatorMaxHeight = topLimit - armHeight
-
-                field = field.coerceAtMost(elevatorMaxHeight)
-                field = field.coerceAtLeast(elevator.limits.bottomLimit)
-//                if ((wristAngle.absoluteValue >= PI/4) && (armAngle >= .35)) {
-//                    // if the wrist is not upright and the arm is close to it,
-//                    field = field.coerceAtLeast(
-//                        Constants.Elevator.limits.bottomLimit
-//                                + inchesToMeters(10.0)
-//                    )
-//                }
-
-            }
         }
 
     fun setMotorVoltage(voltage: Double) {
@@ -183,8 +167,9 @@ class Elevator(
             )
         )
         .entry
-
     var zeroElevator = false
+    val overHeight
+        get() = height > (inchesToMeters(76.0) - (arm.length * cos(armController.armPosition)))
 
     override fun periodic() {
         SmartDashboard.putData("elevcmd", this)
@@ -205,7 +190,18 @@ class Elevator(
             setMotorVoltage(
                 motorPid.calculate(
                     height,
-                    setpoint
+                    TrapezoidProfile.State(
+                        setpoint.coerceAtMost(
+                            inchesToMeters(60.0) - (armLength * cos(armController.armPosition))
+                        ).coerceAtLeast(
+                            elevator.limits.bottomLimit
+                        ),
+                        0.0
+                    ),
+                    TrapezoidProfile.Constraints(
+                        elevator.elevatorMotor.PID.TrapezoidProfile.maxVelocity,
+                        (if(overHeight) 2 else 1) * elevator.elevatorMotor.PID.TrapezoidProfile.maxAcceleration
+                    )
                 ) + feedforward.calculate(
                     motorPid.setpoint.velocity,
                 )
@@ -219,10 +215,10 @@ class Elevator(
         // check if its in teleop
 //        if (RobotController.getUserButton()) setMotorVoltage(0.0)
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
-        if (limitSwitchPressed != lastLimitSwitch) {
+        if (limitSwitch.get() != lastLimitSwitch) {
             this.height = elevator.limits.bottomLimit
         }
-        lastLimitSwitch = limitSwitchPressed
+        lastLimitSwitch = limitSwitch.get()
     }
 
     override fun simulationPeriodic() {
@@ -252,6 +248,4 @@ class Elevator(
         )
         // just set the motor voltage to the control scheme's output
     }
-
-
 }
