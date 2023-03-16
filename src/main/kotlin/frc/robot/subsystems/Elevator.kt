@@ -29,6 +29,7 @@ class Elevator(
     val robotContainer: RobotContainer?,
     val armController: Arm
 ) : SubsystemBase() {
+    val armLength = 1.047
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
     val armLength = 1.047
@@ -178,6 +179,7 @@ class Elevator(
         if (Constants.fullDSControl)
             setpoint = heightEntry.getDouble(elevator.limits.bottomLimit)
         // set motor voltage
+        
         if (zeroElevator) {
             setMotorVoltage(
                 motorPid.calculate(
@@ -207,6 +209,7 @@ class Elevator(
                 )
             )
         }
+        
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 
