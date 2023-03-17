@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.math.controller.ArmFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.Preferences
@@ -106,6 +107,12 @@ class Arm : SubsystemBase() {
      */
     fun setArmPosition(position: Double) {
         armSetpoint = position.coerceIn(
+            arm.minAngle,
+            arm.maxAngle
+        )
+    }
+    fun setArmPosition(position: Rotation2d) {
+        armSetpoint = position.degrees.coerceIn(
             arm.minAngle,
             arm.maxAngle
         )
