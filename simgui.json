@@ -177,6 +177,9 @@
         },
         "elevator": {
           "style": "Line"
+        },
+        "window": {
+          "visible": true
         }
       },
       "/SmartDashboard/field": {

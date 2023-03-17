@@ -27,6 +27,7 @@ import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
+import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToCommunityZone
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
@@ -107,9 +108,13 @@ class RobotContainer {
                     )
 
                 // assign outtake to set manipulator speed to -0.5
-                spinIntakeOut
-                    .whileTrue(SetManipulatorSpeed(manipulator, -0.2))
-                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
+//                spinIntakeOut
+//                    .whileTrue(SetManipulatorSpeed(manipulator, -0.2))
+//                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
+
+                throwObject
+                    .whileTrue(Throw(manipulator) { wantedObject })
+                    .onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 spinIntakeIn
                     .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
