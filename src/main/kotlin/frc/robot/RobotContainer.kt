@@ -34,10 +34,7 @@ import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ControlScheme
-import frc.robot.subsystems.Arm
-import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.Elevator
-import frc.robot.subsystems.Manipulator
+import frc.robot.subsystems.*
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
@@ -230,28 +227,7 @@ class RobotContainer {
                 autoBalance
                     .whileTrue(AutoBalance(drivetrain))
 
-//                if (i == 0) {//warn: this is a hack VERY VERY BAD
-//                    //fixme dont do this
-//                    xbox!!.povLeft().onTrue(
-//                        InstantCommand({
-//                            arm.armOffset += 5.0
-//                        }, arm).ignoringDisable(true)
-//                    )
-//                    xbox!!.povRight().onTrue(
-//                        InstantCommand({
-//                            arm.armOffset -= 5.0
-//                        }, arm).ignoringDisable(true)
-//                    )
-//                } else {
-//                    xbox!!.povLeft().onTrue(
-//                        InstantCommand({
-//                            this@RobotContainer.wantingObject =
-//                                if (this@RobotContainer.wantingObject == GamePiece.cube)
-//                                    GamePiece.cone
-//                                else GamePiece.cube
-//                        }, NoSubsystem).ignoringDisable(true)
-//                    )
-//                }
+
             }
         }
     }
@@ -393,8 +369,12 @@ class RobotContainer {
 
     val armFieldPosition = drivetrain.field2d.getObject("arm")
 
+    val smartDashboardSelector = DashboardSelector()
+
     fun update() {
         leds.update()
+
+        smartDashboardSelector.selected = 3 to 3
 
         // send subsystems to SmartDashboard
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
