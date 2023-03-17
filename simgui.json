@@ -207,6 +207,13 @@
           "style": "Hidden",
           "width": 0.10000000149011612
         },
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "/Users/24wilber/Documents/Code/FRC2023/field/2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }

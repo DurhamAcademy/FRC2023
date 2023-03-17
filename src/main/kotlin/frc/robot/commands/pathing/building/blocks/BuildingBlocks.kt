@@ -11,11 +11,13 @@ import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.utils.grid.FloorGamePiecePosition
+import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
+import frc.robot.constants.RobotProportions.width as robotWidth
 
 object BuildingBlocks {
     val alliance: () -> DriverStation.Alliance = { Game.alliance }
@@ -63,25 +65,27 @@ object BuildingBlocks {
             }
         }
         val placementX: () -> Double = {
-            if(abs(8 - drivetrain.estimatedPose2d.x) - .2> abs(8 - exitPoint())) {
+            // if the robot is on the side of the field that the object is on
+            if (abs(8 - drivetrain.estimatedPose2d.x) - .2 > abs(8 - exitPoint())) {
                 if (clearRoute()) {
                     exitPoint()
                 } else {
                     middleX()
                 }
-            }
-            else{
-                if(firstRun){
-                    posX = when(alliance()){
-                        Red -> (8 + position.x) - cos(atan2(position.y - drivetrain.estimatedPose2d.y, position.x - drivetrain.estimatedPose2d.x))
-                        Blue -> (8 - position.x) - cos(atan2(position.y - drivetrain.estimatedPose2d.y, position.x - drivetrain.estimatedPose2d.x))
-                        Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                    }
-                    posY = when(alliance()){
-                        Red -> (position.y - sin(atan2(position.y - drivetrain.estimatedPose2d.y, position.x - drivetrain.estimatedPose2d.x)))
-                        Blue -> (position.y - sin(atan2(position.y - drivetrain.estimatedPose2d.y, position.x - drivetrain.estimatedPose2d.x)))
-                        Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                    }
+            } else {
+                if (firstRun) {
+                    posX = (8 + position.x * alliance().xMul) - cos(
+                        atan2(
+                            position.y - drivetrain.estimatedPose2d.y,
+                            position.x - drivetrain.estimatedPose2d.x
+                        )
+                    )
+                    posY = (position.y - sin(
+                        atan2(
+                            position.y - drivetrain.estimatedPose2d.y,
+                            position.x - drivetrain.estimatedPose2d.x
+                        )
+                    ))
                     firstRun = false
                 }
                 posX
@@ -177,12 +181,27 @@ object BuildingBlocks {
                 Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
             }
         }
+        val isClose: () -> Boolean = {
+            (drivetrain.estimatedPose2d.y - group.offset + side.offset).absoluteValue < 0.1
+        }
+
         val placementX: () -> Double = {
-            when(level){
+            when (level) {
                 //TODO fill in values (replace 5.2)
-                PlacmentLevel.Level1 -> xCenter + (((robotLength / 2.0) + 5.2) * -alliance().xMul)
-                PlacmentLevel.Level2 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
-                PlacmentLevel.Level3 -> xCenter + (((robotLength / 2) + 5.3) * -alliance().xMul)
+                PlacmentLevel.Level1 ->
+                    xCenter + ((-(robotLength / 2) + centerDistX -
+                            if (!isClose()) 0.1
+                            else 0.0) * -alliance().xMul)
+
+                PlacmentLevel.Level2 ->
+                    xCenter + ((-(robotLength / 2) + centerDistX -
+                            if (!isClose()) 0.1
+                            else 0.0) * -alliance().xMul)
+
+                PlacmentLevel.Level3 ->
+                    xCenter + ((-(robotLength / 2) + centerDistX -
+                            if (!isClose()) 0.1
+                            else 0.0) * -alliance().xMul)
             }
         }
         val placementY: () -> Double = {
@@ -196,19 +215,29 @@ object BuildingBlocks {
                 Pose2d(
                     placementX(),
                     placementY(),
-                    Rotation2d()
+                    when (alliance()) {
+                        Red -> Rotation2d.fromDegrees(180.0)
+                        Blue -> Rotation2d.fromDegrees(0.0)
+                        Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                    }
                 )
             }
         )
     }
 
-    fun goToCommunityZone(
+    fun goToPickupZone(
         drivetrain: Drivetrain,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
         val bottomCommunityZoneLimit = 5.75
+        val midCommunityZoneLimit = 6.75
+        val bottomStartingX: () -> Double = { xCenter + (((robotLength / 2.0) + (-5.15)) * -alliance().xMul) }
+        val midStartingX: () -> Double = { xCenter + (((robotLength / 2.0) + (-1.825)) * -alliance().xMul) }
         val isInCommunityZone: () -> Boolean = {
-            drivetrain.estimatedPose2d.y < bottomCommunityZoneLimit
+            ((drivetrain.estimatedPose2d.y > bottomCommunityZoneLimit)
+                    && (drivetrain.estimatedPose2d.x - bottomStartingX()) * -alliance().xMul > 0)
+                    || ((drivetrain.estimatedPose2d.y > midCommunityZoneLimit)
+                    && (drivetrain.estimatedPose2d.x - midStartingX()) * -alliance().xMul > 0)
         }
         val placementX: () -> Double = {
             if (isInCommunityZone())
@@ -216,7 +245,7 @@ object BuildingBlocks {
             else
                 xCenter + (((robotLength / 2.0) + (-6.0)) * -alliance().xMul)
         }
-        val placementY = 6.4
+        val placementY = midCommunityZoneLimit + robotWidth / 2.0
         return MoveToPosition(
             drivetrain,
             {
@@ -227,7 +256,7 @@ object BuildingBlocks {
                 )
             }
         ).until {
-            drivetrain.estimatedPose2d.x < (xCenter + (((robotLength / 2.0) + (-5.22)) * -alliance().xMul))
+            isInCommunityZone()
         }
     }
 }
