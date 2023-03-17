@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -29,7 +30,8 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToCommunityZone
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPickupZone
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
 import frc.robot.constants.Field2dLayout
@@ -42,6 +44,7 @@ import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.GamePiece.*
+import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.grid.PlacmentLevel
@@ -332,8 +335,12 @@ class RobotContainer {
         addOption(
             "2",
             goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+                .andThen(WaitCommand(3.0))
                 .andThen(leaveCommunityZone(drivetrain, arm))
-                .andThen(goToCommunityZone(drivetrain))
+                .andThen(WaitCommand(3.0))
+                .andThen(goToPickupZone(drivetrain))
+                .andThen(WaitCommand(3.0))
+                .andThen(BuildingBlocks.pickupObjectFromFloor(drivetrain, FloorGamePiecePosition.MiddleFar))
         )
         addOption("3", leaveCommunityZone(drivetrain, arm))
     }
