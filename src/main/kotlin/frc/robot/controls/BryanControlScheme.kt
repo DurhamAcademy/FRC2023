@@ -1,6 +1,7 @@
 package frc.robot.controls
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
+import edu.wpi.first.wpilibj2.command.button.Trigger
 
 class BryanControlScheme(
     xboxNum: Int = 0
@@ -21,4 +22,5 @@ class BryanControlScheme(
     override val ledColor = xbox.povLeft()
 
     override val stopIntake = xbox.povUp()
+    override val throwObject: Trigger = xbox.rightBumper()
 }
