@@ -6,8 +6,10 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 /**
  * This enum represents the positions the elevator and arm should go to when scoring at different levels
  *
- * @param elevatorHeight the height the elevator needs to go to in meters
- * @param armRotation the rotation the arm needs to be at as a Rotation2d
+ * @param coneElevatorHeight the height the elevator needs to go to in meters for a cone
+ * @param coneArmRotation the rotation the arm needs to be at as a Rotation2d for a cone
+ * @param cubeElevatorHeight same as coneElevatorHeight but for a cube
+ * @param cubeArmRotation same as coneArmRotation but for a cube
  */
 enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation2d, val cubeElevatorHeight: Double, val cubeArmRotation: Rotation2d){
     High(frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0), Rotation2d.fromRadians(1.32), frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0), Rotation2d.fromRadians(1.32)),

@@ -111,12 +111,6 @@ class Arm : SubsystemBase() {
             arm.maxAngle
         )
     }
-    fun setArmPosition(position: Rotation2d) {
-        armSetpoint = position.degrees.coerceIn(
-            arm.minAngle,
-            arm.maxAngle
-        )
-    }
 
     // shuffleboard
     val armTab = Shuffleboard.getTab("Arm")
