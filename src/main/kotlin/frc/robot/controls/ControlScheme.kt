@@ -49,4 +49,6 @@ abstract class ControlScheme {
     open val selectGridRight: Trigger = Trigger { false }
 
     open val confirmGridSelection: Trigger = Trigger { false }
+
+    open val throwObject: Trigger = Trigger { false }
 }
