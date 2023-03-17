@@ -189,9 +189,8 @@ object BuildingBlocks {
             when (level) {
                 //TODO fill in values (replace 5.2)
                 PlacmentLevel.Level1 ->
-                    xCenter + ((-(robotLength / 2) + centerDistX -
-                            if (!isClose()) 0.1
-                            else 0.0) * -alliance().xMul)
+                    xCenter + ((-(robotLength / 2) + centerDistX -//4.46
+                            0.5) * -alliance().xMul)
 
                 PlacmentLevel.Level2 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -

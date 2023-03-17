@@ -2,6 +2,8 @@ package frc.robot.commands.alltogether
 
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units.inchesToMeters
+import frc.robot.constants.elevator.limits.bottomLimit
+import frc.robot.constants.elevator.limits.topLimit
 
 /**
  * This enum represents the positions the elevator and arm should go to when scoring at different levels
@@ -11,11 +13,42 @@ import edu.wpi.first.math.util.Units.inchesToMeters
  * @param cubeElevatorHeight same as coneElevatorHeight but for a cube
  * @param cubeArmRotation same as coneArmRotation but for a cube
  */
-enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation2d, val cubeElevatorHeight: Double, val cubeArmRotation: Rotation2d){
-    High(frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0), Rotation2d.fromRadians(1.32), frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0), Rotation2d.fromRadians(1.32)),
-    Mid(inchesToMeters(38.0), Rotation2d.fromRadians(1.32),inchesToMeters(38.0), Rotation2d.fromRadians(1.32)),
-    Low(frc.robot.constants.elevator.limits.topLimit, Rotation2d.fromRadians(2.61),frc.robot.constants.elevator.limits.topLimit, Rotation2d.fromRadians(2.61)),
-    HumanPlayerSlider(1.3 - inchesToMeters(11.0), Rotation2d.fromRadians(1.4), 1.3 - inchesToMeters(11.0), Rotation2d.fromRadians(1.4)),
-    Idle(frc.robot.constants.elevator.limits.bottomLimit, Rotation2d.fromRadians(0.0), frc.robot.constants.elevator.limits.bottomLimit, Rotation2d.fromRadians(0.0)),
-    FloorIntake(frc.robot.constants.elevator.limits.bottomLimit + inchesToMeters(1.0), Rotation2d.fromRadians(1.81), frc.robot.constants.elevator.limits.bottomLimit + inchesToMeters(1.0), Rotation2d.fromRadians(1.81))
+enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation2d, val cubeElevatorHeight: Double, val cubeArmRotation: Rotation2d) {
+    High(
+        topLimit - inchesToMeters(2.0),
+        Rotation2d.fromRadians(1.32),
+        topLimit - inchesToMeters(2.0),
+        Rotation2d.fromRadians(1.32)
+    ),
+    Mid(
+        inchesToMeters(38.0),
+        Rotation2d.fromRadians(1.32),
+        .85,
+        Rotation2d.fromRadians(1.32)
+    ),
+    Low(
+        //for the height here is 0.88
+        1.0,
+        Rotation2d.fromRadians(2.61),
+        0.88,
+        Rotation2d.fromRadians(2.61)
+    ),
+    HumanPlayerSlider(
+        1.3 - inchesToMeters(11.0),
+        Rotation2d.fromRadians(1.4),
+        1.3 - inchesToMeters(11.0),
+        Rotation2d.fromRadians(1.4)
+    ),
+    Idle(
+        bottomLimit,
+        Rotation2d.fromRadians(0.0),
+        bottomLimit,
+        Rotation2d.fromRadians(0.0)
+    ),
+    FloorIntake(
+        bottomLimit + inchesToMeters(1.0),
+        Rotation2d.fromRadians(1.81),
+        bottomLimit + inchesToMeters(1.0),
+        Rotation2d.fromRadians(1.81)
+    )
 }

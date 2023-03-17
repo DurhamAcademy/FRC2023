@@ -15,7 +15,7 @@ class SetSubsystemPosition (
     val level: () -> IOLevel,
     val wantedObject: () -> GamePiece,
 
-    val stopAtEnd: Boolean = true
+    val stopAtEnd: Boolean = false
 ) : CommandBase() {
     constructor(robotContainer: RobotContainer, level: () -> IOLevel, wantedObject: () -> GamePiece) : this(
         robotContainer.elevator,
@@ -35,21 +35,22 @@ class SetSubsystemPosition (
     }
     override fun execute() {
         if(wantedObject() == GamePiece.cube){
-            goalArmPosition = level().cubeArmRotation.degrees
+            goalArmPosition = level().cubeArmRotation.radians
             goalElevatorPosition = level().cubeElevatorHeight
         }
         else{
-            goalArmPosition = level().coneArmRotation.degrees
+            goalArmPosition = level().coneArmRotation.radians
             goalElevatorPosition = level().coneElevatorHeight
         }
-            arm.setArmPosition(goalArmPosition)
-            // use arm angle to determine elevator height
-            val armAngle = arm.armPosition
-            val armHeight = armLength * sin(armAngle)
-            val elevatorMaxHeight = topLimit - armHeight
-            elevator.setpoint = goalElevatorPosition
-                .coerceIn(bottomLimit, elevatorMaxHeight)
-        }
-    override fun isFinished(): Boolean = stopAtEnd && (arm.armPosition - goalArmPosition).absoluteValue < 0.1 && (elevator.height - goalElevatorPosition).absoluteValue < 0.1
+        arm.setArmPosition(goalArmPosition)
+        // use arm angle to determine elevator height
+        val armAngle = arm.armPosition
+        val armHeight = armLength * sin(armAngle)
+        val elevatorMaxHeight = topLimit - armHeight
+        elevator.setpoint = goalElevatorPosition
+            .coerceIn(bottomLimit, elevatorMaxHeight)
+    }
+
+    override fun isFinished(): Boolean = stopAtEnd && (arm.armPosition - goalArmPosition).absoluteValue < 0.1
 }
 
