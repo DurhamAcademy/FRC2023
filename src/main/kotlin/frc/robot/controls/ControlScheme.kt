@@ -1,48 +1,54 @@
 package frc.robot.controls
 
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import edu.wpi.first.wpilibj2.command.button.Trigger
 
 abstract class ControlScheme {
     abstract val xbox: CommandXboxController?
-    abstract val rotation: Double
-    abstract val strafe: Double
-    abstract val forward: Double
-    open val testMode = Trigger { DriverStation.isTest() }
-
-    open val testGoToAprilTag1: Trigger = Trigger { false }
-    open val testGoToZeroZero: Trigger = Trigger { false }
-
-    open val testArm90: Trigger = Trigger { false }
-    open val testArm0: Trigger = Trigger { false }
-    open val testArmNeg90: Trigger = Trigger { false }
-
-    open val testWrist90: Trigger = Trigger { false }
-    open val testWrist0: Trigger = Trigger { false }
-    open val testWristNeg90: Trigger = Trigger { false }
-
-    open val openManipulator: Trigger = Trigger { false }
-    open val closeManipulator: Trigger = Trigger { false }
+    open val rotation: Double
+        get() = 0.0
+    open val strafe: Double
+        get() = 0.0
+    open val forward: Double
+        get() = 0.0
     open val toggleManipulator: Trigger = Trigger { false }
-    open val grabCone: Trigger = Trigger { false }
-    open val holdCone: Trigger = Trigger { false }
-
-    open val intakeFront: Trigger = Trigger { false }
 
     open val idleConfiguration: Trigger = Trigger { false }
     open val placeLvl1: Trigger = Trigger { false }
     open val placeLvl2: Trigger = Trigger { false }
     open val placeLvl3: Trigger = Trigger { false }
-
-    open val intake: Trigger = Trigger { false }
-    open val outtake: Trigger = Trigger { false }
-
+    open val intakeHPS: Trigger = Trigger { false }
     open val lowIntake: Trigger = Trigger { false }
-    open val highIntake: Trigger = Trigger { false }
 
-    open val moveToClosestHPS: Trigger = Trigger { false }
-    open val moveToClosestScoreStation: Trigger = Trigger { false }
+    open val spinIntakeIn: Trigger = Trigger { false }
+    open val spinIntakeOut: Trigger = Trigger { false }
+    open val stopIntake: Trigger = Trigger { false }
+
+
+    open val moveToClosestHPSAxis: Trigger = Trigger { false }
+    open val moveToClosestScoreStationAxis: Trigger = Trigger { false }
 
     open val autoBalance: Trigger = Trigger { false }
+
+    open val ledColor: Trigger = Trigger { false }
+
+    open val increaseEncoderAngle: Trigger = Trigger { false }
+    open val decreaseEncoderAngle: Trigger = Trigger { false }
+
+    open val alignClosestConeL1: Trigger = Trigger { false }
+    open val alignClosestConeL2: Trigger = Trigger { false }
+    open val alignClosestConeL3: Trigger = Trigger { false }
+
+    open val alignClosestHPS: Trigger = Trigger { false }
+
+    open val overrideAlignmentSafety: Trigger = Trigger { false }
+
+    open val selectGridUp: Trigger = Trigger { false }
+    open val selectGridDown: Trigger = Trigger { false }
+    open val selectGridLeft: Trigger = Trigger { false }
+    open val selectGridRight: Trigger = Trigger { false }
+
+    open val confirmGridSelection: Trigger = Trigger { false }
+
+    open val throwObject: Trigger = Trigger { false }
 }

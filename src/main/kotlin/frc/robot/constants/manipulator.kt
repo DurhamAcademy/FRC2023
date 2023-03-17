@@ -18,4 +18,11 @@ object manipulator {
         val purpleCube = Color(0.19, 0.07, 0.77)
         val yellowCone = Color(0.95, 0.77, 0.06)
     }
+
+    object Speeds {
+        const val intake = 0.5
+        const val outtake = -0.5
+        const val stop = 0.0
+        const val idle = 0.1
+    }
 }
