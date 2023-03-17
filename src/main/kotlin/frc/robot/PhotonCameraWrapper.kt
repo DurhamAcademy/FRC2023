@@ -2,9 +2,7 @@ package frc.robot
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Pose3d
 import edu.wpi.first.wpilibj.RobotBase
-import frc.robot.Constants.VisionConstants
 import org.photonvision.EstimatedRobotPose
 import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
@@ -29,9 +27,9 @@ class PhotonCameraWrapper {
     else
         PhotonPoseEstimator(
             AprilTagFieldLayout("/home/lvuser/deploy/2023-chargedup.json"),
-            PhotonPoseEstimator.PoseStrategy.LOWEST_AMBIGUITY,
+            PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP,
             photonCamera,
-            VisionConstants.robotToCam.minus(Pose3d())
+            VisionConstants.robotToCam
         )
 
     /**
@@ -44,6 +42,18 @@ class PhotonCameraWrapper {
     fun getEstimatedGlobalPose(prevEstimatedRobotPose: Pose2d?): Optional<EstimatedRobotPose> {
         if (photonPoseEstimator == null) return Optional.empty()
         photonPoseEstimator!!.setReferencePose(prevEstimatedRobotPose)
-        return photonPoseEstimator!!.update()
+        return if (photonCamera.latestResult.targets.size > 2) {
+            photonPoseEstimator!!.update()
+        } else if (photonCamera.latestResult.targets.size == 2) {
+            if (photonCamera.latestResult.targets
+                    .minOf { it.poseAmbiguity } < 0.5
+            )
+                photonPoseEstimator!!.update()
+            else Optional.empty()
+        } else if (photonCamera.latestResult.targets.size == 1) {
+            if ((photonCamera.latestResult.bestTarget?.poseAmbiguity ?: 1.0) < 0.2)
+                photonPoseEstimator!!.update()
+            else Optional.empty()
+        } else Optional.empty()
     }
 }

@@ -20,10 +20,14 @@ class SetArmToAngle(
     }
 
     override fun end(interrupted: Boolean) {
-        arm.armSetpoint = null
+        arm.setArmPosition(arm.armPosition)
     }
 
     override fun isFinished(): Boolean {
         return false
+    }
+
+    fun resetArm(){
+        arm.setArmPosition(0.0)
     }
 }
