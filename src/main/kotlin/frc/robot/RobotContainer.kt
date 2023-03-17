@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -37,10 +36,7 @@ import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
 import frc.robot.controls.ControlScheme
-import frc.robot.subsystems.Arm
-import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.Elevator
-import frc.robot.subsystems.Manipulator
+import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
@@ -53,6 +49,8 @@ import kotlin.math.sin
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
     val controlScheme1: ControlScheme = BryanControlScheme(1)
+
+    val smartDashboardSelector = DashboardSelector()
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
 
@@ -142,12 +140,11 @@ class RobotContainer {
                                 return@snapToScoring Field2dLayout.Axes.YInt.platforms.toList()
                             },
                             {
-                                return@snapToScoring if (Game.alliance == DriverStation.Alliance.Blue)
-                                    listOf(PI, -PI)
-                                else if (Game.alliance == DriverStation.Alliance.Red)
-                                    listOf(0.0, 2 * PI, -2 * PI)
-                                else
-                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                return@snapToScoring when (Game.alliance) {
+                                    DriverStation.Alliance.Blue -> listOf(PI, -PI)
+                                    DriverStation.Alliance.Red -> listOf(0.0, 2 * PI, -2 * PI)
+                                    else -> listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                }
                             }
                         )
                     )
@@ -172,28 +169,14 @@ class RobotContainer {
                 autoBalance
                     .whileTrue(AutoBalance(drivetrain))
 
-//                if (i == 0) {//warn: this is a hack VERY VERY BAD
-//                    //fixme dont do this
-//                    xbox!!.povLeft().onTrue(
-//                        InstantCommand({
-//                            arm.armOffset += 5.0
-//                        }, arm).ignoringDisable(true)
-//                    )
-//                    xbox!!.povRight().onTrue(
-//                        InstantCommand({
-//                            arm.armOffset -= 5.0
-//                        }, arm).ignoringDisable(true)
-//                    )
-//                } else {
-//                    xbox!!.povLeft().onTrue(
-//                        InstantCommand({
-//                            this@RobotContainer.wantingObject =
-//                                if (this@RobotContainer.wantingObject == GamePiece.cube)
-//                                    GamePiece.cone
-//                                else GamePiece.cube
-//                        }, NoSubsystem).ignoringDisable(true)
-//                    )
-//                }
+                selectGridUp
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
+                selectGridDown
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, -1))
+                selectGridLeft
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
+                selectGridRight
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
             }
         }
     }
@@ -210,7 +193,7 @@ class RobotContainer {
         TeleopFMSRed,
         TeleopFMSBlue,
         NoDriverStation,
-        unknown
+        Unknown
     }
 
     private val lightStatus: LightStatus
@@ -241,7 +224,7 @@ class RobotContainer {
                 TeleopNoFMS
             }
 
-            else -> LightStatus.unknown
+            else -> Unknown
         }
 
     var wantedObject = none
@@ -320,7 +303,7 @@ class RobotContainer {
 
         val nothing =
             AnimationPulse(Color.white.withAlpha(20) * 0.2, 1.0.seconds, true)
-            { lightStatus == LightStatus.unknown || lightStatus == TeleopNoFMS }
+            { lightStatus == Unknown || lightStatus == TeleopNoFMS }
 
 
         val body = KLEDRegion(
@@ -361,8 +344,6 @@ class RobotContainer {
     val elevatorLine = armVisual.getObject("elevator")
 
     val armFieldPosition = drivetrain.field2d.getObject("arm")
-
-    val smartDashboardSelector = DashboardSelector()
 
     fun update() {
         leds.update()
