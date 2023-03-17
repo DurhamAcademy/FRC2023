@@ -22,9 +22,7 @@ import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
-import frc.robot.commands.alltogether.HoldPosition
-import frc.robot.commands.alltogether.IntakePositionForward
-import frc.robot.commands.alltogether.SetPosition
+import frc.robot.commands.alltogether.*
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -88,25 +86,25 @@ class RobotContainer {
                 // assign l1
                 placeLvl1
                     .whileTrue(
-                        SetPosition.setpoint(PlacmentLevel.Level1, this@RobotContainer)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Low }, { wantedObject })
                     )
 
                 // assign l2
                 placeLvl2
                     .whileTrue(
-                        SetPosition.setpoint(PlacmentLevel.Level2, this@RobotContainer)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Mid }, { wantedObject })
                     )
 
                 // assign l3
                 placeLvl3
                     .whileTrue(
-                        SetPosition.setpoint(PlacmentLevel.Level3, this@RobotContainer)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.High }, { wantedObject })
                     )
 
                 // assign intake
                 lowIntake
                     .whileTrue(
-                        IntakePositionForward(elevator, arm)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.FloorIntake }, { wantedObject })
                             .alongWith(SetManipulatorSpeed(manipulator, 1.0))
                     )
 
@@ -125,7 +123,7 @@ class RobotContainer {
 
                 intakeHPS
                     .whileTrue(
-                        SetPosition.humanPlayer(elevator, arm)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.HumanPlayerSlider }, { wantedObject })
                             .alongWith(
                                 SetManipulatorSpeed(manipulator, 1.0)
                             )
