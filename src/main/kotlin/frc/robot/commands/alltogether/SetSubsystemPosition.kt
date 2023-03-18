@@ -51,6 +51,8 @@ class SetSubsystemPosition (
             .coerceIn(bottomLimit, elevatorMaxHeight)
     }
 
-    override fun isFinished(): Boolean = stopAtEnd && (arm.armPosition - goalArmPosition).absoluteValue < 0.1
+    override fun isFinished(): Boolean = stopAtEnd &&
+            (arm.armPosition - goalArmPosition).absoluteValue < 0.1 &&
+            (elevator.height - goalElevatorPosition).absoluteValue < 0.05
 }
 

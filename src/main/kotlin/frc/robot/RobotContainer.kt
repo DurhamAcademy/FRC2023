@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
@@ -14,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.Commands
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -23,8 +24,10 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IOLevel
+import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
+import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
@@ -34,14 +37,11 @@ import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
 import frc.robot.controls.ControlScheme
-import frc.robot.subsystems.Arm
-import frc.robot.subsystems.Drivetrain
-import frc.robot.subsystems.Elevator
-import frc.robot.subsystems.Manipulator
+import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
-import frc.robot.utils.grid.PlacmentLevel
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -50,6 +50,8 @@ import kotlin.math.sin
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
     val controlScheme1: ControlScheme = BryanControlScheme(1)
+
+    val smartDashboardSelector = DashboardSelector()
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
 
@@ -74,7 +76,9 @@ class RobotContainer {
 
                 idleConfiguration
                     .whileTrue(
-                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle }, { wantedObject })
+                        SetPosition.idle(elevator, arm, true)
+                            .andThen(ZeroElevatorAndIdle(elevator, arm))
+                            .andThen(SetPosition.idle(elevator, arm, false))
                     )
 
                 // assign l1
@@ -137,12 +141,11 @@ class RobotContainer {
                                 return@snapToScoring Field2dLayout.Axes.YInt.platforms.toList()
                             },
                             {
-                                return@snapToScoring if (Game.alliance == DriverStation.Alliance.Blue)
-                                    listOf(PI, -PI)
-                                else if (Game.alliance == DriverStation.Alliance.Red)
-                                    listOf(0.0, 2 * PI, -2 * PI)
-                                else
-                                    listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                return@snapToScoring when (Game.alliance) {
+                                    DriverStation.Alliance.Blue -> listOf(PI, -PI)
+                                    DriverStation.Alliance.Red -> listOf(0.0, 2 * PI, -2 * PI)
+                                    else -> listOf(0.0, 2 * PI, -2 * PI, PI, -PI)
+                                }
                             }
                         )
                     )
@@ -167,14 +170,38 @@ class RobotContainer {
                 autoBalance
                     .whileTrue(AutoBalance(drivetrain))
 
-                ledColor.onTrue(InstantCommand({
-                    when (this@RobotContainer.wantedObject) {
-                        none -> this@RobotContainer.wantedObject = cone
-                        cone -> this@RobotContainer.wantedObject = cube
-                        cube -> this@RobotContainer.wantedObject = cone
-                        else -> this@RobotContainer.wantedObject = none
-                    }
-                }))
+                selectGridUp
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
+                selectGridDown
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, -1))
+                selectGridLeft
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
+                selectGridRight
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
+
+                confirmGridSelection
+                    .whileTrue(
+                        goToPlacementPoint(
+                            drivetrain,
+                            { smartDashboardSelector.placementLevel },
+                            { smartDashboardSelector.placementPosition },
+                            { smartDashboardSelector.placementSide },
+                        )
+                            .deadlineWith(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { IOLevel.Idle },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                )
+                            )
+                            .andThen(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { smartDashboardSelector.placementLevel.ioLevel },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                )
+                            )
+                    )
             }
         }
     }
@@ -191,7 +218,7 @@ class RobotContainer {
         TeleopFMSRed,
         TeleopFMSBlue,
         NoDriverStation,
-        unknown
+        Unknown
     }
 
     private val lightStatus: LightStatus
@@ -222,7 +249,7 @@ class RobotContainer {
                 TeleopNoFMS
             }
 
-            else -> LightStatus.unknown
+            else -> Unknown
         }
 
     var wantedObject = none
@@ -301,7 +328,7 @@ class RobotContainer {
 
         val nothing =
             AnimationPulse(Color.white.withAlpha(20) * 0.2, 1.0.seconds, true)
-            { lightStatus == LightStatus.unknown || lightStatus == TeleopNoFMS }
+            { lightStatus == Unknown || lightStatus == TeleopNoFMS }
 
 
         val body = KLEDRegion(
@@ -322,15 +349,33 @@ class RobotContainer {
     val autoChooser = SendableChooser<Command>().apply {
         addOption(
             "1",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level1, PlacementGroup.Farthest, PlacementSide.Cube)
+            SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true)
+                .alongWith(SetManipulatorSpeed(manipulator, 0.5).withTimeout(0.25))
+                .andThen(ZeroElevatorAndIdle(elevator, arm))
+                .andThen(
+                    goToPlacementPoint(
+                        drivetrain,
+                        { PlacementLevel.Level1 },
+                        { PlacementGroup.Farthest },
+                        { PlacementSide.FarCone }
+                    )
+                )
+                .andThen(
+                    Commands.runOnce({
+                        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), false)
+                    }, drivetrain)
+                )
+                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.High }, { cone }, true))
+                .andThen(Throw(manipulator, { cone }).withTimeout(0.5))
+                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true))
         )
         addOption(
             "2",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
         )
         addOption(
             "3",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
         )
     }
 
@@ -346,6 +391,7 @@ class RobotContainer {
 
     fun update() {
         leds.update()
+        smartDashboardSelector.update()
 
         // send subsystems to SmartDashboard
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
