@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
@@ -326,7 +328,25 @@ class RobotContainer {
     val autoChooser = SendableChooser<Command>().apply {
         addOption(
             "1",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level1, PlacementGroup.Farthest, PlacementSide.Cube)
+            SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true)
+                .alongWith(SetManipulatorSpeed(manipulator, 0.5).withTimeout(0.25))
+                .andThen(ZeroElevatorAndIdle(elevator, arm))
+                .andThen(
+                    goToPlacementPoint(
+                        drivetrain,
+                        PlacmentLevel.Level3,
+                        PlacementGroup.Farthest,
+                        PlacementSide.FarCone
+                    )
+                )
+                .andThen(
+                    Commands.runOnce({
+                        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), false)
+                    }, drivetrain)
+                )
+                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.High }, { cone }, true))
+                .andThen(Throw(manipulator, { cone }).withTimeout(0.5))
+                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true))
         )
         addOption(
             "2",
