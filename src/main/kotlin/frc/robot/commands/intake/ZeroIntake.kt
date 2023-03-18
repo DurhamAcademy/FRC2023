@@ -18,5 +18,8 @@ class ZeroIntake(
         //zero
     }
 
-    override fun isFinished(): //TODO check if volatage gets high
+    override fun isFinished() {
+        intake.getVoltage()
+    }
+         //TODO check if volatage gets high
 }

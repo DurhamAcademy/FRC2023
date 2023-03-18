@@ -65,6 +65,9 @@ class Intake : SubsystemBase()  {
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
 
+    fun getVoltage(): Double {
+        return modeMotor.busVoltage
+    }
     override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
