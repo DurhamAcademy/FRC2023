@@ -14,7 +14,8 @@ import frc.robot.subsystems.Drivetrain
 import kotlin.math.*
 
 class AutoBalance(
-    val drivetrain: Drivetrain
+    val drivetrain: Drivetrain,
+    val balanceDirection: Double //-1.0 or 1.0 are different directions
 ) : CommandBase() {
     init {
         addRequirements(drivetrain)
@@ -47,7 +48,7 @@ class AutoBalance(
     override fun execute() {
         drivetrain.drive(
             ChassisSpeeds(
-                -1.0,
+                balanceDirection,
                 0.0,
                 0.0
             ),

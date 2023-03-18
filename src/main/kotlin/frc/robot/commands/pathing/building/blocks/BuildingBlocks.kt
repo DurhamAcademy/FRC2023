@@ -21,6 +21,9 @@ import frc.robot.constants.RobotProportions.length as robotLength
 import frc.robot.constants.RobotProportions.width as robotWidth
 
 object BuildingBlocks {
+    /**
+     * Variables
+     */
     val alliance: () -> DriverStation.Alliance = { Game.alliance }
     val exitFalseGoalPoint: () -> Double = {
         when (alliance()) {
@@ -42,13 +45,18 @@ object BuildingBlocks {
         }
     }
 
+    /**
+     * These functions check if the robt can rotate safely (ie the arm is up)
+     */
     private fun safeRotation(armAngle: Double, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         if (armAngle.absoluteValue < 0.15) angle
         else drivetrainAngle
-
     private fun safeRotation(arm: Arm?, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         safeRotation(arm?.armPosition ?: 0.0, angle, drivetrainAngle)
 
+    /**
+     * Move to the game pieces from the floor
+     */
     fun pickupObjectFromFloor(
         drivetrain: Drivetrain,
         arm: Arm,
@@ -122,6 +130,10 @@ object BuildingBlocks {
             }
         )
     }
+
+    /**
+     * Leave the community zone
+     */
     fun leaveCommunityZone(
         drivetrain: Drivetrain,
         arm: Arm,
@@ -173,6 +185,9 @@ object BuildingBlocks {
             }
     }
 
+    /**
+     * Go to a specific node
+     */
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
         arm: Arm? = null,
@@ -235,7 +250,6 @@ object BuildingBlocks {
             }
         )
     }
-
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
         arm: Arm? = null,
