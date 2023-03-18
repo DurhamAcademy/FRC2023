@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units.inchesToMeters
 import frc.robot.constants.elevator.limits.bottomLimit
 import frc.robot.constants.elevator.limits.topLimit
+import kotlin.math.PI
 
 /**
  * This enum represents the positions the elevator and arm should go to when scoring at different levels
@@ -50,5 +51,11 @@ enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation
         Rotation2d.fromRadians(1.81),
         bottomLimit + inchesToMeters(1.0),
         Rotation2d.fromRadians(1.81)
+    ),
+    StartingConfig(
+        topLimit,
+        Rotation2d.fromDegrees(PI),
+        topLimit,
+        Rotation2d.fromDegrees(PI)
     )
 }
