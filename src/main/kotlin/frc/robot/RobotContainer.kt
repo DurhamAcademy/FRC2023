@@ -23,10 +23,8 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IOLevel
-import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
-import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
@@ -76,9 +74,7 @@ class RobotContainer {
 
                 idleConfiguration
                     .whileTrue(
-                        SetPosition.idle(elevator, arm, true)
-                            .andThen(ZeroElevatorAndIdle(elevator, arm))
-                            .andThen(SetPosition.idle(elevator, arm, false))
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle }, { wantedObject })
                     )
 
                 // assign l1
@@ -175,7 +171,7 @@ class RobotContainer {
                     when (this@RobotContainer.wantedObject) {
                         none -> this@RobotContainer.wantedObject = cone
                         cone -> this@RobotContainer.wantedObject = cube
-                        cube -> this@RobotContainer.wantedObject = none
+                        cube -> this@RobotContainer.wantedObject = cone
                         else -> this@RobotContainer.wantedObject = none
                     }
                 }))
