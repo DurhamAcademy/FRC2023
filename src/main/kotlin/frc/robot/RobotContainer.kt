@@ -164,7 +164,7 @@ class RobotContainer {
                     )
 
                 autoBalance
-                    .whileTrue(AutoBalance(drivetrain))
+                    .whileTrue(AutoBalance(drivetrain, -1.0))
 
                 selectGridUp
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
