@@ -224,6 +224,21 @@ object BuildingBlocks {
         )
     }
 
+    fun goToPlacementPoint(
+        drivetrain: Drivetrain,
+        level: PlacementLevel,
+        group: PlacementGroup,
+        side: PlacementSide,
+        alliance: () -> DriverStation.Alliance = { Game.alliance },
+    ): Command =
+        goToPlacementPoint(
+            drivetrain,
+            { level },
+            { group },
+            { side },
+            alliance
+        )
+
     fun goToPickupZone(
         drivetrain: Drivetrain,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
