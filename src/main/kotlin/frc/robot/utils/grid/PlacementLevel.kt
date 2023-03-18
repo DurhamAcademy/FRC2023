@@ -5,11 +5,12 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
+import frc.robot.constants.Field2dLayout
 import frc.robot.constants.Field2dLayout.Axes
 
 object GridConstants {
-    const val centerDistX: Double = 6.894576//feetToMeters(22.625)
-    const val centerX: Double = 8.0
+    const val centerDistX: Double = 6.87//feetToMeters(22.625)
+    const val centerX: Double = Field2dLayout.xCenter
 }
 
 /**
@@ -50,11 +51,13 @@ enum class PlacementLevel(val depth: Double, val height: Double) {
  */
 enum class PlacementGroup(val offset: Double) {
     /** The group of game pieces that are closest to the judging table. */
-    Closest(inchesToMeters(42.0 + 16)),
+    Closest(inchesToMeters(42.0/* + 16*/)),
+
     /** The group of game pieces that are farthest from the judging table. */
-    Farthest(inchesToMeters(174.0 + 2)),
+    Farthest(inchesToMeters(174.0/* + 2*/)),
+
     /** The group of game pieces that are in front of the charging station. */
-    Middle(inchesToMeters(108.0 + 9)),
+    Middle(inchesToMeters(108.0/* + 9*/)),
 }
 
 enum class PlacementSide(val offset: Double) {

@@ -3,6 +3,7 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
+import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
@@ -14,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -21,16 +24,15 @@ import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.HoldPosition
-import frc.robot.commands.alltogether.IntakePositionForward
+import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetPosition
+import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToCommunityZone
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -83,25 +85,25 @@ class RobotContainer {
                 // assign l1
                 placeLvl1
                     .whileTrue(
-                        SetPosition.setpoint(PlacementLevel.Level1, this@RobotContainer)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Low }, { wantedObject })
                     )
 
                 // assign l2
                 placeLvl2
                     .whileTrue(
-                        SetPosition.setpoint(PlacementLevel.Level2, this@RobotContainer)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Mid }, { wantedObject })
                     )
 
                 // assign l3
                 placeLvl3
                     .whileTrue(
-                        SetPosition.setpoint(PlacementLevel.Level3, this@RobotContainer)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.High }, { wantedObject })
                     )
 
                 // assign intake
                 lowIntake
                     .whileTrue(
-                        IntakePositionForward(elevator, arm)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.FloorIntake }, { wantedObject })
                             .alongWith(SetManipulatorSpeed(manipulator, 1.0))
                     )
 
@@ -120,7 +122,7 @@ class RobotContainer {
 
                 intakeHPS
                     .whileTrue(
-                        SetPosition.humanPlayer(elevator, arm)
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.HumanPlayerSlider }, { wantedObject })
                             .alongWith(
                                 SetManipulatorSpeed(manipulator, 1.0)
                             )
@@ -325,15 +327,34 @@ class RobotContainer {
     val autoChooser = SendableChooser<Command>().apply {
         addOption(
             "1",
-            goToPlacementPoint(drivetrain, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone)
+            SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true)
+                .alongWith(SetManipulatorSpeed(manipulator, 0.5).withTimeout(0.25))
+                .andThen(ZeroElevatorAndIdle(elevator, arm))
+                .andThen(
+                    goToPlacementPoint(
+                        drivetrain,
+                        PlacementLevel.Level3,
+                        PlacementGroup.Farthest,
+                        PlacementSide.FarCone
+                    )
+                )
+                .andThen(
+                    Commands.runOnce({
+                        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), false)
+                    }, drivetrain)
+                )
+                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.High }, { cone }, true))
+                .andThen(Throw(manipulator, { cone }).withTimeout(0.5))
+                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true))
         )
         addOption(
             "2",
-            goToPlacementPoint(drivetrain, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
-                .andThen(leaveCommunityZone(drivetrain, arm))
-                .andThen(goToCommunityZone(drivetrain))
+            goToPlacementPoint(drivetrain, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
         )
-        addOption("3", leaveCommunityZone(drivetrain, arm))
+        addOption(
+            "3",
+            goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+        )
     }
 
     // shuffleboard auto chooser

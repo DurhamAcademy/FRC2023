@@ -44,9 +44,9 @@ open class MoveToPosition(
      * The desired velocity of the robot (in meters per second)
      */
     private val velocity: Transform2d = Transform2d(),
-    private val toleranceppos: Double = 0.025,
+    private val toleranceppos: Double = 0.075,
     private val tolerancepvel: Double = 0.1,
-    private val tolerancerpos: Double = 0.01,
+    private val tolerancerpos: Double = 0.05,
     private val tolerancervel: Double = 0.1,
     private val snapMode: Boolean = false
 ) : CommandBase() {
@@ -56,14 +56,15 @@ open class MoveToPosition(
         Transform2d(Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)),
     )
 
-    constructor(drivetrain: Drivetrain,
-                pose: Pose2d,
-                velocity: Transform2d = Transform2d(),
-                toleranceppos: Double = 0.1,
-                tolerancepvel: Double = 0.1,
-                tolerancerpos: Double = 0.025,
-                tolerancervel: Double = 0.1,
-                snapMode: Boolean = false
+    constructor(
+        drivetrain: Drivetrain,
+        pose: Pose2d,
+        velocity: Transform2d = Transform2d(),
+        toleranceppos: Double = 0.1,
+        tolerancepvel: Double = 0.1,
+        tolerancerpos: Double = 0.1,
+        tolerancervel: Double = 0.1,
+        snapMode: Boolean = false
     ) : this(
         drivetrain,
         { pose },
@@ -238,7 +239,7 @@ open class MoveToPosition(
             snapMode
         )
     companion object {
-        const val rP = 4.0
+        const val rP = 8.0
         const val yP = 2.25
         const val xP = 2.25
         /**
