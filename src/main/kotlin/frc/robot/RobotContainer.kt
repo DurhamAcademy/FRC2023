@@ -22,7 +22,6 @@ import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
-import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
@@ -127,10 +126,7 @@ class RobotContainer {
                             )
                     )
                     .onFalse(
-                        HoldPosition(elevator, arm)
-                            .alongWith(
-                                SetManipulatorSpeed(manipulator, 0.1)
-                            )
+                        SetManipulatorSpeed(manipulator, 0.1)
                     )
 
                 moveToClosestHPSAxis
