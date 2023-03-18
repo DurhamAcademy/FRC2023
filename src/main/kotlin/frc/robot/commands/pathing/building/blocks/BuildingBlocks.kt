@@ -13,8 +13,8 @@ import frc.robot.subsystems.Drivetrain
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
-import frc.robot.utils.grid.PlacmentLevel
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
 import frc.robot.constants.RobotProportions.width as robotWidth
@@ -166,9 +166,9 @@ object BuildingBlocks {
 
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
-        level: PlacmentLevel,
-        group: PlacementGroup,
-        side: PlacementSide,
+        level: () -> PlacementLevel,
+        group: () -> PlacementGroup,
+        side: () -> PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
         val upperYValue = 4.675
@@ -182,29 +182,29 @@ object BuildingBlocks {
             }
         }
         val isClose: () -> Boolean = {
-            (drivetrain.estimatedPose2d.y - group.offset + side.offset).absoluteValue < 0.1
+            (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.1
         }
 
         val placementX: () -> Double = {
-            when (level) {
+            when (level()) {
                 //TODO fill in values (replace 5.2)
-                PlacmentLevel.Level1 ->
+                PlacementLevel.Level1 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -//4.46
                             0.5) * -alliance().xMul)
 
-                PlacmentLevel.Level2 ->
+                PlacementLevel.Level2 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -
                             if (!isClose()) 0.1
                             else 0.0) * -alliance().xMul)
 
-                PlacmentLevel.Level3 ->
+                PlacementLevel.Level3 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -
                             if (!isClose()) 0.1
                             else 0.0) * -alliance().xMul)
             }
         }
         val placementY: () -> Double = {
-            if (isInGridZone()) group.offset - side.offset
+            if (isInGridZone()) group().offset - side().offset
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
@@ -223,6 +223,21 @@ object BuildingBlocks {
             }
         )
     }
+
+    fun goToPlacementPoint(
+        drivetrain: Drivetrain,
+        level: PlacementLevel,
+        group: PlacementGroup,
+        side: PlacementSide,
+        alliance: () -> DriverStation.Alliance = { Game.alliance },
+    ): Command =
+        goToPlacementPoint(
+            drivetrain,
+            { level },
+            { group },
+            { side },
+            alliance
+        )
 
     fun goToPickupZone(
         drivetrain: Drivetrain,
