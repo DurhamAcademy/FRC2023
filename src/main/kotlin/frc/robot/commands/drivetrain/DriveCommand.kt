@@ -9,6 +9,7 @@ import frc.robot.constants.Constants
 import frc.robot.constants.Field2dLayout
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.Drivetrain
+import frc.robot.subsystems.slewLimited
 
 class DriveCommand(
     var drivetrain: Drivetrain,
@@ -31,7 +32,7 @@ class DriveCommand(
                 vec.y * Constants.powerPercent * alianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1),
                 -controlScheme.rotation * 2 * Math.PI *
                         Constants.powerPercent * .5 * (if (drivetrain.invertrot.getBoolean(false)) -1 else 1)
-            ),
+            ).slewLimited(drivetrain.xSlewRateLimiter, drivetrain.ySlewRateLimiter, drivetrain.rotSlewRateLimiter),
             true,
             Translation2d() // chris wants in the middle
         )

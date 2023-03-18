@@ -191,7 +191,7 @@ object BuildingBlocks {
             }
         }
         val isClose: () -> Boolean = {
-            (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.1
+            (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.05
         }
 
         val placementX: () -> Double = {
@@ -204,12 +204,12 @@ object BuildingBlocks {
                 PlacementLevel.Level2 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -
                             if (!isClose()) 0.1
-                            else 0.0) * -alliance().xMul)
+                            else -0.075) * -alliance().xMul)
 
                 PlacementLevel.Level3 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -
                             if (!isClose()) 0.1
-                            else 0.0) * -alliance().xMul)
+                            else -.075) * -alliance().xMul)
             }
         }
         val placementY: () -> Double = {
@@ -226,8 +226,8 @@ object BuildingBlocks {
                     safeRotation(
                         arm,
                         when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0)
-                            Blue -> Rotation2d.fromDegrees(0.0)
+                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
+                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
                             Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                         },
                         drivetrain.estimatedPose2d.rotation

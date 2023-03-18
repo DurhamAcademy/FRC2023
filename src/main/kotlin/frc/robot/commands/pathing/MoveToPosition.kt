@@ -15,6 +15,8 @@ import frc.robot.subsystems.Drivetrain
 import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
+import kotlin.math.max
+import frc.robot.constants.drivetrain as drivetrainConstants
 
 val Pose2d.flipped: Pose2d
     get() = Pose2d(
@@ -35,7 +37,7 @@ open class MoveToPosition(
      * The desired velocity of the robot (in meters per second)
      */
     private val velocity: Transform2d = Transform2d(),
-    private val toleranceppos: Double = 0.075,
+    private val toleranceppos: Double = 0.02,
     private val tolerancepvel: Double = 0.1,
     private val tolerancerpos: Double = 0.01,
     private val tolerancervel: Double = 0.1,
@@ -51,9 +53,9 @@ open class MoveToPosition(
         drivetrain: Drivetrain,
         pose: Pose2d,
         velocity: Transform2d = Transform2d(),
-        toleranceppos: Double = 0.1,
+        toleranceppos: Double = 0.075,
         tolerancepvel: Double = 0.1,
-        tolerancerpos: Double = 0.1,
+        tolerancerpos: Double = 0.01,
         tolerancervel: Double = 0.1,
         snapMode: Boolean = false
     ) : this(
@@ -81,18 +83,18 @@ open class MoveToPosition(
 //        .entry
 
     val xPIDController = ProfiledPIDController(
-        Companion.xP, 0.0, 0.0, TrapezoidProfile.Constraints(
+        Companion.xP, 0.0, 0.05, TrapezoidProfile.Constraints(
             7.0,
-            10.0
+            max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
         it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     val yPIDController = ProfiledPIDController(
-        Companion.yP, 0.0, 0.0, TrapezoidProfile.Constraints(
+        Companion.yP, 0.0, 0.05, TrapezoidProfile.Constraints(
             7.0,
-            10.0
+            max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
         it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
@@ -100,7 +102,7 @@ open class MoveToPosition(
     }
     val rPIDController = ProfiledPIDController(
         Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            PI / 1.0, PI*2
+            PI / 1.0, max(PI * 2, drivetrainConstants.maxAngularAcceleration)
         )
     ).also {
         it.enableContinuousInput(-PI, PI)
@@ -210,12 +212,13 @@ open class MoveToPosition(
 
     override fun isFinished(): Boolean {
         // stop when the robot is within 0.1 meters of the desired position
-        return drivetrain.estimatedPose2d.minus(Pose2d(pose().translation, Rotation2d())).translation.norm < toleranceppos
-                && drivetrain.estimatedPose2d.rotation.minus(Rotation2d(pose().rotation.radians)).radians.absoluteValue < tolerancerpos
+        return xPIDController.atGoal() && yPIDController.atGoal() && rPIDController.atGoal()
+        //return drivetrain.estimatedPose2d.minus(Pose2d(pose().translation, Rotation2d())).translation.norm < toleranceppos
+        //       && rPIDController.atGoal()
     }
 
     override fun end(interrupted: Boolean) {
-        drivetrain.drive(ChassisSpeeds(), true)
+        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), true)
     }
 
     val flipped: MoveToPosition
@@ -230,9 +233,9 @@ open class MoveToPosition(
             snapMode
         )
     companion object {
-        const val rP = 16.0
-        const val yP = 2.25
-        const val xP = 2.25
+        const val rP = 8.0
+        const val yP = 5.0
+        const val xP = 5.0
 //        /**
 //         * Auto 1: Only places game piece
 //         * Use if swerve broken

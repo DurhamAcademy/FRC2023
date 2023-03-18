@@ -15,9 +15,9 @@ import frc.robot.constants.elevator.limits.topLimit
  */
 enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation2d, val cubeElevatorHeight: Double, val cubeArmRotation: Rotation2d) {
     High(
-        topLimit,
-        Rotation2d.fromRadians(1.35),
-        topLimit,
+        topLimit - inchesToMeters(4.0),
+        Rotation2d.fromRadians(1.2),
+        .85,
         Rotation2d.fromRadians(1.32)
     ),
     Mid(
