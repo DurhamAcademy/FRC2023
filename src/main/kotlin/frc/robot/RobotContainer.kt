@@ -30,6 +30,7 @@ import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks.pickupObjectFromFloor
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.controls.BryanControlScheme
@@ -38,6 +39,7 @@ import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.*
+import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
@@ -375,6 +377,10 @@ class RobotContainer {
         addOption(
             "3",
             goToPlacementPoint(drivetrain, arm, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+        )
+        addOption(
+            "4",
+            pickupObjectFromFloor(drivetrain, arm, FloorGamePiecePosition.Closest)
         )
     }
 

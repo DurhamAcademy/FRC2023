@@ -6,10 +6,13 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
 import frc.kyberlib.command.Game
+import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
+import frc.robot.subsystems.DashboardSelector
 import frc.robot.subsystems.Drivetrain
+import frc.robot.utils.GamePiece
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
@@ -21,6 +24,7 @@ import frc.robot.constants.RobotProportions.width as robotWidth
 
 object BuildingBlocks {
     val alliance: () -> DriverStation.Alliance = { Game.alliance }
+    val floorIntakeAngle = IOLevel.FloorIntake.coneArmRotation.degrees //TODO revisit to make work if cone and cube rotation become different
     val exitFalseGoalPoint: () -> Double = {
         when (alliance()) {
             Red -> 10.53
@@ -28,6 +32,7 @@ object BuildingBlocks {
             else -> throw IllegalArgumentException("Alliance is not Blue or Red")
         }
     }
+    val armLength = frc.robot.constants.arm.length
     val clearUp = 4.0 //Y value above charge station
     val clearDown = 1.5 //Y value below charge station
     val exitPoint: () -> Double = {
@@ -53,9 +58,6 @@ object BuildingBlocks {
         arm: Arm,
         position: FloorGamePiecePosition,
     ): MoveToPosition {
-        var firstRun = true
-        var posX = 0.0
-        var posY = 0.0
         val clearRoute: () -> Boolean = {
             drivetrain.estimatedPose2d.y < clearUp + .25 && drivetrain.estimatedPose2d.y > clearUp - .25 || drivetrain.estimatedPose2d.y > clearDown - .25 && drivetrain.estimatedPose2d.y < clearDown + .25
         }
@@ -69,7 +71,7 @@ object BuildingBlocks {
                 //TODO charge station
             }
             else{
-                posY
+                position.y
             }
         }
         val placementX: () -> Double = {
@@ -80,23 +82,22 @@ object BuildingBlocks {
                 } else {
                     middleX()
                 }
-            } else {
-                if (firstRun) {
-                    posX = (8 + position.x * alliance().xMul) - cos(
-                        atan2(
-                            position.y - drivetrain.estimatedPose2d.y,
-                            position.x - drivetrain.estimatedPose2d.x
-                        )
-                    )
-                    posY = (position.y - sin(
-                        atan2(
-                            position.y - drivetrain.estimatedPose2d.y,
-                            position.x - drivetrain.estimatedPose2d.x
-                        )
-                    ))
-                    firstRun = false
+            } else if(abs(position.x - drivetrain.estimatedPose2d.x) < .2 && abs(position.y - drivetrain.estimatedPose2d.y) < .2){
+                when(alliance()) {
+                    Red ->  8 + position.x + armLength + .2
+                    Blue -> 8 - position.x - armLength -.2
+                    Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                 }
-                posX
+            }
+            else if(arm.armPosition - .25 < floorIntakeAngle && arm.armPosition + .25 > floorIntakeAngle){
+                when(alliance()) {
+                    Red -> 8 + position.x + armLength - .5
+                    Blue -> 8 - position.x - armLength + .5
+                    Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                }
+            }
+            else{
+                drivetrain.estimatedPose2d.x
             }
         }
         val closestRightAngle : Double = round(drivetrain.estimatedPose2d.rotation.degrees/90) * 90
@@ -105,9 +106,11 @@ object BuildingBlocks {
                 Rotation2d.fromDegrees(closestRightAngle)
             }
             else{
-                Rotation2d.fromDegrees(
-                    -atan2(position.y - drivetrain.estimatedPose2d.y, position.x - drivetrain.estimatedPose2d.x)
-                )
+                when (alliance()) {
+                    Red -> Rotation2d.fromDegrees(180.0)
+                    Blue -> Rotation2d.fromDegrees(0.0)
+                    Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                }
             }
         }
         return MoveToPosition(
