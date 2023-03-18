@@ -12,8 +12,8 @@ import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
-import frc.robot.utils.grid.PlacmentLevel
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
 
@@ -162,7 +162,7 @@ object BuildingBlocks {
 
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
-        level: PlacmentLevel,
+        level: PlacementLevel,
         group: PlacementGroup,
         side: PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
@@ -178,11 +178,11 @@ object BuildingBlocks {
             }
         }
         val placementX: () -> Double = {
-            when(level){
+            when (level) {
                 //TODO fill in values (replace 5.2)
-                PlacmentLevel.Level1 -> xCenter + (((robotLength / 2.0) + 5.2) * -alliance().xMul)
-                PlacmentLevel.Level2 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
-                PlacmentLevel.Level3 -> xCenter + (((robotLength / 2) + 5.3) * -alliance().xMul)
+                PlacementLevel.Level1 -> xCenter + (((robotLength / 2.0) + 5.2) * -alliance().xMul)
+                PlacementLevel.Level2 -> xCenter + (((robotLength / 2) + 5.2) * -alliance().xMul)
+                PlacementLevel.Level3 -> xCenter + (((robotLength / 2) + 5.3) * -alliance().xMul)
             }
         }
         val placementY: () -> Double = {

@@ -5,12 +5,10 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
-import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.constants.FieldConstants
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
-import frc.robot.subsystems.Manipulator
-import frc.robot.utils.grid.PlacmentLevel
+import frc.robot.utils.grid.PlacementLevel
 import kotlin.math.absoluteValue
 import kotlin.math.sin
 
@@ -34,19 +32,20 @@ class SetPosition(
     )
 
     companion object {
-        fun setpoint(placmentLevel: PlacmentLevel, elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) =
-            when (placmentLevel) {
-                PlacmentLevel.Level1 -> low(elevator, arm, stopAtEnd)
-                PlacmentLevel.Level2 -> mid(elevator, arm, stopAtEnd)
-                PlacmentLevel.Level3 -> high(elevator, arm, stopAtEnd)
+        fun setpoint(placementLevel: PlacementLevel, elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) =
+            when (placementLevel) {
+                PlacementLevel.Level1 -> low(elevator, arm, stopAtEnd)
+                PlacementLevel.Level2 -> mid(elevator, arm, stopAtEnd)
+                PlacementLevel.Level3 -> high(elevator, arm, stopAtEnd)
             }
 
-        fun setpoint(placmentLevel: PlacmentLevel, robotContainer: RobotContainer, stopAtEnd: Boolean = false) = setpoint(
-            placmentLevel,
-            robotContainer.elevator,
-            robotContainer.arm,
-            stopAtEnd
-        )
+        fun setpoint(placementLevel: PlacementLevel, robotContainer: RobotContainer, stopAtEnd: Boolean = false) =
+            setpoint(
+                placementLevel,
+                robotContainer.elevator,
+                robotContainer.arm,
+                stopAtEnd
+            )
 
         fun high(elevator: Elevator, arm: Arm, stopAtEnd: Boolean = false) = SetPosition(
             elevator,

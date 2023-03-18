@@ -3,11 +3,9 @@ package frc.robot.utils.grid
 import edu.wpi.first.math.geometry.Translation3d
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import frc.robot.constants.Field2dLayout.Axes
-import java.security.InvalidParameterException
 
 object GridConstants {
     const val centerDistX: Double = 6.894576//feetToMeters(22.625)
@@ -26,6 +24,7 @@ enum class FloorGamePiecePosition(val x: Double, val y: Double){
     MiddleFar(inchesToMeters(47.36), inchesToMeters(132.19)), //y 3.517
     Farthest(inchesToMeters(47.36), inchesToMeters(180.19)), //
 }
+
 /**
  * This enum represents the different levels of the field.
  *
@@ -34,8 +33,8 @@ enum class FloorGamePiecePosition(val x: Double, val y: Double){
  * @param height the height of the level from the ground to the center of the
  * cube placement area in the group.
  */
-enum class PlacmentLevel(val depth: Double, val height: Double) {
-    Level1(inchesToMeters(13.0/2), inchesToMeters(0.0)),
+enum class PlacementLevel(val depth: Double, val height: Double) {
+    Level1(inchesToMeters(13.0 / 2), inchesToMeters(0.0)),
     Level2(inchesToMeters(22.0), inchesToMeters(33.75)),
     Level3(inchesToMeters(40.0), inchesToMeters(45.75)),
 }
@@ -85,7 +84,7 @@ enum class PlacementSide(val offset: Double) {
  * @param side the side of the group.
  */
 fun getPlacementTransform(
-    level: PlacmentLevel,
+    level: PlacementLevel,
     group: PlacementGroup,
     side: PlacementSide,
     alliance: DriverStation.Alliance = DriverStation.getAlliance()

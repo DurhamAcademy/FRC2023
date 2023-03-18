@@ -39,8 +39,8 @@ import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
-import frc.robot.utils.grid.PlacmentLevel
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -83,19 +83,19 @@ class RobotContainer {
                 // assign l1
                 placeLvl1
                     .whileTrue(
-                        SetPosition.setpoint(PlacmentLevel.Level1, this@RobotContainer)
+                        SetPosition.setpoint(PlacementLevel.Level1, this@RobotContainer)
                     )
 
                 // assign l2
                 placeLvl2
                     .whileTrue(
-                        SetPosition.setpoint(PlacmentLevel.Level2, this@RobotContainer)
+                        SetPosition.setpoint(PlacementLevel.Level2, this@RobotContainer)
                     )
 
                 // assign l3
                 placeLvl3
                     .whileTrue(
-                        SetPosition.setpoint(PlacmentLevel.Level3, this@RobotContainer)
+                        SetPosition.setpoint(PlacementLevel.Level3, this@RobotContainer)
                     )
 
                 // assign intake
@@ -166,6 +166,7 @@ class RobotContainer {
                         )
                     )
 
+                s
                 autoBalance
                     .whileTrue(AutoBalance(drivetrain))
 
@@ -324,11 +325,11 @@ class RobotContainer {
     val autoChooser = SendableChooser<Command>().apply {
         addOption(
             "1",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone)
+            goToPlacementPoint(drivetrain, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.CloseCone)
         )
         addOption(
             "2",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
                 .andThen(leaveCommunityZone(drivetrain, arm))
                 .andThen(goToCommunityZone(drivetrain))
         )
@@ -347,8 +348,7 @@ class RobotContainer {
 
     fun update() {
         leds.update()
-
-        smartDashboardSelector.selected = 3 to 3
+        smartDashboardSelector.update()
 
         // send subsystems to SmartDashboard
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)
