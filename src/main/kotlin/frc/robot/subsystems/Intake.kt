@@ -5,9 +5,10 @@ import com.ctre.phoenix.sensors.CANCoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
+import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.constants.intake
 
-class Intake {
+class Intake : SubsystemBase()  {
     private val driveMotor = CANSparkMax(intake.driveMotorId,
         CANSparkMaxLowLevel.MotorType.kBrushless).apply {
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
@@ -64,7 +65,7 @@ class Intake {
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
 
-    fun periodic() {
+    override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
         systemMotorCurrent.setDouble(systemMotor.outputCurrent)

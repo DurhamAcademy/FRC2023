@@ -13,10 +13,6 @@ class ZeroElevatorAndIdle(
         addRequirements(arm)
     }
 
-    override fun initialize() {
-        println("Zeroing Elevator")
-    }
-
     override fun execute() {
         elevator.zeroElevator = true
         arm.setArmPosition(0.0)
@@ -24,7 +20,6 @@ class ZeroElevatorAndIdle(
 
     override fun end(interrupted: Boolean) {
         elevator.zeroElevator = false
-        println("Elevator Zeroed")
     }
 
     override fun isFinished(): Boolean = elevator.limitSwitchPressed
