@@ -54,8 +54,8 @@ enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation
     ),
     StartingConfig(
         topLimit,
-        Rotation2d.fromDegrees(PI),
+        Rotation2d.fromDegrees(220.0),
         topLimit,
-        Rotation2d.fromDegrees(PI)
+        Rotation2d.fromDegrees(220.0)
     )
 }
