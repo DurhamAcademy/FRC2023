@@ -76,9 +76,7 @@ class RobotContainer {
 
                 idleConfiguration
                     .whileTrue(
-                        SetPosition.idle(elevator, arm, true)
-                            .andThen(ZeroElevatorAndIdle(elevator, arm))
-                            .andThen(SetPosition.idle(elevator, arm, false))
+                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle}, { wantedObject })
                     )
 
                 // assign l1
