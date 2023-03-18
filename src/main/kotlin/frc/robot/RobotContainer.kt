@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -32,6 +31,7 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
@@ -168,7 +168,6 @@ class RobotContainer {
                         )
                     )
 
-                s
                 autoBalance
                     .whileTrue(AutoBalance(drivetrain))
 
@@ -180,6 +179,30 @@ class RobotContainer {
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
                 selectGridRight
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
+
+                confirmGridSelection
+                    .whileTrue(
+                        goToPlacementPoint(
+                            drivetrain,
+                            { smartDashboardSelector.placementLevel },
+                            { smartDashboardSelector.placementPosition },
+                            { smartDashboardSelector.placementSide },
+                        )
+                            .deadlineWith(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { IOLevel.Idle },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                )
+                            )
+                            .andThen(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { smartDashboardSelector.placementLevel.ioLevel },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                )
+                            )
+                    )
             }
         }
     }

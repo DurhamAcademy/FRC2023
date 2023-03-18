@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.InstantCommand
-import frc.robot.utils.grid.*
+import frc.robot.utils.grid.PlacementGroup
+import frc.robot.utils.grid.PlacementLevel
+import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.wrap
 import kotlin.math.roundToInt
 
@@ -135,7 +137,7 @@ class DashboardSelector {
     val placementSide: PlacementSide
         get() = when (selected.first) {
             0, 3, 6 -> PlacementSide.CloseCone
-            1, 4, 7 -> PlacementSide.MiddleCone
+            1, 4, 7 -> PlacementSide.Cube
             2, 5, 8 -> PlacementSide.FarCone
             else -> PlacementSide.CloseCone
         }

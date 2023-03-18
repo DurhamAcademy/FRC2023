@@ -166,9 +166,9 @@ object BuildingBlocks {
 
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
-        level: PlacementLevel,
-        group: PlacementGroup,
-        side: PlacementSide,
+        level: () -> PlacementLevel,
+        group: () -> PlacementGroup,
+        side: () -> PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
         val upperYValue = 4.675
@@ -182,11 +182,11 @@ object BuildingBlocks {
             }
         }
         val isClose: () -> Boolean = {
-            (drivetrain.estimatedPose2d.y - group.offset + side.offset).absoluteValue < 0.1
+            (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.1
         }
 
         val placementX: () -> Double = {
-            when (level) {
+            when (level()) {
                 //TODO fill in values (replace 5.2)
                 PlacementLevel.Level1 ->
                     xCenter + ((-(robotLength / 2) + centerDistX -//4.46
@@ -204,7 +204,7 @@ object BuildingBlocks {
             }
         }
         val placementY: () -> Double = {
-            if (isInGridZone()) group.offset - side.offset
+            if (isInGridZone()) group().offset - side().offset
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
