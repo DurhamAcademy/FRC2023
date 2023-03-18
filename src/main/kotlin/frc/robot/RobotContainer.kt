@@ -38,6 +38,7 @@ import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.*
+import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
@@ -183,6 +184,7 @@ class RobotContainer {
                     .whileTrue(
                         goToPlacementPoint(
                             drivetrain,
+                            arm,
                             { smartDashboardSelector.placementLevel },
                             { smartDashboardSelector.placementPosition },
                             { smartDashboardSelector.placementSide },
@@ -252,7 +254,8 @@ class RobotContainer {
             else -> Unknown
         }
 
-    var wantedObject = none
+    val wantedObject: GamePiece
+        get() = smartDashboardSelector.placementSide.asObject
 
     val leds = KLEDStrip(9, frc.robot.constants.leds.count).apply {
         val coral = Color(255, 93, 115)
@@ -355,7 +358,8 @@ class RobotContainer {
                 .andThen(
                     goToPlacementPoint(
                         drivetrain,
-                        { PlacementLevel.Level1 },
+                        arm,
+                        { PlacementLevel.Level3 },
                         { PlacementGroup.Farthest },
                         { PlacementSide.FarCone }
                     )
@@ -371,11 +375,11 @@ class RobotContainer {
         )
         addOption(
             "2",
-            goToPlacementPoint(drivetrain, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, arm, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
         )
         addOption(
             "3",
-            goToPlacementPoint(drivetrain, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, arm, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
         )
     }
 
