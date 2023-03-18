@@ -31,7 +31,6 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
@@ -356,9 +355,9 @@ class RobotContainer {
                 .andThen(
                     goToPlacementPoint(
                         drivetrain,
-                        PlacementLevel.Level3,
-                        PlacementGroup.Farthest,
-                        PlacementSide.FarCone
+                        { PlacementLevel.Level1 },
+                        { PlacementGroup.Farthest },
+                        { PlacementSide.FarCone }
                     )
                 )
                 .andThen(
@@ -376,7 +375,7 @@ class RobotContainer {
         )
         addOption(
             "3",
-            goToPlacementPoint(drivetrain, PlacmentLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
         )
     }
 
