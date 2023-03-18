@@ -3,22 +3,24 @@ package frc.robot.commands.manipulator
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.GamePiece
-import frc.robot.utils.GamePiece.*
+import frc.robot.utils.GamePiece.cone
+import frc.robot.utils.GamePiece.cube
+import frc.robot.utils.grid.PlacementLevel
 
-class Throw (
+class Throw(
     private val manipulator: Manipulator,
-    val gamePiece: ()->GamePiece
-) : CommandBase(){
+    val gamePiece: () -> GamePiece,
+    val placementLevel: () -> PlacementLevel
+) : CommandBase() {
     init {
         addRequirements(manipulator)
     }
 
-    override fun execute(){
+    override fun execute() {
         manipulator.motorPercentage = when (gamePiece()) {
-            cone -> -0.15
-            cube -> -0.15
-            unknown -> -0.15
-            none -> -0.15
+            cone -> placementLevel().ioLevel.coneVelocity
+            cube -> placementLevel().ioLevel.cubeVelocity
+            else -> -0.15
         }
     }
 }

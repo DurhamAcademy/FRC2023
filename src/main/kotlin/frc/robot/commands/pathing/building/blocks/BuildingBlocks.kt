@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
 import frc.kyberlib.command.Game
+import frc.robot.commands.alltogether.IOLevel
+import frc.robot.commands.alltogether.IOLevel.*
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
@@ -13,7 +15,6 @@ import frc.robot.subsystems.Drivetrain
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
-import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
@@ -175,7 +176,7 @@ object BuildingBlocks {
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
         arm: Arm? = null,
-        level: () -> PlacementLevel,
+        level: () -> IOLevel,
         group: () -> PlacementGroup,
         side: () -> PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
@@ -194,22 +195,20 @@ object BuildingBlocks {
             (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.05
         }
 
+        val altOffset = 0.2
+
         val placementX: () -> Double = {
             when (level()) {
                 //TODO fill in values (replace 5.2)
-                PlacementLevel.Level1 ->
+                Low, Mid, High, HumanPlayerSlider ->
                     xCenter + ((-(robotLength / 2) + centerDistX -//4.46
-                            0.5) * -alliance().xMul)
+                            if (!isClose()) 0.2
+                            else level().offsetDistance ?: 0.2) * -alliance().xMul)
 
-                PlacementLevel.Level2 ->
-                    xCenter + ((-(robotLength / 2) + centerDistX -
-                            if (!isClose()) 0.1
-                            else -0.075) * -alliance().xMul)
-
-                PlacementLevel.Level3 ->
-                    xCenter + ((-(robotLength / 2) + centerDistX -
-                            if (!isClose()) 0.1
-                            else -.075) * -alliance().xMul)
+                else ->
+                    throw IllegalArgumentException(
+                        "Level is not Low, Mid, High, or HumanPlayerSlider"
+                    )
             }
         }
         val placementY: () -> Double = {
@@ -240,7 +239,7 @@ object BuildingBlocks {
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
         arm: Arm? = null,
-        level: PlacementLevel,
+        level: IOLevel,
         group: PlacementGroup,
         side: PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },

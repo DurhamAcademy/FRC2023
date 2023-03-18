@@ -111,7 +111,7 @@ class RobotContainer {
 //                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 throwObject
-                    .whileTrue(Throw(manipulator) { wantedObject })
+                    .whileTrue(Throw(manipulator, { wantedObject }) { smartDashboardSelector.placementLevel })
                     .onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 spinIntakeIn
@@ -180,7 +180,7 @@ class RobotContainer {
                         goToPlacementPoint(
                             drivetrain,
                             arm,
-                            { smartDashboardSelector.placementLevel },
+                            { smartDashboardSelector.placementLevel.ioLevel },
                             { smartDashboardSelector.placementPosition },
                             { smartDashboardSelector.placementSide },
                         )
@@ -354,7 +354,7 @@ class RobotContainer {
                     goToPlacementPoint(
                         drivetrain,
                         arm,
-                        { PlacementLevel.Level3 },
+                        { PlacementLevel.Level3.ioLevel },
                         { PlacementGroup.Farthest },
                         { PlacementSide.FarCone }
                     )
@@ -365,16 +365,28 @@ class RobotContainer {
                     }, drivetrain)
                 )
                 .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.High }, { cone }, true))
-                .andThen(Throw(manipulator, { cone }).withTimeout(0.5))
+                .andThen(Throw(manipulator, { cone }, { PlacementLevel.Level3 }).withTimeout(0.5))
                 .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true))
         )
         addOption(
             "2",
-            goToPlacementPoint(drivetrain, arm, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(
+                drivetrain,
+                arm,
+                PlacementLevel.Level2.ioLevel,
+                PlacementGroup.Farthest,
+                PlacementSide.Cube
+            )
         )
         addOption(
             "3",
-            goToPlacementPoint(drivetrain, arm, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(
+                drivetrain,
+                arm,
+                PlacementLevel.Level3.ioLevel,
+                PlacementGroup.Farthest,
+                PlacementSide.Cube
+            )
         )
     }
 
