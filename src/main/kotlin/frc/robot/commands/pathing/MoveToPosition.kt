@@ -46,7 +46,7 @@ open class MoveToPosition(
     private val velocity: Transform2d = Transform2d(),
     private val toleranceppos: Double = 0.075,
     private val tolerancepvel: Double = 0.1,
-    private val tolerancerpos: Double = 0.05,
+    private val tolerancerpos: Double = 0.01,
     private val tolerancervel: Double = 0.1,
     private val snapMode: Boolean = false
 ) : CommandBase() {
@@ -239,7 +239,7 @@ open class MoveToPosition(
             snapMode
         )
     companion object {
-        const val rP = 8.0
+        const val rP = 16.0
         const val yP = 2.25
         const val xP = 2.25
         /**

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
 import frc.robot.constants.FieldConstants
+import frc.robot.constants.elevator.limits.topLimit
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Elevator
 import frc.robot.utils.grid.PlacementLevel
@@ -51,7 +52,7 @@ class SetPosition(
             elevator,
             arm,
             1.32,
-            frc.robot.constants.elevator.limits.topLimit - inchesToMeters(2.0),
+            topLimit,
             Math.toRadians(-30.0),
             stopAtEnd
         )
@@ -69,7 +70,7 @@ class SetPosition(
             elevator,
             arm,
             degreesToRadians(150.0),
-            frc.robot.constants.elevator.limits.topLimit,
+            topLimit,
             Math.toRadians(-10.0),
             stopAtEnd
         )

@@ -24,7 +24,6 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IOLevel
-import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
@@ -77,7 +76,9 @@ class RobotContainer {
 
                 idleConfiguration
                     .whileTrue(
-                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle}, { wantedObject })
+                        SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { wantedObject }, true)
+                            .andThen(ZeroElevatorAndIdle(elevator, arm))
+                            .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { wantedObject }, false))
                     )
 
                 // assign l1
