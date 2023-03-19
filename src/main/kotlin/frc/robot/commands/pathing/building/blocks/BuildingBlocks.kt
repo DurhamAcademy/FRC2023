@@ -12,6 +12,7 @@ import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
+import frc.robot.utils.GamePiece
 import frc.robot.utils.Slider
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
@@ -272,44 +273,35 @@ object BuildingBlocks {
         drivetrain: Drivetrain,
         arm: Arm? = null,
         slider: () -> Slider,
+        gamePiece: () -> GamePiece,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
-        val upperYValue = 4.675
-        val lowerYValue = 1.169
-        val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
-        val isInGridZone: () -> Boolean = {
-            when (alliance()) {
-                Red -> drivetrain.estimatedPose2d.x > chargeLimit()
-                Blue -> drivetrain.estimatedPose2d.x < chargeLimit()
-                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-            }
-        }
-        val isClose: () -> Boolean = {
-            (drivetrain.estimatedPose2d.y - slider().fieldYValue).absoluteValue < 0.05
-        }
-
-        val altOffset = 0.2
-
-        val placementX: () -> Double = {
-            xCenter + ((-(robotLength / 2) + (16.20 - xCenter) -//4.46
-                    if (!isClose()) altOffset
-                    else HumanPlayerSlider.offsetDistance ?: altOffset) * alliance().xMul)
-        }
-
         val placementY: () -> Double = {
             slider().fieldYValue
+        }
+        val isClose: () -> Boolean = {
+            (drivetrain.estimatedPose2d.y - placementY())
+                .absoluteValue < 0.09
+        }
+
+        val altOffset = 0.4
+
+        val placementX: () -> Double = {
+            xCenter + (((-robotLength / 2) + (16.2 - xCenter) + //4.46
+                    -if (!isClose()) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
+                    else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
         return MoveToPosition(
             drivetrain,
             {
                 Pose2d(
                     placementX(),
-                    slider().fieldYValue,
+                    placementY(),
                     safeRotation(
                         arm,
                         when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                            Red -> Rotation2d.fromDegrees(0.0 - 2.0)
+                            Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
                             Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                         },
                         drivetrain.estimatedPose2d.rotation
