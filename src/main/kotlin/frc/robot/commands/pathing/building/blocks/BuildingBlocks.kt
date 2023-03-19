@@ -275,20 +275,21 @@ object BuildingBlocks {
         slider: () -> Slider,
         gamePiece: () -> GamePiece,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
+        endAtAlignment: Boolean = false,
     ): Command {
         val placementY: () -> Double = {
             slider().fieldYValue
         }
-        val isClose: () -> Boolean = {
+        val isClose: (margin: Double?) -> Boolean = { margin ->
             (drivetrain.estimatedPose2d.y - placementY())
-                .absoluteValue < 0.09
+                .absoluteValue < (margin ?: 0.09)
         }
 
         val altOffset = 0.4
 
         val placementX: () -> Double = {
             xCenter + (((-robotLength / 2) + (16.2 - xCenter) + //4.46
-                    -if (!isClose()) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
+                    -if (!isClose(null) || endAtAlignment) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
         return MoveToPosition(
@@ -350,8 +351,6 @@ object BuildingBlocks {
                     )
                 )
             }
-        ).until {
-            isInCommunityZone()
-        }
+        )
     }
 }

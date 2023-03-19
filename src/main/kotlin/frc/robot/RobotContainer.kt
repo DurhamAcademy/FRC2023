@@ -30,6 +30,7 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
@@ -209,6 +210,13 @@ class RobotContainer {
                             null,
                             { Slider.far },
                             { smartDashboardSelector.placementSide.asObject },
+                            true
+                        ).andThen(
+                            SetSubsystemPosition(
+                                elevator, arm,
+                                { IOLevel. },
+                                { smartDashboardSelector.placementSide.asObject },
+                            )
                         )
                     )
             }
