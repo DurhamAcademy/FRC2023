@@ -130,6 +130,7 @@ open class MoveToPosition(
     // on command start and every time the command is executed, calculate the
 
     override fun execute() {
+        if (!drivetrain.canTrustPose) return initialize()
         val current = drivetrain.estimatedPose2d
         val desired = pose()
 

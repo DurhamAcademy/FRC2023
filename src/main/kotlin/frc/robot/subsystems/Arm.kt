@@ -18,9 +18,12 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
+import frc.robot.commands.alltogether.IOLevel
 import frc.robot.constants.arm
+import frc.robot.utils.GamePiece
 import java.lang.Math.PI
 import java.lang.Math.toRadians
+import kotlin.math.absoluteValue
 
 class Arm : SubsystemBase() {
     val armMotor = CANSparkMax(
@@ -174,5 +177,16 @@ class Arm : SubsystemBase() {
     override fun simulationPeriodic() {
         simArmSystem.update(0.02)
     }
+
+    fun isAtPosition(ioLevel: IOLevel, gamePiece: GamePiece) =
+        when (gamePiece) {
+            GamePiece.cone -> (armPosition - ioLevel.coneArmRotation.radians).absoluteValue < (arm.motor.positionTolerance / 2)
+                    && armPID.atGoal()
+
+            GamePiece.cube -> (armPosition - ioLevel.cubeArmRotation.radians).absoluteValue < (arm.motor.positionTolerance / 2)
+                    && armPID.atGoal()
+
+            else -> armPID.atGoal()
+        }
 
 }

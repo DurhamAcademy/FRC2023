@@ -12,7 +12,6 @@ import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
-import frc.robot.utils.GamePiece
 import frc.robot.utils.Slider
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
@@ -273,7 +272,6 @@ object BuildingBlocks {
         drivetrain: Drivetrain,
         arm: Arm? = null,
         slider: () -> Slider,
-        gamePiece: () -> GamePiece,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
         endAtAlignment: Boolean = false,
     ): Command {
@@ -301,8 +299,8 @@ object BuildingBlocks {
                     safeRotation(
                         arm,
                         when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(0.0 - 2.0)
-                            Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
+                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
+                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
                             Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                         },
                         drivetrain.estimatedPose2d.rotation

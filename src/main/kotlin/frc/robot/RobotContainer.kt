@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.WaitCommand
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -30,11 +32,11 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
+import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
 import frc.robot.controls.ControlScheme
@@ -207,16 +209,39 @@ class RobotContainer {
                     .whileTrue(
                         goToHumanPlayerStation(
                             drivetrain,
-                            null,
+                            arm,
                             { Slider.far },
-                            { smartDashboardSelector.placementSide.asObject },
-                            true
-                        ).andThen(
+                            endAtAlignment = true
+                        ).deadlineWith(
                             SetSubsystemPosition(
                                 elevator, arm,
-                                { IOLevel. },
+                                { IOLevel.Idle },
                                 { smartDashboardSelector.placementSide.asObject },
                             )
+                        )
+                            .andThen(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { IOLevel.HumanPlayerSlider },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                )
+                                    .alongWith(
+                                        WaitCommand(0.1)
+                                            .andThen(
+                                                WaitUntilCommand {
+                                                    elevator.motorPid.atGoal() && arm.armPID.atGoal()
+                                                }.andThen(
+                                                    goToHumanPlayerStation(
+                                                        drivetrain,
+                                                        arm,
+                                                        { Slider.far },
+                                                        endAtAlignment = false
+                                                    ).deadlineWith(
+                                                        SetManipulatorSpeed(manipulator, 1.0)
+                                                    )
+                                                )
+                                            )
+                                    )
                         )
                     )
             }
@@ -272,7 +297,7 @@ class RobotContainer {
     val wantedObject: GamePiece
         get() = smartDashboardSelector.placementSide.asObject
 
-    val leds = KLEDStrip(9, frc.robot.constants.leds.count).apply {
+    val leds = KLEDStrip(9, count).apply {
         val coral = Color(255, 93, 115)
         val coneColor = Color(255, 255, 0)
         val cubeColor = Color(123, 0, 255)
@@ -348,11 +373,20 @@ class RobotContainer {
             AnimationPulse(Color.white.withAlpha(20) * 0.2, 1.0.seconds, true)
             { lightStatus == Unknown || lightStatus == TeleopNoFMS }
 
+        val cameraReady = AnimationCustom({ _, len ->
+            val percent = drivetrain.cameraWrappers.maxOf { it.percentage }
+            val color = Color(256 - (percent * 256).toInt(), (percent * 256).toInt(), 0)
+            val index = (percent * len).toInt()
+            return@AnimationCustom List<Color>(len) { i ->
+                if (i >= index) color else Color.black
+            }
+        }, { !drivetrain.canTrustPose })
+
 
         val body = KLEDRegion(
             0,
-            frc.robot.constants.leds.count,
-            noFMSDisabled, fmsRedDisabled, fmsBlueDisabled, eStopped, autoNoFMS,
+            count,
+            cameraReady, noFMSDisabled, fmsRedDisabled, fmsBlueDisabled, eStopped, autoNoFMS,
             autoFMSRed, autoFMSBlue, noDriverStation, teleopCone, teleopCube,
             teleopFMSRed, teleopFMSBlue, teleopNoFMSRed, teleopNoFMSBlue,
             nothing,

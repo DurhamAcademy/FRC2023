@@ -365,6 +365,9 @@ class Drivetrain(
         )
     }
 
+    val canTrustPose: Boolean
+        get() = cameraWrappers.any { it.canTrustPose } || Game.sim
+
 }
 
 fun ChassisSpeeds.slewLimited(
