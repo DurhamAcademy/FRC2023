@@ -50,7 +50,7 @@ enum class IOLevel(
     ),
     HumanPlayerSlider(
         1.3 - inchesToMeters(11.0),
-        Rotation2d.fromRadians(1.4),
+        Rotation2d.fromRadians(-1.4),
         1.3 - inchesToMeters(11.0),
         Rotation2d.fromRadians(-1.4),
         0.75, 1.0,
