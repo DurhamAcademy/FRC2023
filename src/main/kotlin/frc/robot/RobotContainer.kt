@@ -25,6 +25,7 @@ import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
+import frc.robot.commands.drivetrain.SpinCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
@@ -345,6 +346,7 @@ class RobotContainer {
 
     // auto chooser
     val autoChooser = SendableChooser<Command>().apply {
+        setDefaultOption("Spin", SpinCommand(drivetrain))
         addOption(
             "1",
             SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true)
