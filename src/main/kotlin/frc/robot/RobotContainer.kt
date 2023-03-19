@@ -380,7 +380,7 @@ class RobotContainer {
         )
         addOption(
             "4",
-            pickupObjectFromFloor(drivetrain, arm, FloorGamePiecePosition.Closest)
+            pickupObjectFromFloor(drivetrain, arm, elevator, {FloorGamePiecePosition.Closest}, { wantedObject })
         )
     }
 

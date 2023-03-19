@@ -9,9 +9,11 @@ import frc.kyberlib.command.Game
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
+import frc.robot.constants.elevator
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.DashboardSelector
 import frc.robot.subsystems.Drivetrain
+import frc.robot.subsystems.Elevator
 import frc.robot.utils.GamePiece
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
@@ -24,7 +26,6 @@ import frc.robot.constants.RobotProportions.width as robotWidth
 
 object BuildingBlocks {
     val alliance: () -> DriverStation.Alliance = { Game.alliance }
-    val floorIntakeAngle = IOLevel.FloorIntake.coneArmRotation.degrees //TODO revisit to make work if cone and cube rotation become different
     val exitFalseGoalPoint: () -> Double = {
         when (alliance()) {
             Red -> 10.53
@@ -56,8 +57,18 @@ object BuildingBlocks {
     fun pickupObjectFromFloor(
         drivetrain: Drivetrain,
         arm: Arm,
-        position: FloorGamePiecePosition,
+        elevator: Elevator,
+        position: () -> FloorGamePiecePosition,
+        wantedObject: () -> GamePiece
     ): MoveToPosition {
+        val floorIntakeAngle: () -> Double = {
+            if(wantedObject() == GamePiece.cube) IOLevel.FloorIntake.cubeArmRotation.degrees
+            else IOLevel.FloorIntake.coneArmRotation.degrees
+        }
+        val floorIntakeHeight: () -> Double = {
+            if(wantedObject() == GamePiece.cube) IOLevel.FloorIntake.cubeElevatorHeight
+            else IOLevel.FloorIntake.coneElevatorHeight
+        }
         val clearRoute: () -> Boolean = {
             drivetrain.estimatedPose2d.y < clearUp + .25 && drivetrain.estimatedPose2d.y > clearUp - .25 || drivetrain.estimatedPose2d.y > clearDown - .25 && drivetrain.estimatedPose2d.y < clearDown + .25
         }
@@ -71,7 +82,7 @@ object BuildingBlocks {
                 //TODO charge station
             }
             else{
-                position.y
+                position().y
             }
         }
         val placementX: () -> Double = {
@@ -82,17 +93,22 @@ object BuildingBlocks {
                 } else {
                     middleX()
                 }
-            } else if(abs(position.x - drivetrain.estimatedPose2d.x) < .2 && abs(position.y - drivetrain.estimatedPose2d.y) < .2){
+            } else if(abs(position().x - drivetrain.estimatedPose2d.x) < .2 && abs(position().y - drivetrain.estimatedPose2d.y) < .2){
                 when(alliance()) {
-                    Red ->  8 + position.x + armLength + .2
-                    Blue -> 8 - position.x - armLength -.2
+                    Red ->  8 + position().x + armLength + .2
+                    Blue -> 8 - position().x - armLength -.2
                     Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                 }
             }
-            else if(arm.armPosition - .25 < floorIntakeAngle && arm.armPosition + .25 > floorIntakeAngle){
+            else if(
+                arm.armPosition - .25 < floorIntakeAngle() &&
+                arm.armPosition + .25 > floorIntakeAngle() &&
+                elevator.height - .25 < floorIntakeHeight() &&
+                elevator.height + .25 > floorIntakeHeight()
+                ){
                 when(alliance()) {
-                    Red -> 8 + position.x + armLength - .5
-                    Blue -> 8 - position.x - armLength + .5
+                    Red -> 8 + position().x + armLength - .5
+                    Blue -> 8 - position().x - armLength + .5
                     Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                 }
             }
