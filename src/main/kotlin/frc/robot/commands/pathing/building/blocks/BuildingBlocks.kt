@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.IOLevel.*
@@ -17,6 +18,7 @@ import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
+import java.time.Instant
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
 import frc.robot.constants.RobotProportions.width as robotWidth
@@ -197,6 +199,13 @@ object BuildingBlocks {
         side: () -> PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
+        val correctStartingPos: () -> Boolean = {
+            when(alliance()){
+                Red -> drivetrain.estimatedPose2d.x > 8
+                Blue -> drivetrain.estimatedPose2d.x < 8
+                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+            }
+        }
         val upperYValue = 4.675
         val lowerYValue = 1.169
         val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
@@ -210,9 +219,7 @@ object BuildingBlocks {
         val isClose: () -> Boolean = {
             (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.05
         }
-
         val altOffset = 0.2
-
         val placementX: () -> Double = {
             when (level()) {
                 Low, Mid, High, HumanPlayerSlider ->
@@ -231,24 +238,27 @@ object BuildingBlocks {
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
-        return MoveToPosition(
-            drivetrain,
-            { _, _, _ ->
-                Pose2d(
-                    placementX(),
-                    placementY(),
-                    safeRotation(
-                        arm,
-                        when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
-                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                        },
-                        drivetrain.estimatedPose2d.rotation
+        if(correctStartingPos()){
+            return MoveToPosition(
+                drivetrain,
+                { _, _, _ ->
+                    Pose2d(
+                        placementX(),
+                        placementY(),
+                        safeRotation(
+                            arm,
+                            when (alliance()) {
+                                Red -> Rotation2d.fromDegrees(180.0 - 2.0)
+                                Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                            },
+                            drivetrain.estimatedPose2d.rotation
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
+        else return InstantCommand()
     }
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
@@ -274,6 +284,13 @@ object BuildingBlocks {
         alliance: () -> DriverStation.Alliance = { Game.alliance },
         endAtAlignment: Boolean = false,
     ): Command {
+        val correctStartingPos: () -> Boolean = {
+            when(alliance()){
+                Red -> drivetrain.estimatedPose2d.x < 8
+                Blue -> drivetrain.estimatedPose2d.x > 8
+                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+            }
+        }
         val placementY: () -> Double = {
             slider().fieldYValue
         }
@@ -289,30 +306,32 @@ object BuildingBlocks {
                     -if (!isClose(null) || endAtAlignment) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
-        return MoveToPosition(
-            drivetrain,
-            { xPid, yPid, rotPid ->
-                Pose2d(
-                    placementX(),
-                    placementY(),
-                    safeRotation(
-                        arm,
-                        when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
-                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                        },
-                        drivetrain.estimatedPose2d.rotation
+        if(correctStartingPos()){
+            return MoveToPosition(
+                drivetrain,
+                { xPid, yPid, rotPid ->
+                    Pose2d(
+                        placementX(),
+                        placementY(),
+                        safeRotation(
+                            arm,
+                            when (alliance()) {
+                                Red -> Rotation2d.fromDegrees(180.0 - 2.0)
+                                Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                            },
+                            drivetrain.estimatedPose2d.rotation
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
+        else return InstantCommand()
     }
 
     fun goToPickupZone(
         drivetrain: Drivetrain,
-        arm: Arm? = null,
-        alliance: () -> DriverStation.Alliance = { Game.alliance },
+        arm: Arm? = null
     ): Command {
         val bottomCommunityZoneLimit = 5.75
         val midCommunityZoneLimit = 6.75
