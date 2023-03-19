@@ -10,9 +10,7 @@ import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Field2dLayout.xCenter
 import frc.robot.subsystems.Arm
-import frc.robot.subsystems.DashboardSelector
 import frc.robot.subsystems.Drivetrain
-import frc.robot.utils.GamePiece
 import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
@@ -48,7 +46,14 @@ object BuildingBlocks {
 
     private fun safeRotation(armAngle: Double, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         if (armAngle.absoluteValue < 0.15) angle
-        else drivetrainAngle
+        else Rotation2d.fromRadians(
+            max(
+                min(
+                    drivetrainAngle.radians - angle.radians,
+                    Rotation2d.fromDegrees(5.0).radians
+                ), Rotation2d.fromDegrees(-5.0).radians
+            )
+        ) + drivetrainAngle
 
     private fun safeRotation(arm: Arm?, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         safeRotation(arm?.armPosition ?: 0.0, angle, drivetrainAngle)
@@ -76,41 +81,34 @@ object BuildingBlocks {
         }
         val placementX: () -> Double = {
             // if the robot is on the side of the field that the object is on
-            if (abs(8 - drivetrain.estimatedPose2d.x) - .2 > abs(8 - exitPoint())) {
+            if ((abs(8 - drivetrain.estimatedPose2d.x) - .2) > abs(8 - exitPoint())) {
                 if (clearRoute()) {
                     exitPoint()
                 } else {
                     middleX()
                 }
-            } else if(abs(position.x - drivetrain.estimatedPose2d.x) < .2 && abs(position.y - drivetrain.estimatedPose2d.y) < .2){
-                when(alliance()) {
-                    Red ->  8 + position.x + armLength + .2
-                    Blue -> 8 - position.x - armLength -.2
+            } else if (abs(position.x - drivetrain.estimatedPose2d.x) < .2 && abs(position.y - drivetrain.estimatedPose2d.y) < .2) {
+                when (alliance()) {
+                    Red -> 8 + position.x + armLength + .2
+                    Blue -> 8 - position.x - armLength - .2
                     Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                 }
-            }
-            else if(arm.armPosition - .25 < floorIntakeAngle && arm.armPosition + .25 > floorIntakeAngle){
-                when(alliance()) {
-                    Red -> 8 + position.x + armLength - .5
-                    Blue -> 8 - position.x - armLength + .5
+            } else if (((arm.armPosition - .25) < floorIntakeAngle) && ((arm.armPosition + .25) > floorIntakeAngle)) {
+                when (alliance()) {
+                    Red -> (8 + position.x + armLength) - .5
+                    Blue -> (8 - position.x - armLength) + .5
                     Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                 }
-            }
-            else{
+            } else {
                 drivetrain.estimatedPose2d.x
             }
         }
         val closestRightAngle : Double = round(drivetrain.estimatedPose2d.rotation.degrees/90) * 90
         val rotation: () -> Rotation2d = {
-            if(abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint())){
-                Rotation2d.fromDegrees(closestRightAngle)
-            }
-            else{
-                when (alliance()) {
-                    Red -> Rotation2d.fromDegrees(180.0)
-                    Blue -> Rotation2d.fromDegrees(0.0)
-                    Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                }
+            when (alliance()) {
+                Red -> Rotation2d.fromDegrees(0.0)
+                Blue -> Rotation2d.fromDegrees(180.0)
+                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
             }
         }
         return MoveToPosition(

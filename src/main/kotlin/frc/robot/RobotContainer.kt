@@ -381,6 +381,7 @@ class RobotContainer {
         addOption(
             "4",
             pickupObjectFromFloor(drivetrain, arm, FloorGamePiecePosition.Closest)
+                .alongWith(SetSubsystemPosition(elevator, arm, { IOLevel.FloorIntake }, { cube }, true))
         )
     }
 
