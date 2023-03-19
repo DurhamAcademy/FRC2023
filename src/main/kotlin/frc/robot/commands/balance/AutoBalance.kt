@@ -33,9 +33,8 @@ class AutoBalance(
     // using the following formula:
     // inclination = arctan(pitch / sqrt(1 - pitch^2) * cos(roll) + roll * sin(roll))
     val currentInclination: Angle
-        get() = atan2(
-            currentPitch.radians,
-            sqrt(1 - currentPitch.radians.pow(2)) * cos(currentRoll.radians) + currentRoll.radians * sin(currentRoll.radians)
+        get() = atan2(currentPitch.radians,
+            sqrt(1 - currentPitch.radians.pow(2)) * cos(currentRoll.radians) + currentRoll.radians * sin(currentRoll.radians),
         ).radians
     val lastInclination = currentInclination
     val lastTime = Timer.getFPGATimestamp().seconds
