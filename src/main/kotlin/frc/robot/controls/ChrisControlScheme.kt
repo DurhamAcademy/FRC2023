@@ -16,7 +16,7 @@ class ChrisControlScheme(
         get() = MathUtil.applyDeadband(xbox.leftY.coerceIn(-1.0, 1.0), 0.05)
 
     override val alignClosestConeL1 = Trigger { false }
-    override val confirmGridSelection: Trigger = xbox.a()
+    override val confirmGridSelection: Trigger = Trigger { false }//xbox.a()
     override val alignClosestConeL2: Trigger = xbox.x()
     override val alignClosestConeL3: Trigger = xbox.y()
     override val alignClosestHPS: Trigger = xbox.b()
