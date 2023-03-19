@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.WaitCommand
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -224,23 +222,17 @@ class RobotContainer {
                                     elevator, arm,
                                     { IOLevel.HumanPlayerSlider },
                                     { smartDashboardSelector.placementSide.asObject },
+                                    stopAtEnd = true
                                 )
-                                    .alongWith(
-                                        WaitCommand(0.1)
-                                            .andThen(
-                                                WaitUntilCommand {
-                                                    elevator.motorPid.atGoal() && arm.armPID.atGoal()
-                                                }.andThen(
-                                                    goToHumanPlayerStation(
-                                                        drivetrain,
-                                                        arm,
-                                                        { Slider.far },
-                                                        endAtAlignment = false
-                                                    ).deadlineWith(
-                                                        SetManipulatorSpeed(manipulator, 1.0)
-                                                    )
-                                                )
-                                            )
+                                    .andThen(
+                                        goToHumanPlayerStation(
+                                            drivetrain,
+                                            arm,
+                                            { Slider.far },
+                                            endAtAlignment = false
+                                        ).deadlineWith(
+                                            SetManipulatorSpeed(manipulator, 1.0)
+                                        )
                                     )
                         )
                     )
@@ -375,7 +367,7 @@ class RobotContainer {
 
         val cameraReady = AnimationCustom({ _, len ->
             val percent = drivetrain.cameraWrappers.maxOf { it.percentage }
-            val color = Color(256 - (percent * 256).toInt(), (percent * 256).toInt(), 0)
+            val color = Color(255 - (percent * 255).toInt(), (percent * 255).toInt(), 0)
             val index = (percent * len).toInt()
             return@AnimationCustom List<Color>(len) { i ->
                 if (i >= index) color else Color.black

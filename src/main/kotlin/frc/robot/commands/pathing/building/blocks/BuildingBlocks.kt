@@ -122,7 +122,7 @@ object BuildingBlocks {
         }
         return MoveToPosition(
             drivetrain,
-            {
+            { _, _, _ ->
                 Pose2d(
                     placementX(),
                     placementY(),
@@ -173,7 +173,7 @@ object BuildingBlocks {
         }
         return MoveToPosition(
             drivetrain,
-            {
+            { _, _, _ ->
                 Pose2d(
                     placementX(),
                     placementY(),
@@ -234,7 +234,7 @@ object BuildingBlocks {
         }
         return MoveToPosition(
             drivetrain,
-            {
+            { _, _, _ ->
                 Pose2d(
                     placementX(),
                     placementY(),
@@ -292,7 +292,7 @@ object BuildingBlocks {
         }
         return MoveToPosition(
             drivetrain,
-            {
+            { xPid, yPid, rotPid ->
                 Pose2d(
                     placementX(),
                     placementY(),
@@ -334,7 +334,7 @@ object BuildingBlocks {
         val placementY = midCommunityZoneLimit + robotWidth / 2.0
         return MoveToPosition(
             drivetrain,
-            {
+            { _, _, _ ->
                 Pose2d(
                     placementX(),
                     placementY,

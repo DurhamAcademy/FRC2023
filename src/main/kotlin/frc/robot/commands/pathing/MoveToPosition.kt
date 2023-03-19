@@ -32,7 +32,11 @@ open class MoveToPosition(
     /**
      * The desired position of the robot (in meters)
      */
-    private var pose: () -> Pose2d,
+    private var pose: (
+        xPID: ProfiledPIDController,
+        yPID: ProfiledPIDController,
+        rPID: ProfiledPIDController
+    ) -> Pose2d,
     /**
      * The desired velocity of the robot (in meters per second)
      */
@@ -60,7 +64,7 @@ open class MoveToPosition(
         snapMode: Boolean = false
     ) : this(
         drivetrain,
-        { pose },
+        { _, _, _ -> pose },
         velocity,
         toleranceppos,
         tolerancepvel,
@@ -117,14 +121,14 @@ open class MoveToPosition(
 
     val visualization = drivetrain.field2d.getObject("MoveToPosition")
     override fun initialize() {
-        if (snapMode) pose = {
+        if (snapMode) pose = { _, _, _ ->
             SnapToPostion.closestPose(drivetrain)
         }
         xPIDController.reset(drivetrain.estimatedPose2d.translation.x, drivetrain.estimatedVelocity.translation.x)
         yPIDController.reset(drivetrain.estimatedPose2d.translation.y, drivetrain.estimatedVelocity.translation.y)
         rPIDController.reset(drivetrain.estimatedPose2d.rotation.radians, drivetrain.estimatedVelocity.rotation.radians)
 
-        visualization.pose = pose()
+        visualization.pose = pose(xPIDController, yPIDController, rPIDController)
     }
 
     // on command start and every time the command is executed, calculate the
@@ -132,7 +136,7 @@ open class MoveToPosition(
     override fun execute() {
         if (!drivetrain.canTrustPose) return initialize()
         val current = drivetrain.estimatedPose2d
-        val desired = pose()
+        val desired = pose(xPIDController, yPIDController, rPIDController)
 
         visualization.pose = desired
 
@@ -225,7 +229,7 @@ open class MoveToPosition(
     val flipped: MoveToPosition
         get() = MoveToPosition(
             drivetrain,
-            { pose().flipped },
+            { x, y, r -> pose(x, y, r).flipped },
             velocity,
             toleranceppos,
             tolerancepvel,
@@ -528,7 +532,7 @@ open class MoveToPosition(
                 (drivetrain.estimatedPose2d)
                 MoveToPosition(
                     drivetrain,
-                    {
+                    { _, _, _ ->
                         Pose2d(
                             drivetrain.estimatedPose2d.translation.x,
                             y(),
