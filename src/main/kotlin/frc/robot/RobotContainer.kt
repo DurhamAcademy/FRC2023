@@ -462,7 +462,7 @@ class RobotContainer {
         )
         addOption(
             "full auto",
-            fullAuto(drivetrain, arm, elevator, manipulator)
+            fullAuto(drivetrain, arm, elevator, manipulator, smartDashboardSelector)
         )
     }
 
