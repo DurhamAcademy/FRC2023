@@ -10,9 +10,11 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.kyberlib.command.Game
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.constants.manipulator.motorId
 import frc.robot.utils.GamePiece
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import frc.robot.constants.manipulator as ManipConsts
 
@@ -23,12 +25,15 @@ class Manipulator: SubsystemBase() {
         setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
 //        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
         idleMode = CANSparkMax.IdleMode.kBrake
+
     }
 
     var motorPercentage: Double
         get() = motor.get()
         set(value) {
             motor.set(value)
+            if (value.absoluteValue < 0.1 || Game.disabled) motor.idleMode = CANSparkMax.IdleMode.kBrake
+            else motor.idleMode = CANSparkMax.IdleMode.kCoast
         }
 
 
@@ -127,6 +132,7 @@ class Manipulator: SubsystemBase() {
     }
 
     override fun periodic() {
+        if (Game.disabled) motor.idleMode = CANSparkMax.IdleMode.kBrake
         if (sensorConnected) {
             val distFiltered = distFilter.calculate(colorSensor.proximity.toDouble())
             distance = 0.1 * (1 - (distFiltered / 2047.0)).pow(1 / 2.0)

@@ -1,5 +1,6 @@
 package frc.robot.commands.pathing.building.blocks
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
@@ -33,8 +34,8 @@ object BuildingBlocks {
             else -> throw IllegalArgumentException("Alliance is not Blue or Red")
         }
     }
-    val clearUp = 4.0 //Y value above charge station
-    val clearDown = 1.5 //Y value below charge station
+    val clearUp = 4.0 + (robotLength / 2.0) + 0.25 //Y value above charge station
+    val clearDown = 1.5 - (robotLength / 2.0) - 0.25 //Y value below charge station
     val exitPoint: () -> Double = {
         xCenter + (((robotLength / 2.0) + 3.0) * -alliance().xMul)
     }
@@ -47,11 +48,31 @@ object BuildingBlocks {
     }
 
     /**
+     * These functions return the direction to rotate that will get from a start
+     * rotation to an end rotation with the least amount of rotation.
+     * @param start the start rotation
+     * @param end the end rotation
+     * @return true if the shortest rotation is an increase in angle (on the
+     * unit circle) and false if the shortest rotation is a decrease in angle.
+     */
+    fun shortestRotationDirection(start: Rotation2d, end: Rotation2d): Boolean {
+        // Get the difference between the two angles
+        val difference = end - start
+        // if the difference is less than 180 degrees, return true
+        return MathUtil.angleModulus(difference.radians.absoluteValue) < 0.0
+    }
+
+    /**
      * These functions check if the robt can rotate safely (ie the arm is up)
      */
     private fun safeRotation(armAngle: Double, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         if (armAngle.absoluteValue < 0.15) angle
         else drivetrainAngle
+
+    //                if (!shortestRotationDirection(drivetrainAngle, angle))
+//                    Rotation2d(PI/4)
+//                else
+//                    Rotation2d(-PI/4)
     private fun safeRotation(arm: Arm?, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         safeRotation(arm?.armPosition ?: 0.0, angle, drivetrainAngle)
 
@@ -138,7 +159,7 @@ object BuildingBlocks {
     fun leaveCommunityZone(
         drivetrain: Drivetrain,
         arm: Arm,
-        ): Command? {
+    ): Command {
         val hasExited: () -> Boolean = {
             (exitPoint() - drivetrain.estimatedPose2d.x).absoluteValue < 0.25
         }
@@ -197,8 +218,8 @@ object BuildingBlocks {
         side: () -> PlacementSide,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
-        val upperYValue = 4.675
-        val lowerYValue = 1.169
+        val upperYValue = clearUp
+        val lowerYValue = clearDown
         val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
         val isInGridZone: () -> Boolean = {
             when (alliance()) {
@@ -298,8 +319,8 @@ object BuildingBlocks {
                     safeRotation(
                         arm,
                         when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                            Red -> Rotation2d.fromDegrees(0.0 - 2.0)
+                            Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
                             Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                         },
                         drivetrain.estimatedPose2d.rotation
@@ -349,5 +370,47 @@ object BuildingBlocks {
                 )
             }
         )
+    }
+
+    fun leavePickupZone(
+        drivetrain: Drivetrain,
+        arm: Arm? = null,
+        alliance: () -> DriverStation.Alliance = { Game.alliance },
+    ): Command {
+        val hasLeftZone: () -> Boolean = {
+            (((drivetrain.estimatedPose2d.x - xCenter).absoluteValue
+                    < (4.0 - (robotLength / 2.0))
+                    ) && (drivetrain.estimatedPose2d.y < (5.3 - (robotWidth / 2.0))))
+                    || (drivetrain.estimatedPose2d.y < (5.3 - (robotWidth / 2.0)))
+        }
+        val x: () -> Double = {
+            if (drivetrain.estimatedPose2d.y < (5.3 - (robotWidth / 2.0)))
+                xCenter + (((robotLength / 2.0) + (5.22)) * -alliance().xMul)
+            else xCenter + ((4.3 - (robotLength / 2.0)) * -alliance().xMul)
+        }
+        val y: () -> Double = {
+            if ((drivetrain.estimatedPose2d.x - xCenter).absoluteValue < (4.73 - (robotLength / 2.0)))
+                5.0 - (robotWidth / 2.0)
+            else drivetrain.estimatedPose2d.y
+        }
+        return MoveToPosition(
+            drivetrain,
+            { _, _, _ ->
+                Pose2d(
+                    x(),
+                    y(),
+                    safeRotation(
+                        arm,
+                        when (alliance()) {
+                            Red -> Rotation2d.fromDegrees(180.0)
+                            Blue -> Rotation2d.fromDegrees(0.0)
+                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                        },
+                        drivetrain.estimatedPose2d.rotation
+                    )
+                )
+            }
+        )
+            .until { hasLeftZone() }
     }
 }
