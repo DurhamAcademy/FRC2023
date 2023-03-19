@@ -215,7 +215,6 @@ object BuildingBlocks {
 
         val placementX: () -> Double = {
             when (level()) {
-                //TODO fill in values (replace 5.2)
                 Low, Mid, High, HumanPlayerSlider ->
                     xCenter + ((-(robotLength / 2) + centerDistX -//4.46
                             if (!isClose()) altOffset

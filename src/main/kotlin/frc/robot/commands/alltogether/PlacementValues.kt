@@ -28,7 +28,7 @@ enum class IOLevel(
         Rotation2d.fromRadians(1.2),
         .85,
         Rotation2d.fromRadians(1.32),
-        -0.15, -.15,
+        -0.15, -0.15,
         -0.075
     ),
     Mid(
@@ -36,7 +36,7 @@ enum class IOLevel(
         Rotation2d.fromRadians(1.175),
         .85,
         Rotation2d.fromRadians(1.32),
-        -0.15, -.10,
+        -0.15, -0.10,
         .2668
     ),
     Low(
@@ -45,7 +45,7 @@ enum class IOLevel(
         Rotation2d.fromRadians(2.61),
         0.88,
         Rotation2d.fromRadians(2.61),
-        -0.15, -.15,
+        -0.15, -0.15,
         0.5
     ),
     HumanPlayerSlider(
@@ -53,7 +53,7 @@ enum class IOLevel(
         Rotation2d.fromRadians(-1.4),
         1.3 - inchesToMeters(11.0),
         Rotation2d.fromRadians(-1.4),
-        .75, 1.0,
+        0.75, 1.0,
         inchesToMeters(13.0) + (robotLength / 2)
 
     ),
@@ -62,14 +62,14 @@ enum class IOLevel(
         Rotation2d.fromRadians(0.0),
         bottomLimit,
         Rotation2d.fromRadians(0.0),
-        -0.15, -.15
+        -0.15, -0.15
     ),
     FloorIntake(
         bottomLimit + inchesToMeters(1.0),
         Rotation2d.fromRadians(1.81),
         bottomLimit + inchesToMeters(1.0),
         Rotation2d.fromRadians(1.81),
-        -0.15, -.15
+        -0.15, -0.15
     ),
     StartingConfig(
         topLimit,
