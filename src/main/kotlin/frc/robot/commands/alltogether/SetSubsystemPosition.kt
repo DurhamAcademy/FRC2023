@@ -38,7 +38,7 @@ class SetSubsystemPosition (
             goalArmPosition = level().cubeArmRotation.radians
             goalElevatorPosition = elevator.height
         }
-        if(wantedObject() == GamePiece.cube){
+        else if(wantedObject() == GamePiece.cube){
             goalArmPosition = level().cubeArmRotation.radians
             goalElevatorPosition = level().cubeElevatorHeight
         }
@@ -51,8 +51,13 @@ class SetSubsystemPosition (
         val armAngle = arm.armPosition
         val armHeight = armLength * sin(armAngle)
         val elevatorMaxHeight = topLimit - armHeight
-        elevator.setpoint = goalElevatorPosition
-            .coerceIn(bottomLimit, elevatorMaxHeight)
+        if(arm.armPosition > .2 && goalArmPosition < -.2 || arm.armPosition < -.2 && goalArmPosition > .2){
+            elevator.setpoint = bottomLimit
+        }
+        else{
+            elevator.setpoint = goalElevatorPosition
+                .coerceIn(bottomLimit, elevatorMaxHeight)
+        }
     }
 
     override fun isFinished(): Boolean = stopAtEnd &&
