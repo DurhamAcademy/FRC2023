@@ -37,12 +37,7 @@ class Intake : SubsystemBase()  {
         configSensorDirection(intake.systemencoder.inverted)
     }
 
-    val modeEncoder = CANCoder(intake.modeencoder.id).apply {
-        configFactoryDefault()
-        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        configMagnetOffset((intake.modeencoder.offset))
-        configSensorDirection(intake.modeencoder.inverted)
-    }
+    val modeEncoder = modeMotor.getEncoder()
 
     var driveMotorPercentage: Double
         get() = driveMotor.get()
@@ -82,7 +77,7 @@ class Intake : SubsystemBase()  {
         get() = !limitSwitch.get()
 
     val modeMotorPosition: Double
-        get() = Math.toRadians(modeEncoder.absolutePosition)
+        get() = Math.toRadians(modeEncoder.position)
 
     val systemMotorPosition: Double
         get() = Math.toRadians(systemEncoder.absolutePosition)

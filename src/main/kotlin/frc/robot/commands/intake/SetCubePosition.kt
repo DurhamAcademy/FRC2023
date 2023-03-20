@@ -21,7 +21,8 @@ class SetCubePosition(
     }
 
     override fun isFinished(): Boolean {
-        return intake.modeMotorPosition == 180.0
+        //TODO CHANGE THIS VALUE TO WHAT IS THE ACTUAL VALUE
+        return intake.modeMotorPosition >= 180.0
     }
 
 }
