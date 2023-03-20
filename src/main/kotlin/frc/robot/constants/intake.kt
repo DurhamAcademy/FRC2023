@@ -10,6 +10,9 @@ object intake {
     const val modeMotorId = 0
     const val modeMotorLimit = 0
 
+    const val maxAngle = 0.0
+    const val minAngle = 0.0
+
 
     object systemmotor{
         const val positionTolerance = 0.0

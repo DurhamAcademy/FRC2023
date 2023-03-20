@@ -100,10 +100,12 @@ class Intake : SubsystemBase()  {
         return modeMotor.busVoltage
     }
 
+    private var intakeSetpoint: Double? = null
+
     fun setIntakePosition(position: Double) {
         intakeSetpoint = position.coerceIn(
-            arm.minAngle,
-            arm.maxAngle
+            intake.minAngle,
+            intake.maxAngle
         )
     }
 
