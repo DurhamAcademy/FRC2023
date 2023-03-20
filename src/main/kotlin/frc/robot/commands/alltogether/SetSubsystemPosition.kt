@@ -35,8 +35,8 @@ class SetSubsystemPosition (
     }
     override fun execute() {
         if(level() == IOLevel.StartingConfig){
-            goalArmPosition = level().cubeArmRotation.radians
-            goalElevatorPosition = elevator.height
+            arm.setArmPosition(level().cubeArmRotation.radians)
+            return
         }
         else if(wantedObject() == GamePiece.cube){
             goalArmPosition = level().cubeArmRotation.radians
