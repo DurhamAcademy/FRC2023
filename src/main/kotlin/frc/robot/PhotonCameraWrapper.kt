@@ -13,6 +13,14 @@ class PhotonCameraWrapper {
         VisionConstants.cameraName
     )
 
+    var validPoseCount = 0UL
+
+    val canTrustPose: Boolean
+        get() = validPoseCount > 100UL
+
+    val percentage: Double
+        get() = validPoseCount.toDouble() / 100.0
+
     //if is simulation, don't use photon camera
     /**
      * The pose estimator for the camera. This is null if the robot is in
@@ -43,17 +51,22 @@ class PhotonCameraWrapper {
         if (photonPoseEstimator == null) return Optional.empty()
         photonPoseEstimator!!.setReferencePose(prevEstimatedRobotPose)
         return if (photonCamera.latestResult.targets.size > 2) {
-            photonPoseEstimator!!.update()
+            update()
         } else if (photonCamera.latestResult.targets.size == 2) {
             if (photonCamera.latestResult.targets
                     .minOf { it.poseAmbiguity } < 0.5
             )
-                photonPoseEstimator!!.update()
+                update()
             else Optional.empty()
         } else if (photonCamera.latestResult.targets.size == 1) {
             if ((photonCamera.latestResult.bestTarget?.poseAmbiguity ?: 1.0) < 0.2)
-                photonPoseEstimator!!.update()
+                update()
             else Optional.empty()
         } else Optional.empty()
+    }
+
+    private fun update(): Optional<EstimatedRobotPose> {
+        validPoseCount++
+        return photonPoseEstimator!!.update()
     }
 }

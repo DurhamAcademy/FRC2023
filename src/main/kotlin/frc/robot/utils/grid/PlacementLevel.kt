@@ -5,8 +5,10 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
+import frc.robot.commands.alltogether.IOLevel
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.Field2dLayout.Axes
+import frc.robot.utils.GamePiece
 
 object GridConstants {
     const val centerDistX: Double = 6.87//feetToMeters(22.625)
@@ -25,6 +27,7 @@ enum class FloorGamePiecePosition(val x: Double, val y: Double){
     MiddleFar(inchesToMeters(47.36), inchesToMeters(132.19)), //y 3.517
     Farthest(inchesToMeters(47.36), inchesToMeters(180.19)), //
 }
+
 /**
  * This enum represents the different levels of the field.
  *
@@ -33,10 +36,17 @@ enum class FloorGamePiecePosition(val x: Double, val y: Double){
  * @param height the height of the level from the ground to the center of the
  * cube placement area in the group.
  */
-enum class PlacmentLevel(val depth: Double, val height: Double) {
-    Level1(inchesToMeters(13.0/2), inchesToMeters(0.0)),
+enum class PlacementLevel(val depth: Double, val height: Double) {
+    Level1(inchesToMeters(13.0 / 2), inchesToMeters(0.0)),
     Level2(inchesToMeters(22.0), inchesToMeters(33.75)),
-    Level3(inchesToMeters(40.0), inchesToMeters(45.75)),
+    Level3(inchesToMeters(40.0), inchesToMeters(45.75)), ;
+
+    val ioLevel: IOLevel
+        get() = when (this) {
+            Level1 -> IOLevel.Low
+            Level2 -> IOLevel.Mid
+            Level3 -> IOLevel.High
+        }
 }
 
 /**
@@ -64,13 +74,22 @@ enum class PlacementSide(val offset: Double) {
      * The cone placement area closest to the judging table in a group.
      */
     CloseCone(inchesToMeters(22.0)),
+
     /** The cube placement area, in between the two cone placement areas and in
      * the middle of the group.
      */
     Cube(0.0),
+
     /** The cone placement area farthest from the judging table in a group.
      */
-    FarCone(inchesToMeters(-22.0)),
+    FarCone(inchesToMeters(-22.0)), ;
+
+    val asObject: GamePiece
+        get() = when (this) {
+            CloseCone -> GamePiece.cone
+            Cube -> GamePiece.cube
+            FarCone -> GamePiece.cone
+        }
 }
 
 /**
@@ -86,7 +105,7 @@ enum class PlacementSide(val offset: Double) {
  * @param side the side of the group.
  */
 fun getPlacementTransform(
-    level: PlacmentLevel,
+    level: PlacementLevel,
     group: PlacementGroup,
     side: PlacementSide,
     alliance: DriverStation.Alliance = DriverStation.getAlliance()

@@ -17,13 +17,15 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.RobotContainer
+import frc.robot.commands.alltogether.IOLevel
 import frc.robot.constants.Constants
-import frc.robot.constants.FieldConstants
 import frc.robot.constants.arm
 import frc.robot.constants.elevator
+import frc.robot.constants.elevator.elevatorMotor.tolerance.positionTolerance
+import frc.robot.utils.GamePiece
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.cos
-import kotlin.math.sin
 
 class Elevator(
     val robotContainer: RobotContainer?,
@@ -80,7 +82,7 @@ class Elevator(
 
     var height: Double
         get() = if (RobotBase.isSimulation())
-            elevatorSim.positionMeters// + simOffset + offset
+            motorPid.setpoint.position// + simOffset + offset
         else
             (elevatorMotor.selectedSensorPosition *
                     elevator.encoderDistancePerPulse *
@@ -244,4 +246,11 @@ class Elevator(
         )
         // just set the motor voltage to the control scheme's output
     }
+
+    fun isAtPosition(ioLevel: IOLevel, asObject: GamePiece) =
+        when (asObject) {
+            GamePiece.cone -> (height - ioLevel.coneElevatorHeight).absoluteValue < positionTolerance / 2
+            GamePiece.cube -> (height - ioLevel.cubeElevatorHeight).absoluteValue < positionTolerance / 2
+            else -> motorPid.atGoal()
+        }
 }

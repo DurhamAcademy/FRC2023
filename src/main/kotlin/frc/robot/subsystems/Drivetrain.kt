@@ -263,7 +263,7 @@ class Drivetrain(
     ) {
         val chassisSpeedsField =
             if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
-                chassisSpeeds.slewLimited(xSlewRateLimiter, ySlewRateLimiter, rotSlewRateLimiter),
+                chassisSpeeds,//.slewLimited(xSlewRateLimiter, ySlewRateLimiter, rotSlewRateLimiter),
                 estimatedPose2d.rotation
             )
             else chassisSpeeds
@@ -364,6 +364,9 @@ class Drivetrain(
             )
         )
     }
+
+    val canTrustPose: Boolean
+        get() = cameraWrappers.any { it.canTrustPose } || Game.sim
 
 }
 

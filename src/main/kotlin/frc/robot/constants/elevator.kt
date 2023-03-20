@@ -45,6 +45,6 @@ object elevator {
 
     object limits {
         val bottomLimit: Double = Units.inchesToMeters(17.83)
-        val topLimit: Double = Units.inchesToMeters(50.5)
+        val topLimit: Double = Units.inchesToMeters(48.5)
     }
 }

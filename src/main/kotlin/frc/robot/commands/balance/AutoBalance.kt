@@ -14,7 +14,8 @@ import frc.robot.subsystems.Drivetrain
 import kotlin.math.*
 
 class AutoBalance(
-    val drivetrain: Drivetrain
+    val drivetrain: Drivetrain,
+    val balanceDirection: Double //-1.0 or 1.0 are different directions
 ) : CommandBase() {
     init {
         addRequirements(drivetrain)
@@ -32,9 +33,8 @@ class AutoBalance(
     // using the following formula:
     // inclination = arctan(pitch / sqrt(1 - pitch^2) * cos(roll) + roll * sin(roll))
     val currentInclination: Angle
-        get() = atan2(
-            currentPitch.radians,
-            sqrt(1 - currentPitch.radians.pow(2)) * cos(currentRoll.radians) + currentRoll.radians * sin(currentRoll.radians)
+        get() = atan2(currentPitch.radians,
+            sqrt(1 - currentPitch.radians.pow(2)) * cos(currentRoll.radians) + currentRoll.radians * sin(currentRoll.radians),
         ).radians
     val lastInclination = currentInclination
     val lastTime = Timer.getFPGATimestamp().seconds
@@ -47,7 +47,7 @@ class AutoBalance(
     override fun execute() {
         drivetrain.drive(
             ChassisSpeeds(
-                -1.0,
+                balanceDirection,
                 0.0,
                 0.0
             ),
