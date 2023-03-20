@@ -3,6 +3,7 @@ package frc.robot.commands.pathing.building.blocks
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
@@ -22,6 +23,7 @@ import frc.robot.utils.xMul
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
 import frc.robot.constants.RobotProportions.width as robotWidth
+import frc.robot.constants.drivetrain as drivetrainConstraints
 
 object BuildingBlocks {
     val robotDiagRadius = hypot(robotLength / 2.0, robotWidth / 2.0) + 0.1
@@ -30,19 +32,15 @@ object BuildingBlocks {
      * Variables
      */
     val exitFalseGoalPoint = { alliance: Alliance ->
-        xCenter + ((2.15 + robotDiagRadius) * alliance.xMul)
+        xCenter + ((2.15 - robotDiagRadius) * alliance.xMul)
     }
     val clearUp = 4.0 + (robotLength / 2.0) + 0.25 //Y value above charge station
     val clearDown = 1.5 - (robotLength / 2.0) - 0.25 //Y value below charge station
     val exitPoint = { alliance: Alliance ->
-        xCenter + ((robotDiagRadius + 3.0) * -alliance.xMul)
+        xCenter + ((3.3 - robotDiagRadius) * -alliance.xMul)
     }
     val middleX = { alliance: Alliance ->
-        when (alliance) {
-            Red -> 12.0
-            Blue -> 2.5
-            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-        }
+        xCenter + (6.0 * -alliance.xMul)
     }
 
     /**
@@ -107,6 +105,7 @@ object BuildingBlocks {
                 if (clearRoute()) {
                     exitPoint(alliance())
                 } else {
+                    //
                     middleX(alliance())
                 }
             } else {
@@ -162,12 +161,12 @@ object BuildingBlocks {
             (exitPoint(alliance()) - drivetrain.estimatedPose2d.x).absoluteValue < 0.25
         }
         val clearRoute: () -> Boolean = {
-
-            ((
-                    drivetrain.estimatedPose2d.y < clearUp + .25
-                    ).and(
-                    drivetrain.estimatedPose2d.y > clearUp - .25
-                )
+            (
+                    (
+                            drivetrain.estimatedPose2d.y < clearUp + .25
+                            ).and(
+                            drivetrain.estimatedPose2d.y > clearUp - .25
+                        )
                     ).or(
                     (
                             drivetrain.estimatedPose2d.y > clearDown - .25
@@ -175,7 +174,6 @@ object BuildingBlocks {
                             drivetrain.estimatedPose2d.y < clearDown + .25
                         )
                 )
-
         }
         val placementX: () -> Double = {
             if (clearRoute()) {
@@ -185,11 +183,11 @@ object BuildingBlocks {
             }
         }
         val placementY: () -> Double = {
-            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
-                clearDown
-            } else {
-                clearUp
-            }
+//            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
+//                clearDown
+//            } else {
+            clearUp
+//            }
             //TODO charge station
         }
         val rotationAlliance: () -> Rotation2d = {
@@ -205,8 +203,23 @@ object BuildingBlocks {
         }
         return MoveToPosition(
             drivetrain,
-            { _, _, _ ->
-                Pose2d(
+            { xPID, _, _ ->
+                if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
+                    xPID.setConstraints(
+                        TrapezoidProfile.Constraints(
+                            0.2,
+                            drivetrainConstraints.maxAcceleration
+                        )
+                    )
+                } else {
+                    xPID.setConstraints(
+                        TrapezoidProfile.Constraints(
+                            10.0,
+                            drivetrainConstraints.maxAcceleration
+                        )
+                    )
+                }
+                return@MoveToPosition Pose2d(
                     placementX(),
                     placementY(),
                     rotationAlliance()
@@ -359,9 +372,9 @@ object BuildingBlocks {
         }
         val placementX: () -> Double = {
             if (isInCommunityZone())
-                xCenter + (((robotLength / 2.0) + (-5.22)) * -alliance().xMul)
+                xCenter + (((3.0) - (robotLength / 2.0)) * alliance().xMul)
             else
-                xCenter + (((robotLength / 2.0) + (-6.0)) * -alliance().xMul)
+                xCenter + (((3.0) - (robotLength / 2.0)) * alliance().xMul)
         }
         val placementY = midCommunityZoneLimit + robotWidth / 2.0
         return MoveToPosition(
@@ -373,8 +386,8 @@ object BuildingBlocks {
                     safeRotation(
                         arm,
                         when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0)
-                            Blue -> Rotation2d.fromDegrees(0.0)
+                            Red -> Rotation2d.fromDegrees(0.0)
+                            Blue -> Rotation2d.fromDegrees(180.0)
                             Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                         },
                         drivetrain.estimatedPose2d.rotation
@@ -382,6 +395,7 @@ object BuildingBlocks {
                 )
             }
         )
+            .until(isInCommunityZone)
     }
 
     inline fun leavePickupZone(

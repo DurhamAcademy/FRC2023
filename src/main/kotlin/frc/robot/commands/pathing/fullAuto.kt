@@ -17,7 +17,8 @@ fun fullAuto(
     arm: Arm,
     elevator: Elevator,
     manipulator: Manipulator,
-    selector: DashboardSelector
+    selector: DashboardSelector,
+//    command
 ): Command {
     return BuildingBlocks.goToPlacementPoint(
         drivetrain,
@@ -77,7 +78,7 @@ fun fullAuto(
                     SetSubsystemPosition(
                         elevator,
                         arm,
-                        { IOLevel.Idle },
+                        { IOLevel.HumanPlayerSlider },
                         { selector.placementSide.asObject },
                         true
                     )

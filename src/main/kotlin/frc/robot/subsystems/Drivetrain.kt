@@ -232,7 +232,7 @@ class Drivetrain(
             simQueuedForce = Transform2d()
         }
         // update the field 2d widget with the current robot position
-        if (i++ >= 2U) {
+        if (i++ >= 0U) {
             field2d.robotPose = estimatedPose2d
             i = 0U
         }

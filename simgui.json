@@ -55,11 +55,6 @@
           "open": true
         }
       }
-    },
-    "Timing": {
-      "window": {
-        "visible": false
-      }
     }
   },
   "NTProvider": {
