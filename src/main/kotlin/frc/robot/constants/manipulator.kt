@@ -9,7 +9,7 @@ object manipulator {
     const val leftSolenoidReverse = 1
     const val rightSolenoidForward = 3
     const val rightSolenoidReverse = 2
-    const val manipulatorCurrentLimit = 20.0
+    const val manipulatorCurrentLimit = 80.0
 
     val wristToObj = Units.inchesToMeters(8.0)
     const val confidenceThreshold = 0.75

@@ -42,7 +42,7 @@ object Game {
     inline val matchTime
         get() = time - startTime//DriverStation.getMatchTime().seconds
 
-    val alliance: DriverStation.Alliance
+    inline val alliance: DriverStation.Alliance
         get() = DriverStation.getAlliance()
 
 //    val matchName

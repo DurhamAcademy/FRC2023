@@ -30,8 +30,10 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
+import frc.robot.commands.pathing.fullAuto
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.constants.leds.count
@@ -230,11 +232,30 @@ class RobotContainer {
                                             arm,
                                             { Slider.far },
                                             endAtAlignment = false
-                                        ).deadlineWith(
-                                            SetManipulatorSpeed(manipulator, 1.0)
                                         )
                                     )
-                        )
+                                    .deadlineWith(
+                                        SetManipulatorSpeed(manipulator, 1.0)
+                                    )
+                                    .andThen(
+                                        SetManipulatorSpeed(manipulator, 1.0)
+                                            .withTimeout(0.5)
+                                    )
+                            ).andThen(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { IOLevel.Idle },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                    stopAtEnd = true
+                                ).alongWith(
+                                    goToHumanPlayerStation(
+                                        drivetrain,
+                                        arm,
+                                        { Slider.far },
+                                        endAtAlignment = true
+                                    )
+                                )
+                            )
                     )
             }
         }
@@ -434,6 +455,14 @@ class RobotContainer {
                 PlacementGroup.Farthest,
                 PlacementSide.Cube
             )
+        )
+        addOption(
+            "exit human player area",
+            BuildingBlocks.leavePickupZone(drivetrain, arm)
+        )
+        addOption(
+            "full auto",
+            fullAuto(drivetrain, arm, elevator, manipulator, smartDashboardSelector)
         )
     }
 
