@@ -166,6 +166,21 @@ class Drivetrain(
         this.robotPose = estimatedPose2d
     }
 
+    val gyroPitchWidget = Idrc.add("Gyro Pitch", 0.0)
+        .withWidget("Gryo")
+        .withProperties(mapOf("min" to -180.0, "max" to 180.0))
+        .withSize(2, 2)
+        .entry
+    val gyroYawWidget = Idrc.add("Gyro Yaw", 0.0)
+        .withWidget("Gryo")
+        .withProperties(mapOf("min" to -180.0, "max" to 180.0))
+        .withSize(2, 2)
+        .entry
+    val gyroRollWidget = Idrc.add("Gyro Roll", 0.0)
+        .withWidget("Gryo")
+        .withProperties(mapOf("min" to -180.0, "max" to 180.0))
+        .withSize(2, 2)
+        .entry
 
     /**
      * The periodic method is run roughly every 20ms. This is where we update
@@ -177,6 +192,10 @@ class Drivetrain(
     override fun periodic() {
         // This method will be called once per scheduler run
 
+        // update the gyro
+        gyroPitchWidget.setDouble(gyro.pitch)
+        gyroYawWidget.setDouble(gyro.yaw)
+        gyroRollWidget.setDouble(gyro.roll)
 
         // pose estimator handles odometry too
         poseEstimator.update(

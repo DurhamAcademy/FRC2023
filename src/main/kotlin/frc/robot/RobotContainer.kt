@@ -25,7 +25,7 @@ import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.alltogether.SetSubsystemPosition
-import frc.robot.commands.balance.AutoBalance
+import frc.robot.commands.drivetrain.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
