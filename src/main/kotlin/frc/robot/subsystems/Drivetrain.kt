@@ -167,7 +167,7 @@ class Drivetrain(
         this.robotPose = estimatedPose2d
     }
 
-
+    private var i = 0U
     /**
      * The periodic method is run roughly every 20ms. This is where we update
      * any values that are constantly changing, such as the robot's position,
@@ -231,9 +231,11 @@ class Drivetrain(
             simEstimatedPose2d = simEstimatedPose2d + (vel * 0.02 * 0.01) + simQueuedForce
             simQueuedForce = Transform2d()
         }
-
         // update the field 2d widget with the current robot position
-        field2d.robotPose = estimatedPose2d
+        if (i++ >= 2U) {
+            field2d.robotPose = estimatedPose2d
+            i = 0U
+        }
         // push to shuffleboard
         SmartDashboard.putData("field", field2d)
 

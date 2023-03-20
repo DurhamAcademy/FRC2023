@@ -17,14 +17,38 @@ class AnimationLightsaber(val color: Color, transparency: Boolean= false, condit
     private fun length(t: Time): Double {
         return t.seconds.coerceAtMost(1.0)
     }
+    var buffer = mutableListOf<Color>()
     override fun getBuffer(time: Time, length: Int): List<Color> {
-        if(startTime < 0.seconds || Game.time - lastUpdate > 3.seconds)
+        if (startTime < 0.seconds || Game.time - lastUpdate > 3.seconds)
             startTime = time
         lastUpdate = time
 
         val dt = time - startTime
         val brightness = flicker(dt).coerceAtMost(1.0)
         val len = length(dt)
-        return List<Color>(length) {index: Int -> if (index < length * len) color * brightness else Color.BLACK}
+//        List<Color>(length) {index: Int -> if (index < length * len) color * brightness else Color.BLACK}
+        val _color = color * brightness
+        // check if we are fully in the flicker phase
+        if (len != 1.0) {
+            if (buffer.size != length) {
+                buffer.clear()
+                buffer.addAll(List(length) { index: Int -> if (index < length * len) _color else Color.black })
+            } else {
+                for (i in 0 until length) {
+                    buffer[i] = if (i < length * len) _color else Color.black
+                }
+            }
+        } else {
+            if (buffer.size != length) {
+                buffer.clear()
+                buffer.addAll(List(length) { _color })
+            } else {
+                for (i in 0 until length) {
+                    buffer[i] = _color
+                }
+            }
+        }
+
+        return buffer
     }
 }
