@@ -3,7 +3,6 @@ package frc.robot.commands.pathing
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.WaitCommand
-import frc.kyberlib.command.Game
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -49,7 +48,7 @@ fun fullAuto(
             )
     )
         .andThen(
-            BuildingBlocks.leaveCommunityZone(drivetrain, arm, { Game.alliance })
+            BuildingBlocks.leaveCommunityZone(drivetrain, arm)
                 .deadlineWith(
                     SetSubsystemPosition(
                         elevator,

@@ -12,8 +12,8 @@ import kotlin.math.sin
 class SetSubsystemPosition (
     val elevator: Elevator,
     val arm: Arm,
-    val level: () -> IOLevel,
-    val wantedObject: () -> GamePiece,
+    inline val level: () -> IOLevel,
+    inline val wantedObject: () -> GamePiece,
 
     val stopAtEnd: Boolean = false
 ) : CommandBase() {

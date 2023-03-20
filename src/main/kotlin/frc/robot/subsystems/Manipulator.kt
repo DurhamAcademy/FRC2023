@@ -41,7 +41,7 @@ class Manipulator: SubsystemBase() {
     val colorSensor = ColorSensorV3(i2cPort)
 
 
-    val proximity: Int?
+    inline val proximity: Int?
         get() = if (sensorConnected) colorSensor.proximity
         else null
 
@@ -55,7 +55,7 @@ class Manipulator: SubsystemBase() {
      * @see ColorSensorV3.getColor
      * @return the color detected by the sensor
      */
-    val color: Color?
+    inline val color: Color?
         get() = if (sensorConnected)
             colorSensor.color
         else null
@@ -80,10 +80,10 @@ class Manipulator: SubsystemBase() {
      * x=(0.1*(1-(y/2047))^(1/2))
      */
     var distance: Double? = null
-    val sensorConnected: Boolean
+    inline val sensorConnected: Boolean
         get() = colorSensor.isConnected
 
-    val inColorRange: Boolean?
+    inline val inColorRange: Boolean?
         get() = if (sensorConnected) distance!! < 0.095 else null
 
     private val colorMatch = ColorMatch().apply {

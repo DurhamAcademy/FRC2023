@@ -32,7 +32,7 @@ open class MoveToPosition(
     /**
      * The desired position of the robot (in meters)
      */
-    private var pose: (
+    private inline var pose: (
         xPID: ProfiledPIDController,
         yPID: ProfiledPIDController,
         rPID: ProfiledPIDController

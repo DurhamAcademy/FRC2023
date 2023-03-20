@@ -3,7 +3,6 @@ package frc.robot.commands.pathing.building.blocks
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
@@ -157,7 +156,7 @@ object BuildingBlocks {
     fun leaveCommunityZone(
         drivetrain: Drivetrain,
         arm: Arm,
-        alliance: () -> Alliance
+        alliance: () -> Alliance = { Game.alliance }
     ): Command {
         val hasExited: () -> Boolean = {
             (exitPoint(alliance()) - drivetrain.estimatedPose2d.x).absoluteValue < 0.25

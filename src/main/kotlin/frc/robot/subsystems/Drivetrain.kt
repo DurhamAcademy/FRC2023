@@ -123,9 +123,10 @@ class Drivetrain(
         VecBuilder.fill(1.8, 1.8, 1.8)
     )
 
-    private var simEstimatedPose2d: Pose2d = Pose2d()
+    @Deprecated("Use estimatedPose2d instead, this is only for internal drivetrain use")
+    var simEstimatedPose2d: Pose2d = Pose2d()
 
-    val estimatedPose2d: Pose2d
+    inline val estimatedPose2d: Pose2d
         get() = if (!Game.sim) {
             poseEstimator.estimatedPosition
         } else {
@@ -332,7 +333,7 @@ class Drivetrain(
         }
     }
 
-    var swerveModuleStates: List<SwerveModuleState>
+    inline var swerveModuleStates: List<SwerveModuleState>
         get() = this.modules.map { it.currentPosition }
         set(value) = value.forEachIndexed { i, it ->
             modules[i].setpoint = it
@@ -365,7 +366,7 @@ class Drivetrain(
         )
     }
 
-    val canTrustPose: Boolean
+    inline val canTrustPose: Boolean
         get() = cameraWrappers.any { it.canTrustPose } || Game.sim
 
 }
