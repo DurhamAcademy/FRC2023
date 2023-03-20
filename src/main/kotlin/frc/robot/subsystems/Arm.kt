@@ -1,12 +1,13 @@
 package frc.robot.subsystems
 
+//import frc.robot.utils.armFeedforward
+//import frc.robot.utils.createArmSystemPlant
 import com.ctre.phoenix.sensors.AbsoluteSensorRange
 import com.ctre.phoenix.sensors.CANCoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.math.controller.ArmFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.Preferences
@@ -18,8 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
 import frc.robot.constants.arm
-//import frc.robot.utils.armFeedforward
-//import frc.robot.utils.createArmSystemPlant
 import java.lang.Math.PI
 import java.lang.Math.toRadians
 
@@ -85,6 +84,11 @@ class Arm : SubsystemBase() {
                 .configMagnetOffset(-value + arm.encoder.offset)
         }
 
+    /**
+     * @return angle in radians. 0 is upright, -pi/2 is horizontal where the arm
+     * is over our intake. pi/2 is horizontal where the arm out of frame
+     * perimeter.
+     */
     val armPosition: Double
         get() = if (RobotBase.isSimulation()) armPID.setpoint.position//simArmSystem.angleRads
         else toRadians(armEncoder.absolutePosition)

@@ -88,7 +88,6 @@ class DashboardSelector {
             selectedYEntry.setInteger(value.second.toLong())
 
             field = value
-            println("Selected: $selected")
         }
 
     fun moveCommand(x: Int, y: Int) = InstantCommand({
@@ -102,16 +101,18 @@ class DashboardSelector {
     })
 
     fun update() {
-        if (selectedXEntry.getDouble(0.0).roundToInt() != selected.first) {
-            selected = selectedXEntry.getDouble(0.0).roundToInt() to selected.second
+        val selectedXEntryRounded = selectedXEntry.getDouble(0.0).roundToInt()
+        if (selectedXEntryRounded != selected.first) {
+            selected = selectedXEntryRounded to selected.second
         }
-        if (selectedYEntry.getDouble(0.0).roundToInt() != selected.second) {
-            selected = selected.first to selectedYEntry.getDouble(0.0).roundToInt()
+        val selectedYEntryRounded = selectedYEntry.getDouble(0.0).roundToInt()
+        if (selectedYEntryRounded != selected.second) {
+            selected = selected.first to selectedYEntryRounded
         }
 
         for (x in gridEntries.indices) {
             for (y in gridEntries[x].indices) {
-                if (gridEntries[x][y].getBoolean(false)) {
+                if (gridEntries[x][y].getBoolean(false) && selected != x to y) {
                     selected = x to y
                 }
             }

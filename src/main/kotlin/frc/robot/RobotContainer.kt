@@ -22,9 +22,7 @@ import frc.kyberlib.lighting.KLEDStrip
 import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
-import frc.robot.commands.alltogether.HoldPosition
 import frc.robot.commands.alltogether.IOLevel
-import frc.robot.commands.alltogether.SetPosition
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
@@ -38,6 +36,7 @@ import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.*
+import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
@@ -77,7 +76,9 @@ class RobotContainer {
 
                 idleConfiguration
                     .whileTrue(
-                        SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle}, { wantedObject })
+                        SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { wantedObject }, true)
+                            .andThen(ZeroElevatorAndIdle(elevator, arm))
+                            .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { wantedObject }, false))
                     )
 
                 // assign l1
@@ -126,10 +127,7 @@ class RobotContainer {
                             )
                     )
                     .onFalse(
-                        HoldPosition(elevator, arm)
-                            .alongWith(
-                                SetManipulatorSpeed(manipulator, 0.1)
-                            )
+                        SetManipulatorSpeed(manipulator, 0.1)
                     )
 
                 moveToClosestHPSAxis
@@ -182,6 +180,7 @@ class RobotContainer {
                     .whileTrue(
                         goToPlacementPoint(
                             drivetrain,
+                            arm,
                             { smartDashboardSelector.placementLevel },
                             { smartDashboardSelector.placementPosition },
                             { smartDashboardSelector.placementSide },
@@ -251,7 +250,8 @@ class RobotContainer {
             else -> Unknown
         }
 
-    var wantedObject = none
+    val wantedObject: GamePiece
+        get() = smartDashboardSelector.placementSide.asObject
 
     val leds = KLEDStrip(9, frc.robot.constants.leds.count).apply {
         val coral = Color(255, 93, 115)
@@ -354,7 +354,8 @@ class RobotContainer {
                 .andThen(
                     goToPlacementPoint(
                         drivetrain,
-                        { PlacementLevel.Level1 },
+                        arm,
+                        { PlacementLevel.Level3 },
                         { PlacementGroup.Farthest },
                         { PlacementSide.FarCone }
                     )
@@ -370,11 +371,11 @@ class RobotContainer {
         )
         addOption(
             "2",
-            goToPlacementPoint(drivetrain, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, arm, PlacementLevel.Level2, PlacementGroup.Farthest, PlacementSide.Cube)
         )
         addOption(
             "3",
-            goToPlacementPoint(drivetrain, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
+            goToPlacementPoint(drivetrain, arm, PlacementLevel.Level3, PlacementGroup.Farthest, PlacementSide.Cube)
         )
     }
 

@@ -28,8 +28,8 @@ object BuildingBlocks {
             else -> throw IllegalArgumentException("Alliance is not Blue or Red")
         }
     }
-    val clearUp = 4.675 //Y value above charge station
-    val clearDown = 1.169//Y value below charge station
+    val clearUp = 4.0 //Y value above charge station
+    val clearDown = 1.5 //Y value below charge station
     val exitPoint: () -> Double = {
         xCenter + (((robotLength / 2.0) + 3.0) * -alliance().xMul)
     }
@@ -41,8 +41,16 @@ object BuildingBlocks {
         }
     }
 
+    private fun safeRotation(armAngle: Double, angle: Rotation2d, drivetrainAngle: Rotation2d) =
+        if (armAngle.absoluteValue < 0.15) angle
+        else drivetrainAngle
+
+    private fun safeRotation(arm: Arm?, angle: Rotation2d, drivetrainAngle: Rotation2d) =
+        safeRotation(arm?.armPosition ?: 0.0, angle, drivetrainAngle)
+
     fun pickupObjectFromFloor(
         drivetrain: Drivetrain,
+        arm: Arm,
         position: FloorGamePiecePosition,
     ): MoveToPosition {
         var firstRun = true
@@ -108,7 +116,7 @@ object BuildingBlocks {
                 Pose2d(
                     placementX(),
                     placementY(),
-                    rotation()
+                    safeRotation(arm, rotation(), drivetrain.estimatedPose2d.rotation)
                 )
             }
         )
@@ -166,6 +174,7 @@ object BuildingBlocks {
 
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
+        arm: Arm? = null,
         level: () -> PlacementLevel,
         group: () -> PlacementGroup,
         side: () -> PlacementSide,
@@ -173,7 +182,7 @@ object BuildingBlocks {
     ): Command {
         val upperYValue = 4.675
         val lowerYValue = 1.169
-        val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 4.8) * -alliance().xMul) }
+        val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
         val isInGridZone: () -> Boolean = {
             when (alliance()) {
                 Red -> drivetrain.estimatedPose2d.x > chargeLimit()
@@ -214,11 +223,15 @@ object BuildingBlocks {
                 Pose2d(
                     placementX(),
                     placementY(),
-                    when (alliance()) {
-                        Red -> Rotation2d.fromDegrees(180.0)
-                        Blue -> Rotation2d.fromDegrees(0.0)
-                        Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                    }
+                    safeRotation(
+                        arm,
+                        when (alliance()) {
+                            Red -> Rotation2d.fromDegrees(180.0)
+                            Blue -> Rotation2d.fromDegrees(0.0)
+                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                        },
+                        drivetrain.estimatedPose2d.rotation
+                    )
                 )
             }
         )
@@ -226,6 +239,7 @@ object BuildingBlocks {
 
     fun goToPlacementPoint(
         drivetrain: Drivetrain,
+        arm: Arm? = null,
         level: PlacementLevel,
         group: PlacementGroup,
         side: PlacementSide,
@@ -233,6 +247,7 @@ object BuildingBlocks {
     ): Command =
         goToPlacementPoint(
             drivetrain,
+            arm,
             { level },
             { group },
             { side },
@@ -241,6 +256,7 @@ object BuildingBlocks {
 
     fun goToPickupZone(
         drivetrain: Drivetrain,
+        arm: Arm? = null,
         alliance: () -> DriverStation.Alliance = { Game.alliance },
     ): Command {
         val bottomCommunityZoneLimit = 5.75
@@ -266,7 +282,15 @@ object BuildingBlocks {
                 Pose2d(
                     placementX(),
                     placementY,
-                    Rotation2d()
+                    safeRotation(
+                        arm,
+                        when (alliance()) {
+                            Red -> Rotation2d.fromDegrees(180.0)
+                            Blue -> Rotation2d.fromDegrees(0.0)
+                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                        },
+                        drivetrain.estimatedPose2d.rotation
+                    )
                 )
             }
         ).until {
