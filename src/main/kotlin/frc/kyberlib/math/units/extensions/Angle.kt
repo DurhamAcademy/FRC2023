@@ -36,7 +36,7 @@ fun Angle.subtractNearest(other: Angle): Angle {
 operator fun Angle.div(other: KUnit<Second>): KUnit<Div<Radian, Second>> = KUnit(radians / other.value)
 
 /**
- * Convert WPI Rotation2d to kyberlib's KRotaion2d
+ * Convert WPI Rotation2d to kyberlib's KRotation2d
  */
 val Rotation2d.k: Angle inline get() = Angle(this.radians)
 const val TAU = 2 * PI
