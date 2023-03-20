@@ -172,7 +172,7 @@ object BuildingBlocks {
                             drivetrain.estimatedPose2d.y > clearDown - .25
                             ).and(
                             drivetrain.estimatedPose2d.y < clearDown + .25
-                        )
+                        ).and(false)
                 )
         }
         val placementX: () -> Double = {
