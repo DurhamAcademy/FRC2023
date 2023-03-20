@@ -4,8 +4,13 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange
 import com.ctre.phoenix.sensors.CANCoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
+import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.robot.constants.arm
+import frc.robot.constants.elevator
 import frc.robot.constants.intake
 
 class Intake : SubsystemBase()  {
@@ -14,9 +19,9 @@ class Intake : SubsystemBase()  {
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val modeMotor = CANSparkMax(intake.modeMotorId,
+    private val modeMotor = CANSparkMax(intake.modemotor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless).apply {
-        setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
+        setSmartCurrentLimit(intake.modemotor.currentLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
     private val systemMotor = CANSparkMax(intake.systemMotorId,
@@ -25,11 +30,18 @@ class Intake : SubsystemBase()  {
         idleMode = CANSparkMax.IdleMode.kBrake
     }
 
-    val systemEncoder = CANCoder(intake.encoder.id).apply {
+    val systemEncoder = CANCoder(intake.systemencoder.id).apply {
         configFactoryDefault()
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        configMagnetOffset(intake.encoder.offset)
-        configSensorDirection(intake.encoder.inverted)
+        configMagnetOffset(intake.systemencoder.offset)
+        configSensorDirection(intake.systemencoder.inverted)
+    }
+
+    val modeEncoder = CANCoder(intake.modeencoder.id).apply {
+        configFactoryDefault()
+        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
+        configMagnetOffset((intake.modeencoder.offset))
+        configSensorDirection(intake.modeencoder.inverted)
     }
 
     var driveMotorPercentage: Double
@@ -47,6 +59,30 @@ class Intake : SubsystemBase()  {
         set(value) {
             systemMotor.set(value)
         }
+    val limitSwitch = DigitalInput(
+        intake.limitSwitch.intakeLimitSwitch
+    )
+
+    val intakeModePID = ProfiledPIDController(
+        intake.modemotor.kP,
+        intake.modemotor.kI,
+        intake.modemotor.kD,
+        TrapezoidProfile.Constraints(
+            intake.modemotor.maxVelocity,
+            intake.modemotor.maxAcceleration
+        )
+    ).apply {
+        setTolerance(
+            intake.modemotor.positionTolerance,
+            intake.modemotor.velocityTolerance
+        )
+    }
+
+    val limitSwitchPressed: Boolean
+        get() = !limitSwitch.get()
+
+    val modeMotorPosition: Double
+        get() = Math.toRadians(modeEncoder.absolutePosition)
 
     val systemMotorPosition: Double
         get() = Math.toRadians(systemEncoder.absolutePosition)

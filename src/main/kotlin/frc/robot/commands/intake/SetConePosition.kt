@@ -3,7 +3,7 @@ package frc.robot.commands.intake
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Intake
 
-class ZeroIntake(
+class SetConePosition(
     val intake: Intake
 ) : CommandBase() {
     init{
@@ -18,8 +18,7 @@ class ZeroIntake(
         //zero
     }
 
-    override fun isFinished() {
-        intake.getVoltage()
+    override fun isFinished(): Boolean {
+        return intake.limitSwitchPressed
     }
-         //TODO check if volatage gets high
 }
