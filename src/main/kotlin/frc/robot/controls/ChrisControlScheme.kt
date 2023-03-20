@@ -19,6 +19,7 @@ class ChrisControlScheme(
     override val confirmGridSelection: Trigger = xbox.a()
     override val alignClosestConeL2: Trigger = xbox.x()
     override val alignClosestConeL3: Trigger = xbox.y()
+    override val autoBalance: Trigger = xbox.start()
     override val alignClosestHPS: Trigger = Trigger { false }//xbox.b()
 
     override val decreaseEncoderAngle: Trigger = xbox.povLeft()

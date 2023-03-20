@@ -24,7 +24,7 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
-import frc.robot.commands.balance.AutoBalance
+import frc.robot.commands.drivetrain.AutoBalance
 import frc.robot.commands.drivetrain.SpinCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.SetManipulatorSpeed
