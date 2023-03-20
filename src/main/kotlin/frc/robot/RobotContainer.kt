@@ -244,14 +244,18 @@ class RobotContainer {
                                         )
                                     )
                                     .deadlineWith(
-                                        ManipulatorIO(manipulator, { IOLevel.HumanPlayerSlider })
-                                            .alongWith(
-                                                SetManipulatorSpeed(manipulator, 1.0)
-                                            )
+                                        ManipulatorIO(
+                                            manipulator,
+                                            { smartDashboardSelector.placementSide.asObject },
+                                            { IOLevel.HumanPlayerSlider }
+                                        )
                                     )
                                     .andThen(
-                                        SetManipulatorSpeed(manipulator, 1.0)
-                                            .withTimeout(0.5)
+                                        ManipulatorIO(
+                                            manipulator,
+                                            { smartDashboardSelector.placementSide.asObject },
+                                            { IOLevel.HumanPlayerSlider }
+                                        )
                                     )
                             ).andThen(
                                 SetSubsystemPosition(
@@ -259,7 +263,7 @@ class RobotContainer {
                                     { IOLevel.Idle },
                                     { smartDashboardSelector.placementSide.asObject },
                                     stopAtEnd = true
-                                ).alongWith(
+                                ).deadlineWith(
                                     goToHumanPlayerStation(
                                         drivetrain,
                                         arm,
