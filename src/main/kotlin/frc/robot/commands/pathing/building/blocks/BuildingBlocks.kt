@@ -282,7 +282,7 @@ object BuildingBlocks {
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
-        if(correctStartingPos()){
+//        if(correctStartingPos()){
             return MoveToPosition(
                 drivetrain,
                 { _, _, _ ->
@@ -301,8 +301,8 @@ object BuildingBlocks {
                     )
                 }
             )
-        }
-        else return InstantCommand()
+//        }
+//        else return InstantCommand()
     }
 
     inline fun goToPlacementPoint(
