@@ -7,6 +7,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.IOLevel.*
@@ -244,6 +245,13 @@ object BuildingBlocks {
     ): Command {
         val upperYValue = clearUp
         val lowerYValue = clearDown
+        val correctStartingPos: () -> Boolean = {
+            when(alliance()){
+                Red -> drivetrain.estimatedPose2d.x > 8
+                Blue -> drivetrain.estimatedPose2d.x < 8
+                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+            }
+        }
         val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
         val isInGridZone: () -> Boolean = {
             when (alliance()) {
@@ -255,9 +263,7 @@ object BuildingBlocks {
         val isClose: () -> Boolean = {
             (drivetrain.estimatedPose2d.y - group().offset + side().offset).absoluteValue < 0.05
         }
-
         val altOffset = 0.2
-
         val placementX: () -> Double = {
             when (level()) {
                 Low, Mid, High, HumanPlayerSlider ->
@@ -276,24 +282,27 @@ object BuildingBlocks {
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
-        return MoveToPosition(
-            drivetrain,
-            { _, _, _ ->
-                Pose2d(
-                    placementX(),
-                    placementY(),
-                    safeRotation(
-                        arm,
-                        when (alliance()) {
-                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
-                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                        },
-                        drivetrain.estimatedPose2d.rotation
+        if(correctStartingPos()){
+            return MoveToPosition(
+                drivetrain,
+                { _, _, _ ->
+                    Pose2d(
+                        placementX(),
+                        placementY(),
+                        safeRotation(
+                            arm,
+                            when (alliance()) {
+                                Red -> Rotation2d.fromDegrees(180.0 - 2.0)
+                                Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                            },
+                            drivetrain.estimatedPose2d.rotation
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
+        else return InstantCommand()
     }
 
     inline fun goToPlacementPoint(
@@ -320,6 +329,13 @@ object BuildingBlocks {
         crossinline alliance: () -> Alliance = { Game.alliance },
         endAtAlignment: Boolean = false,
     ): Command {
+        val correctStartingPos: () -> Boolean = {
+            when(alliance()){
+                Red -> drivetrain.estimatedPose2d.x < 8
+                Blue -> drivetrain.estimatedPose2d.x > 8
+                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+            }
+        }
         val placementY: () -> Double = {
             slider().fieldYValue
         }
@@ -335,7 +351,8 @@ object BuildingBlocks {
                     -if (!isClose(null) || endAtAlignment) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
-        return MoveToPosition(
+        if(correctStartingPos()){
+            return MoveToPosition(
             drivetrain,
             { xPid, yPid, rotPid ->
                 Pose2d(
@@ -350,9 +367,10 @@ object BuildingBlocks {
                         },
                         drivetrain.estimatedPose2d.rotation
                     )
-                )
-            }
-        )
+                }
+            )
+        }
+        else return InstantCommand()
     }
 
     inline fun goToPickupZone(

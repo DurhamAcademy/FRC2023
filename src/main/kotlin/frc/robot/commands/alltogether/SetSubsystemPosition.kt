@@ -51,13 +51,11 @@ class SetSubsystemPosition (
         val armAngle = arm.armPosition
         val armHeight = armLength * sin(armAngle)
         val elevatorMaxHeight = topLimit - armHeight
-        if(arm.armPosition > .2 && goalArmPosition < -.2 || arm.armPosition < -.2 && goalArmPosition > .2){
+        if(arm.armPosition > .2 && goalArmPosition < -.2 || arm.armPosition < -.2 && goalArmPosition > .2)
             elevator.setpoint = bottomLimit
-        }
-        else{
+        else
             elevator.setpoint = goalElevatorPosition
                 .coerceIn(bottomLimit, elevatorMaxHeight)
-        }
     }
 
     override fun isFinished(): Boolean = stopAtEnd &&
