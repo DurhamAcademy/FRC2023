@@ -19,9 +19,9 @@ class Intake : SubsystemBase()  {
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val modeMotor = CANSparkMax(intake.modemotor.id,
+    private val modeMotor = CANSparkMax(intake.modeMotorId,
         CANSparkMaxLowLevel.MotorType.kBrushless).apply {
-        setSmartCurrentLimit(intake.modemotor.currentLimit) // add current limit to limit the torque
+        setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
     private val systemMotor = CANSparkMax(intake.systemMotorId,
@@ -58,18 +58,18 @@ class Intake : SubsystemBase()  {
         intake.limitSwitch.intakeLimitSwitch
     )
 
-    val intakeModePID = ProfiledPIDController(
-        intake.modemotor.kP,
-        intake.modemotor.kI,
-        intake.modemotor.kD,
+    val intakeSystemPID = ProfiledPIDController(
+        intake.systemmotor.kP,
+        intake.systemmotor.kI,
+        intake.systemmotor.kD,
         TrapezoidProfile.Constraints(
-            intake.modemotor.maxVelocity,
-            intake.modemotor.maxAcceleration
+            intake.systemmotor.maxVelocity,
+            intake.systemmotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.modemotor.positionTolerance,
-            intake.modemotor.velocityTolerance
+            intake.systemmotor.positionTolerance,
+            intake.systemmotor.velocityTolerance
         )
     }
 
@@ -99,6 +99,14 @@ class Intake : SubsystemBase()  {
     fun getVoltage(): Double {
         return modeMotor.busVoltage
     }
+
+    fun setIntakePosition(position: Double) {
+        intakeSetpoint = position.coerceIn(
+            arm.minAngle,
+            arm.maxAngle
+        )
+    }
+
     override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)

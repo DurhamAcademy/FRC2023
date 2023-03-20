@@ -7,12 +7,14 @@ object intake {
     const val systemMotorId = 0 //moves the intake up and down
     const val systemMotorLimit = 0
 
+    const val modeMotorId = 0
+    const val modeMotorLimit = 0
 
-    object modemotor{
+
+    object systemmotor{
         const val positionTolerance = 0.0
         const val velocityTolerance = 0.0
         const val id = 0
-        const val currentLimit = 0
         const val inverted = true
         const val gearRatio = 1 / 2
         const val maxVelocity = 0.0
@@ -26,6 +28,7 @@ object intake {
         const val kV = 0.0
         const val kA = 0.0
     }
+
     object systemencoder{
         const val id = 0
         const val offset = 0.0
