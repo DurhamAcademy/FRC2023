@@ -7,7 +7,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.IOLevel.*
@@ -351,7 +350,7 @@ object BuildingBlocks {
                     -if (!isClose(null) || endAtAlignment) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
-        if(correctStartingPos()){
+//        if(correctStartingPos()){
             return MoveToPosition(
                 drivetrain,
                 { xPid, yPid, rotPid ->
@@ -370,8 +369,8 @@ object BuildingBlocks {
                     )
                 }
             )
-        }
-        else return InstantCommand()
+//        }
+//        else return InstantCommand()
     }
 
     inline fun goToPickupZone(

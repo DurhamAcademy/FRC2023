@@ -27,6 +27,7 @@ import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.AutoBalance
 import frc.robot.commands.drivetrain.SpinCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
+import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
@@ -170,7 +171,7 @@ class RobotContainer {
                     )
 
                 autoBalance
-                    .whileTrue(AutoBalance(drivetrain, -1.0))
+                    .whileTrue(AutoBalance(drivetrain))
 
                 selectGridUp
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
@@ -227,6 +228,14 @@ class RobotContainer {
                                     stopAtEnd = true
                                 )
                                     .andThen(
+                                        SetSubsystemPosition(
+                                            elevator, arm,
+                                            { IOLevel.HumanPlayerSlider },
+                                            { smartDashboardSelector.placementSide.asObject },
+                                            stopAtEnd = false
+                                        ).withTimeout(1.0)
+                                    )
+                                    .andThen(
                                         goToHumanPlayerStation(
                                             drivetrain,
                                             arm,
@@ -235,7 +244,10 @@ class RobotContainer {
                                         )
                                     )
                                     .deadlineWith(
-                                        SetManipulatorSpeed(manipulator, 1.0)
+                                        ManipulatorIO(manipulator, { IOLevel.HumanPlayerSlider })
+                                            .alongWith(
+                                                SetManipulatorSpeed(manipulator, 1.0)
+                                            )
                                     )
                                     .andThen(
                                         SetManipulatorSpeed(manipulator, 1.0)

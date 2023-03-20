@@ -20,7 +20,7 @@ class ChrisControlScheme(
     override val alignClosestConeL2: Trigger = xbox.x()
     override val alignClosestConeL3: Trigger = xbox.y()
     override val autoBalance: Trigger = xbox.start()
-    override val alignClosestHPS: Trigger = Trigger { false }//xbox.b()
+    override val alignClosestHPS: Trigger = xbox.b()
 
     override val decreaseEncoderAngle: Trigger = xbox.povLeft()
     override val increaseEncoderAngle: Trigger = xbox.povRight()

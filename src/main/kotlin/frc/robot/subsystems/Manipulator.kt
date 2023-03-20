@@ -25,7 +25,7 @@ class Manipulator: SubsystemBase() {
         setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
 //        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
         idleMode = CANSparkMax.IdleMode.kBrake
-
+        openLoopRampRate = 1.0
     }
 
     var motorPercentage: Double

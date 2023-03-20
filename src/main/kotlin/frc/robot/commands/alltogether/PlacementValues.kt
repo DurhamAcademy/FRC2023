@@ -52,7 +52,7 @@ enum class IOLevel(
         Rotation2d.fromRadians(1.4),
         1.3 - inchesToMeters(11.0 + 2.75),
         Rotation2d.fromRadians(1.4),
-        0.75, 1.0,
+        0.40, 1.0,
         inchesToMeters(24.0)
     ),
     Idle(
