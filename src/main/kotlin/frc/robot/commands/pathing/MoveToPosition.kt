@@ -579,6 +579,5 @@ fun flipped(x: Double): Double {
         newX=8.3+(8.3-x)
     else
         newX=8.3-(x-8.3)
-
     return newX
 }
