@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.DigitalInput
+import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.constants.arm
@@ -109,9 +110,18 @@ class Intake : SubsystemBase()  {
         )
     }
 
+    val intakePosition: Double
+        get() = if (RobotBase.isSimulation()) intakeSystemPID.setpoint.position//simArmSystem.angleRads
+        else Math.toRadians(systemEncoder.absolutePosition)
+
     override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
         systemMotorCurrent.setDouble(systemMotor.outputCurrent)
+
+        val calculate = intakeSystemPID.calculate(
+            intakePosition,
+            intakeSetpoint ?: intakePosition
+        )
     }
 }
