@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -453,7 +454,7 @@ class RobotContainer {
             cameraReady, noFMSDisabled, fmsRedDisabled, fmsBlueDisabled,
             eStopped, autoCone, autoCube, autoNoFMS, autoFMSRed, autoFMSBlue,
             noDriverStation, teleopCone, teleopCube, teleopFMSRed, teleopFMSBlue,
-            teleopNoFMSRed, teleopNoFMSBlue, nothing,
+            teleopNoFMSRed, teleopNoFMSBlue, nothing, cameraReady
         )
         this += body
     }
@@ -525,7 +526,7 @@ class RobotContainer {
     }
 
     // shuffleboard auto chooser
-    val autoChooserTab = Shuffleboard.getTab("Autonomous")
+    val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
     val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
 
     val armVisual = Field2d()

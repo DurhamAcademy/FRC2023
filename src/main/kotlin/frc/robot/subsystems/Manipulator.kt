@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import com.revrobotics.ColorMatch
 import com.revrobotics.ColorSensorV3
+import edu.wpi.first.math.filter.Debouncer
 import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.wpilibj.I2C
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -22,20 +23,44 @@ import frc.robot.constants.manipulator as ManipConsts
 class Manipulator: SubsystemBase() {
 
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
+        restoreFactoryDefaults()
         setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
-//        setSecondaryCurrentLimit(20.0) // hard limit to prevent motor damage
         idleMode = CANSparkMax.IdleMode.kBrake
-        openLoopRampRate = 1.0
+        openLoopRampRate = 0.5
+        // make the motor report less often to reduce network traffic
+
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 200)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 200)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus3, 200)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus4, 200)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus6, 200)
     }
 
+    val motorIdleDebouncer = Debouncer(0.075)
+
+    var lastPercent = 0.0
+    var lastIdleMode = CANSparkMax.IdleMode.kBrake
+    var idleMode: CANSparkMax.IdleMode
+        get() = motor.idleMode
+        set(value) {
+            if (lastIdleMode != value) {
+                motor.idleMode = value
+                lastIdleMode = value
+            }
+        }
     var motorPercentage: Double
         get() = motor.get()
         set(value) {
-            motor.set(value)
-            if (value.absoluteValue < 0.1 || Game.disabled) motor.idleMode = CANSparkMax.IdleMode.kBrake
-            else motor.idleMode = CANSparkMax.IdleMode.kCoast
+            if (lastPercent != value) {
+                motor.set(value)
+                lastPercent = value
+            }
+            if (motorIdleDebouncer.calculate(value.absoluteValue < 0.1) || Game.disabled)
+                idleMode = CANSparkMax.IdleMode.kBrake
+            else
+                idleMode = CANSparkMax.IdleMode.kCoast
         }
-
 
     private val i2cPort = I2C.Port.kMXP
     val colorSensor = ColorSensorV3(i2cPort)
@@ -59,7 +84,6 @@ class Manipulator: SubsystemBase() {
         get() = if (sensorConnected)
             colorSensor.color
         else null
-
 
     private val distFilter = LinearFilter.singlePoleIIR(0.1, 0.02)
 
@@ -132,7 +156,6 @@ class Manipulator: SubsystemBase() {
     }
 
     override fun periodic() {
-        if (Game.disabled) motor.idleMode = CANSparkMax.IdleMode.kBrake
         if (sensorConnected) {
             val distFiltered = distFilter.calculate(colorSensor.proximity.toDouble())
             distance = 0.1 * (1 - (distFiltered / 2047.0)).pow(1 / 2.0)
@@ -156,7 +179,5 @@ class Manipulator: SubsystemBase() {
         colorGreen.setDouble(color?.green ?: 0.0)
         colorBlue.setDouble(color?.blue ?: 0.0)
         colorIR.setDouble(distance ?: 0.0)
-
-
     }
 }
