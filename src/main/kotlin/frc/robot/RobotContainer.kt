@@ -322,9 +322,17 @@ class RobotContainer {
 
             else -> Unknown
         }
+    var fullAuto = false
+    var fullAutoObject: GamePiece = none
+    fun fullAutoNextObject(gamePiece: GamePiece) {
+        fullAuto = true
+        fullAutoObject = gamePiece
+    }
 
     val wantedObject: GamePiece
-        get() = smartDashboardSelector.placementSide.asObject
+        get() =
+            if (fullAuto) fullAutoObject
+            else smartDashboardSelector.placementSide.asObject
 
     val leds = KLEDStrip(9, count).apply {
         val coral = Color(255, 93, 115)
@@ -512,7 +520,8 @@ class RobotContainer {
         // armLen * sin(armAngle) = z
         val armX = armLength * sin(armAngle)
         val armZ = armLength * cos(armAngle)
-        if(armZ + elevator.height > inchesToMeters(76.0)){ elevator.setpoint = inchesToMeters(76.0) - armZ }
+        if (armZ + elevator.height > inchesToMeters(76.0))
+            elevator.setpoint = inchesToMeters(76.0) - armZ
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(
