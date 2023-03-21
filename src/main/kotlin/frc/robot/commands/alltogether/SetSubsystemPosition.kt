@@ -12,8 +12,8 @@ import kotlin.math.sin
 class SetSubsystemPosition (
     val elevator: Elevator,
     val arm: Arm,
-    val level: () -> IOLevel,
-    val wantedObject: () -> GamePiece,
+    inline val level: () -> IOLevel,
+    inline val wantedObject: () -> GamePiece,
 
     val stopAtEnd: Boolean = false
 ) : CommandBase() {
@@ -35,8 +35,8 @@ class SetSubsystemPosition (
     }
     override fun execute() {
         if(level() == IOLevel.StartingConfig){
-            goalArmPosition = level().cubeArmRotation.radians
-            goalElevatorPosition = elevator.height
+            arm.setArmPosition(level().cubeArmRotation.radians)
+            return
         }
         else if(wantedObject() == GamePiece.cube){
             goalArmPosition = level().cubeArmRotation.radians

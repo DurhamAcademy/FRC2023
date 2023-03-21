@@ -80,7 +80,7 @@ class Elevator(
         Math.random() * (elevator.limits.topLimit -
                 elevator.limits.bottomLimit) * 5
 
-    var height: Double
+    inline var height: Double
         get() = if (RobotBase.isSimulation())
             motorPid.setpoint.position// + simOffset + offset
         else

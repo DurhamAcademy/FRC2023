@@ -24,14 +24,17 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
-import frc.robot.commands.balance.AutoBalance
+import frc.robot.commands.drivetrain.AutoBalance
 import frc.robot.commands.drivetrain.SpinCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
+import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
+import frc.robot.commands.pathing.fullAuto
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.constants.leds.count
@@ -168,7 +171,7 @@ class RobotContainer {
                     )
 
                 autoBalance
-                    .whileTrue(AutoBalance(drivetrain, -1.0))
+                    .whileTrue(AutoBalance(drivetrain))
 
                 selectGridUp
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
@@ -225,16 +228,50 @@ class RobotContainer {
                                     stopAtEnd = true
                                 )
                                     .andThen(
+                                        SetSubsystemPosition(
+                                            elevator, arm,
+                                            { IOLevel.HumanPlayerSlider },
+                                            { smartDashboardSelector.placementSide.asObject },
+                                            stopAtEnd = false
+                                        ).withTimeout(1.0)
+                                    )
+                                    .andThen(
                                         goToHumanPlayerStation(
                                             drivetrain,
                                             arm,
                                             { Slider.far },
                                             endAtAlignment = false
-                                        ).deadlineWith(
-                                            SetManipulatorSpeed(manipulator, 1.0)
                                         )
                                     )
-                        )
+                                    .deadlineWith(
+                                        ManipulatorIO(
+                                            manipulator,
+                                            { smartDashboardSelector.placementSide.asObject },
+                                            { IOLevel.HumanPlayerSlider }
+                                        )
+                                    )
+                                    .andThen(
+                                        ManipulatorIO(
+                                            manipulator,
+                                            { smartDashboardSelector.placementSide.asObject },
+                                            { IOLevel.HumanPlayerSlider }
+                                        )
+                                    )
+                            ).andThen(
+                                SetSubsystemPosition(
+                                    elevator, arm,
+                                    { IOLevel.Idle },
+                                    { smartDashboardSelector.placementSide.asObject },
+                                    stopAtEnd = true
+                                ).deadlineWith(
+                                    goToHumanPlayerStation(
+                                        drivetrain,
+                                        arm,
+                                        { Slider.far },
+                                        endAtAlignment = true
+                                    )
+                                )
+                            )
                     )
             }
         }
@@ -434,6 +471,14 @@ class RobotContainer {
                 PlacementGroup.Farthest,
                 PlacementSide.Cube
             )
+        )
+        addOption(
+            "exit human player area",
+            BuildingBlocks.leavePickupZone(drivetrain, arm)
+        )
+        addOption(
+            "full auto",
+            fullAuto(drivetrain, arm, elevator, manipulator, smartDashboardSelector)
         )
     }
 

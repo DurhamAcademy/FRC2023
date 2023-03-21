@@ -1,11 +1,12 @@
 package frc.robot.commands.pathing.building.blocks
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.DriverStation.Alliance
 import edu.wpi.first.wpilibj.DriverStation.Alliance.*
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.IOLevel.*
@@ -18,34 +19,43 @@ import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.GridConstants.centerDistX
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
-import java.time.Instant
+import frc.robot.utils.xMul
 import kotlin.math.*
 import frc.robot.constants.RobotProportions.length as robotLength
 import frc.robot.constants.RobotProportions.width as robotWidth
+import frc.robot.constants.drivetrain as drivetrainConstraints
 
 object BuildingBlocks {
+    val robotDiagRadius = hypot(robotLength / 2.0, robotWidth / 2.0) + 0.1
+
     /**
      * Variables
      */
-    val alliance: () -> DriverStation.Alliance = { Game.alliance }
-    val exitFalseGoalPoint: () -> Double = {
-        when (alliance()) {
-            Red -> 10.53
-            Blue -> 5.4
-            else -> throw IllegalArgumentException("Alliance is not Blue or Red")
-        }
+    val exitFalseGoalPoint = { alliance: Alliance ->
+        xCenter + ((2.15 - robotDiagRadius) * alliance.xMul)
     }
-    val clearUp = 4.0 //Y value above charge station
-    val clearDown = 1.5 //Y value below charge station
-    val exitPoint: () -> Double = {
-        xCenter + (((robotLength / 2.0) + 3.0) * -alliance().xMul)
+    val clearUp = 4.0 + (robotLength / 2.0) + 0.25 //Y value above charge station
+    val clearDown = 1.5 - (robotLength / 2.0) - 0.25 //Y value below charge station
+    val exitPoint = { alliance: Alliance ->
+        xCenter + ((3.3 - robotDiagRadius) * -alliance.xMul)
     }
-    val middleX: () -> Double = {
-        when (alliance()) {
-            Red -> 12.0
-            Blue -> 2.5
-            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-        }
+    val middleX = { alliance: Alliance ->
+        xCenter + (6.0 * -alliance.xMul)
+    }
+
+    /**
+     * These functions return the direction to rotate that will get from a start
+     * rotation to an end rotation with the least amount of rotation.
+     * @param start the start rotation
+     * @param end the end rotation
+     * @return true if the shortest rotation is an increase in angle (on the
+     * unit circle) and false if the shortest rotation is a decrease in angle.
+     */
+    fun shortestRotationDirection(start: Rotation2d, end: Rotation2d): Boolean {
+        // Get the difference between the two angles
+        val difference = end - start
+        // if the difference is less than 180 degrees, return true
+        return MathUtil.angleModulus(difference.radians.absoluteValue) < 0.0
     }
 
     /**
@@ -54,7 +64,12 @@ object BuildingBlocks {
     private fun safeRotation(armAngle: Double, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         if (armAngle.absoluteValue < 0.15) angle
         else drivetrainAngle
-    private fun safeRotation(arm: Arm?, angle: Rotation2d, drivetrainAngle: Rotation2d) =
+
+    //                if (!shortestRotationDirection(drivetrainAngle, angle))
+//                    Rotation2d(PI/4)
+//                else
+//                    Rotation2d(-PI/4)
+    fun safeRotation(arm: Arm?, angle: Rotation2d, drivetrainAngle: Rotation2d) =
         safeRotation(arm?.armPosition ?: 0.0, angle, drivetrainAngle)
 
     /**
@@ -64,6 +79,7 @@ object BuildingBlocks {
         drivetrain: Drivetrain,
         arm: Arm,
         position: FloorGamePiecePosition,
+        alliance: () -> Alliance
     ): MoveToPosition {
         var firstRun = true
         var posX = 0.0
@@ -72,25 +88,25 @@ object BuildingBlocks {
             drivetrain.estimatedPose2d.y < clearUp + .25 && drivetrain.estimatedPose2d.y > clearUp - .25 || drivetrain.estimatedPose2d.y > clearDown - .25 && drivetrain.estimatedPose2d.y < clearDown + .25
         }
         val placementY: () -> Double = {
-            if(abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint())) {
+            if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(alliance()))) {
                 if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
                     clearDown
                 } else {
                     clearUp
                 }
                 //TODO charge station
-            }
-            else{
+            } else {
                 posY
             }
         }
         val placementX: () -> Double = {
             // if the robot is on the side of the field that the object is on
-            if (abs(8 - drivetrain.estimatedPose2d.x) - .2 > abs(8 - exitPoint())) {
+            if (abs(8 - drivetrain.estimatedPose2d.x) - .2 > abs(8 - exitPoint(alliance()))) {
                 if (clearRoute()) {
-                    exitPoint()
+                    exitPoint(alliance())
                 } else {
-                    middleX()
+                    //
+                    middleX(alliance())
                 }
             } else {
                 if (firstRun) {
@@ -113,10 +129,9 @@ object BuildingBlocks {
         }
         val closestRightAngle : Double = round(drivetrain.estimatedPose2d.rotation.degrees/90) * 90
         val rotation: () -> Rotation2d = {
-            if(abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint())){
+            if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(alliance()))) {
                 Rotation2d.fromDegrees(closestRightAngle)
-            }
-            else{
+            } else {
                 Rotation2d.fromDegrees(
                     -atan2(position.y - drivetrain.estimatedPose2d.y, position.x - drivetrain.estimatedPose2d.x)
                 )
@@ -140,26 +155,39 @@ object BuildingBlocks {
     fun leaveCommunityZone(
         drivetrain: Drivetrain,
         arm: Arm,
-        ): Command? {
+        alliance: () -> Alliance = { Game.alliance }
+    ): Command {
         val hasExited: () -> Boolean = {
-            (exitPoint() - drivetrain.estimatedPose2d.x).absoluteValue < 0.25
+            (exitPoint(alliance()) - drivetrain.estimatedPose2d.x).absoluteValue < 0.25
         }
         val clearRoute: () -> Boolean = {
-            drivetrain.estimatedPose2d.y < clearUp + .25 && drivetrain.estimatedPose2d.y > clearUp - .25 || drivetrain.estimatedPose2d.y > clearDown - .25 && drivetrain.estimatedPose2d.y < clearDown + .25
+            (
+                    (
+                            drivetrain.estimatedPose2d.y < clearUp + .25
+                            ).and(
+                            drivetrain.estimatedPose2d.y > clearUp - .25
+                        )
+                    ).or(
+                    (
+                            drivetrain.estimatedPose2d.y > clearDown - .25
+                            ).and(
+                            drivetrain.estimatedPose2d.y < clearDown + .25
+                        ).and(false)
+                )
         }
         val placementX: () -> Double = {
             if (clearRoute()) {
-                exitFalseGoalPoint()
+                exitFalseGoalPoint(alliance())
             } else {
-                middleX()
+                middleX(alliance())
             }
         }
         val placementY: () -> Double = {
-            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
-                clearDown
-            } else {
-                clearUp
-            }
+//            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
+//                clearDown
+//            } else {
+            clearUp
+//            }
             //TODO charge station
         }
         val rotationAlliance: () -> Rotation2d = {
@@ -175,8 +203,23 @@ object BuildingBlocks {
         }
         return MoveToPosition(
             drivetrain,
-            { _, _, _ ->
-                Pose2d(
+            { xPID, _, _ ->
+                if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
+                    xPID.setConstraints(
+                        TrapezoidProfile.Constraints(
+                            0.2,
+                            drivetrainConstraints.maxAcceleration
+                        )
+                    )
+                } else {
+                    xPID.setConstraints(
+                        TrapezoidProfile.Constraints(
+                            10.0,
+                            drivetrainConstraints.maxAcceleration
+                        )
+                    )
+                }
+                return@MoveToPosition Pose2d(
                     placementX(),
                     placementY(),
                     rotationAlliance()
@@ -191,13 +234,13 @@ object BuildingBlocks {
     /**
      * Go to a specific node
      */
-    fun goToPlacementPoint(
+    inline fun goToPlacementPoint(
         drivetrain: Drivetrain,
         arm: Arm? = null,
-        level: () -> IOLevel,
-        group: () -> PlacementGroup,
-        side: () -> PlacementSide,
-        alliance: () -> DriverStation.Alliance = { Game.alliance },
+        crossinline level: () -> IOLevel,
+        crossinline group: () -> PlacementGroup,
+        crossinline side: () -> PlacementSide,
+        crossinline alliance: () -> Alliance = { Game.alliance },
     ): Command {
         val correctStartingPos: () -> Boolean = {
             when(alliance()){
@@ -206,8 +249,8 @@ object BuildingBlocks {
                 Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
             }
         }
-        val upperYValue = 4.675
-        val lowerYValue = 1.169
+        val upperYValue = clearUp
+        val lowerYValue = clearDown
         val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
         val isInGridZone: () -> Boolean = {
             when (alliance()) {
@@ -238,7 +281,7 @@ object BuildingBlocks {
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
-        if(correctStartingPos()){
+//        if(correctStartingPos()){
             return MoveToPosition(
                 drivetrain,
                 { _, _, _ ->
@@ -257,16 +300,17 @@ object BuildingBlocks {
                     )
                 }
             )
-        }
-        else return InstantCommand()
+//        }
+//        else return InstantCommand()
     }
-    fun goToPlacementPoint(
+
+    inline fun goToPlacementPoint(
         drivetrain: Drivetrain,
         arm: Arm? = null,
         level: IOLevel,
         group: PlacementGroup,
         side: PlacementSide,
-        alliance: () -> DriverStation.Alliance = { Game.alliance },
+        crossinline alliance: () -> Alliance = { Game.alliance },
     ): Command =
         goToPlacementPoint(
             drivetrain,
@@ -277,11 +321,11 @@ object BuildingBlocks {
             alliance
         )
 
-    fun goToHumanPlayerStation(
+    inline fun goToHumanPlayerStation(
         drivetrain: Drivetrain,
         arm: Arm? = null,
-        slider: () -> Slider,
-        alliance: () -> DriverStation.Alliance = { Game.alliance },
+        crossinline slider: () -> Slider,
+        crossinline alliance: () -> Alliance = { Game.alliance },
         endAtAlignment: Boolean = false,
     ): Command {
         val correctStartingPos: () -> Boolean = {
@@ -306,7 +350,7 @@ object BuildingBlocks {
                     -if (!isClose(null) || endAtAlignment) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
-        if(correctStartingPos()){
+//        if(correctStartingPos()){
             return MoveToPosition(
                 drivetrain,
                 { xPid, yPid, rotPid ->
@@ -316,8 +360,8 @@ object BuildingBlocks {
                         safeRotation(
                             arm,
                             when (alliance()) {
-                                Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                                Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                                Red -> Rotation2d.fromDegrees(0.0 - 2.0)
+                                Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
                                 Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
                             },
                             drivetrain.estimatedPose2d.rotation
@@ -325,13 +369,14 @@ object BuildingBlocks {
                     )
                 }
             )
-        }
-        else return InstantCommand()
+//        }
+//        else return InstantCommand()
     }
 
-    fun goToPickupZone(
+    inline fun goToPickupZone(
         drivetrain: Drivetrain,
-        arm: Arm? = null
+        arm: Arm? = null,
+        crossinline alliance: () -> Alliance = { Game.alliance },
     ): Command {
         val bottomCommunityZoneLimit = 5.75
         val midCommunityZoneLimit = 6.75
@@ -345,9 +390,9 @@ object BuildingBlocks {
         }
         val placementX: () -> Double = {
             if (isInCommunityZone())
-                xCenter + (((robotLength / 2.0) + (-5.22)) * -alliance().xMul)
+                xCenter + (((3.0) - (robotLength / 2.0)) * alliance().xMul)
             else
-                xCenter + (((robotLength / 2.0) + (-6.0)) * -alliance().xMul)
+                xCenter + (((3.0) - (robotLength / 2.0)) * alliance().xMul)
         }
         val placementY = midCommunityZoneLimit + robotWidth / 2.0
         return MoveToPosition(
@@ -356,6 +401,48 @@ object BuildingBlocks {
                 Pose2d(
                     placementX(),
                     placementY,
+                    safeRotation(
+                        arm,
+                        when (alliance()) {
+                            Red -> Rotation2d.fromDegrees(0.0)
+                            Blue -> Rotation2d.fromDegrees(180.0)
+                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                        },
+                        drivetrain.estimatedPose2d.rotation
+                    )
+                )
+            }
+        )
+            .until(isInCommunityZone)
+    }
+
+    inline fun leavePickupZone(
+        drivetrain: Drivetrain,
+        arm: Arm? = null,
+        crossinline alliance: () -> Alliance = { Game.alliance },
+    ): Command {
+        val hasLeftZone: () -> Boolean = {
+            (((drivetrain.estimatedPose2d.x - xCenter).absoluteValue
+                    < (4.0 - (robotLength / 2.0))
+                    ) && (drivetrain.estimatedPose2d.y < (5.3 - (robotWidth / 2.0))))
+                    || (drivetrain.estimatedPose2d.y < (5.3 - (robotWidth / 2.0)))
+        }
+        val x: () -> Double = {
+            if (drivetrain.estimatedPose2d.y < (5.3 - (robotWidth / 2.0)))
+                xCenter + (((robotLength / 2.0) + (5.22)) * -alliance().xMul)
+            else xCenter + ((4.3 - (robotLength / 2.0)) * -alliance().xMul)
+        }
+        val y: () -> Double = {
+            if ((drivetrain.estimatedPose2d.x - xCenter).absoluteValue < (4.73 - (robotLength / 2.0)))
+                5.0 - (robotWidth / 2.0)
+            else drivetrain.estimatedPose2d.y
+        }
+        return MoveToPosition(
+            drivetrain,
+            { _, _, _ ->
+                Pose2d(
+                    x(),
+                    y(),
                     safeRotation(
                         arm,
                         when (alliance()) {
@@ -368,5 +455,6 @@ object BuildingBlocks {
                 )
             }
         )
+            .until { hasLeftZone() }
     }
 }

@@ -123,9 +123,10 @@ class Drivetrain(
         VecBuilder.fill(1.8, 1.8, 1.8)
     )
 
-    private var simEstimatedPose2d: Pose2d = Pose2d()
+    @Deprecated("Use estimatedPose2d instead, this is only for internal drivetrain use")
+    var simEstimatedPose2d: Pose2d = Pose2d()
 
-    val estimatedPose2d: Pose2d
+    inline val estimatedPose2d: Pose2d
         get() = if (!Game.sim) {
             poseEstimator.estimatedPosition
         } else {
@@ -166,7 +167,23 @@ class Drivetrain(
         this.robotPose = estimatedPose2d
     }
 
+    val gyroPitchWidget = Idrc.add("Gyro Pitch", 0.0)
+        .withWidget("Gryo")
+        .withProperties(mapOf("min" to -180.0, "max" to 180.0))
+        .withSize(2, 2)
+        .entry
+    val gyroYawWidget = Idrc.add("Gyro Yaw", 0.0)
+        .withWidget("Gryo")
+        .withProperties(mapOf("min" to -180.0, "max" to 180.0))
+        .withSize(2, 2)
+        .entry
+    val gyroRollWidget = Idrc.add("Gyro Roll", 0.0)
+        .withWidget("Gryo")
+        .withProperties(mapOf("min" to -180.0, "max" to 180.0))
+        .withSize(2, 2)
+        .entry
 
+    private var i = 0U
     /**
      * The periodic method is run roughly every 20ms. This is where we update
      * any values that are constantly changing, such as the robot's position,
@@ -177,6 +194,10 @@ class Drivetrain(
     override fun periodic() {
         // This method will be called once per scheduler run
 
+        // update the gyro
+        gyroPitchWidget.setDouble(gyro.pitch)
+        gyroYawWidget.setDouble(gyro.yaw)
+        gyroRollWidget.setDouble(gyro.roll)
 
         // pose estimator handles odometry too
         poseEstimator.update(
@@ -230,9 +251,11 @@ class Drivetrain(
             simEstimatedPose2d = simEstimatedPose2d + (vel * 0.02 * 0.01) + simQueuedForce
             simQueuedForce = Transform2d()
         }
-
         // update the field 2d widget with the current robot position
-        field2d.robotPose = estimatedPose2d
+        if (i++ >= 0U) {
+            field2d.robotPose = estimatedPose2d
+            i = 0U
+        }
         // push to shuffleboard
         SmartDashboard.putData("field", field2d)
 
@@ -332,7 +355,7 @@ class Drivetrain(
         }
     }
 
-    var swerveModuleStates: List<SwerveModuleState>
+    inline var swerveModuleStates: List<SwerveModuleState>
         get() = this.modules.map { it.currentPosition }
         set(value) = value.forEachIndexed { i, it ->
             modules[i].setpoint = it
@@ -365,7 +388,7 @@ class Drivetrain(
         )
     }
 
-    val canTrustPose: Boolean
+    inline val canTrustPose: Boolean
         get() = cameraWrappers.any { it.canTrustPose } || Game.sim
 
 }

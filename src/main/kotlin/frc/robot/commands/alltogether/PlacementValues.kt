@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units.inchesToMeters
 import frc.robot.constants.elevator.limits.bottomLimit
 import frc.robot.constants.elevator.limits.topLimit
-import frc.robot.constants.RobotProportions.length as robotLength
 
 /**
  * This enum represents the positions the elevator and arm should go to when scoring at different levels
@@ -49,13 +48,12 @@ enum class IOLevel(
         0.5
     ),
     HumanPlayerSlider(
-        1.3 - inchesToMeters(11.0),
-        Rotation2d.fromRadians(-1.4),
-        1.3 - inchesToMeters(11.0),
-        Rotation2d.fromRadians(-1.4),
-        0.75, 1.0,
-        inchesToMeters(13.0) + (robotLength / 2)
-
+        1.3 - inchesToMeters(11.0 + 3.0),
+        Rotation2d.fromRadians(1.4),
+        1.3 - inchesToMeters(11.0 + 2.75),
+        Rotation2d.fromRadians(1.4),
+        0.40, 1.0,
+        inchesToMeters(24.0)
     ),
     Idle(
         bottomLimit,
