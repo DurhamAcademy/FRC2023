@@ -106,7 +106,7 @@ open class MoveToPosition(
     }
     val rPIDController = ProfiledPIDController(
         Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            PI / 3.0, max(PI, drivetrainConstants.maxAngularAcceleration)
+            PI / 2.0, max(PI, drivetrainConstants.maxAngularAcceleration)
         )
     ).also {
         it.enableContinuousInput(-PI, PI)

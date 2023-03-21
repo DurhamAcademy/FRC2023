@@ -354,18 +354,30 @@ object BuildingBlocks {
             return MoveToPosition(
                 drivetrain,
                 { xPid, yPid, rotPid ->
+                    if (arm == null) Unit
+                    else if (arm.armPosition.absoluteValue > 0.5) {
+                        rotPid.setConstraints(
+                            TrapezoidProfile.Constraints(
+                                PI / 2,
+                                drivetrainConstraints.maxAngularAcceleration * 0.25
+                            )
+                        )
+                    } else {
+                        rotPid.setConstraints(
+                            TrapezoidProfile.Constraints(
+                                PI / 2,
+                                drivetrainConstraints.maxAcceleration
+                            )
+                        )
+                    }
                     Pose2d(
                         placementX(),
                         placementY(),
-                        safeRotation(
-                            arm,
-                            when (alliance()) {
-                                Red -> Rotation2d.fromDegrees(0.0 - 2.0)
-                                Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
-                                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                            },
-                            drivetrain.estimatedPose2d.rotation
-                        )
+                        when (alliance()) {
+                            Red -> Rotation2d.fromDegrees(0.0 - 2.0)
+                            Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
+                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                        }
                     )
                 }
             )
