@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
 import frc.robot.PhotonCameraWrapper
 import frc.robot.RobotContainer
-import frc.robot.commands.drivetrain.DriveCommand
+import frc.robot.commands.drivetrain.DriverCommand
 import frc.robot.constants.Constants
 import frc.robot.constants.drivetrain
 import frc.robot.controls.ControlScheme
@@ -32,7 +32,7 @@ class Drivetrain(
 ) : SubsystemBase() {
 
     init {
-        defaultCommand = DriveCommand(this, controlScheme)
+        defaultCommand = DriverCommand(this, controlScheme)
     }
 
     private val swerveTab = getTab("Swerve Diagnostics")
