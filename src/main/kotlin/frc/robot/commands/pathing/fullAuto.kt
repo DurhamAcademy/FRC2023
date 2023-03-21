@@ -2,6 +2,7 @@ package frc.robot.commands.pathing
 
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.ConditionalCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
@@ -11,6 +12,7 @@ import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece
 import frc.robot.utils.Slider
+import frc.robot.utils.grid.PlacementSide
 
 fun fullAuto(
     drivetrain: Drivetrain,
@@ -18,6 +20,7 @@ fun fullAuto(
     elevator: Elevator,
     manipulator: Manipulator,
     selector: DashboardSelector,
+    nextGamePieceCallback: (gamePiece: GamePiece) -> Unit,
 //    command
 ): Command {
     return BuildingBlocks.goToPlacementPoint(
@@ -27,10 +30,11 @@ fun fullAuto(
         { selector.placementPosition },
         { selector.placementSide },
     ).deadlineWith(
-        SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { GamePiece.cube }, false)
+        SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { GamePiece.cube }, false)
     ).andThen(
         SetSubsystemPosition(
             elevator, arm,
+            drivetrain,
             { selector.placementLevel.ioLevel },
             { selector.placementSide.asObject },
             true
@@ -54,6 +58,7 @@ fun fullAuto(
                     SetSubsystemPosition(
                         elevator,
                         arm,
+                        drivetrain,
                         { IOLevel.Idle },
                         { selector.placementSide.asObject },
                         true
@@ -65,6 +70,7 @@ fun fullAuto(
                     SetSubsystemPosition(
                         elevator,
                         arm,
+                        drivetrain,
                         { IOLevel.Idle },
                         { selector.placementSide.asObject },
                         true
@@ -78,6 +84,7 @@ fun fullAuto(
                     SetSubsystemPosition(
                         elevator,
                         arm,
+                        drivetrain,
                         { IOLevel.HumanPlayerSlider },
                         { selector.placementSide.asObject },
                         true
@@ -87,6 +94,7 @@ fun fullAuto(
         .andThen(
             SetSubsystemPosition(
                 elevator, arm,
+                drivetrain,
                 { IOLevel.HumanPlayerSlider },
                 { selector.placementSide.asObject },
                 true
@@ -105,11 +113,34 @@ fun fullAuto(
                     SetSubsystemPosition(
                         elevator,
                         arm,
+                        drivetrain,
                         { IOLevel.Idle },
                         { selector.placementSide.asObject },
                         true
                     )
                 )
+                .alongWith(
+                    InstantCommand({
+                        nextGamePieceCallback(
+                            when (selector.placementSide) {
+                                PlacementSide.FarCone -> PlacementSide.CloseCone
+                                PlacementSide.Cube -> PlacementSide.FarCone
+                                PlacementSide.CloseCone -> PlacementSide.Cube
+                            }.asObject
+                        )
+                    })
+                )
         )
         .repeatedly()
+        .beforeStarting(
+            InstantCommand({
+                nextGamePieceCallback(
+                    when (selector.placementSide) {
+                        PlacementSide.FarCone -> PlacementSide.CloseCone
+                        PlacementSide.Cube -> PlacementSide.FarCone
+                        PlacementSide.CloseCone -> PlacementSide.Cube
+                    }.asObject
+                )
+            })
+        )
 }

@@ -7,10 +7,12 @@ import frc.robot.subsystems.Drivetrain
 
 
 class AutoBalance(
-    var drivetrain: Drivetrain
+    var drivetrain: Drivetrain,
+    val getup: Boolean = false,
+    val fromCenter: Boolean = false,
+    var speed: Double = 0.25
 ): CommandBase() {
 
-    var speed: Double = 0.25
     val half = 11.0 //may need to fine tune this
 
     init {
@@ -55,8 +57,7 @@ class AutoBalance(
             Translation2d(0.0, 0.0)
         )
     }
-//
-//    override fun isFinished() {
-//
-//    }
+
+    override fun isFinished() =
+        (-half..half).contains(drivetrain.gyro.pitch)
 }
