@@ -24,5 +24,4 @@ class SetCubePosition(
         //TODO CHANGE THIS VALUE TO WHAT IS THE ACTUAL VALUE
         return intake.modeMotorPosition >= 180.0
     }
-
 }

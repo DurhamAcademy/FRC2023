@@ -32,6 +32,24 @@ object intake {
         const val kA = 0.0
     }
 
+    object modemotor{
+        const val positionTolerance = 0.0
+        const val velocityTolerance = 0.0
+        const val id = 0
+        const val inverted = true
+        const val gearRatio = 1 / 120
+        const val maxVelocity = 0.0
+        const val maxAcceleration = 0.0
+        const val kP = 0.0
+        const val kI = 0.0
+        const val kD = 0.0
+
+        const val kS = 0.0
+        const val kG = 0.0
+        const val kV = 0.0
+        const val kA = 0.0
+    }
+
     object systemencoder{
         const val id = 0
         const val offset = 0.0
