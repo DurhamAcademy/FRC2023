@@ -1,6 +1,7 @@
 package frc.robot.subsystems
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.StatusFrame
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import edu.wpi.first.math.controller.ElevatorFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
@@ -41,6 +42,18 @@ class Elevator(
         setNeutralMode(NeutralMode.Brake)
         inverted = elevator.elevatorMotor.inverted
         selectedSensorPosition = 0.0
+        // set status frames
+        setStatusFramePeriod(StatusFrame.Status_1_General, 10)
+        setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20)
+        setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 100)
+        setStatusFramePeriod(StatusFrame.Status_6_Misc, 100)
+        setStatusFramePeriod(StatusFrame.Status_7_CommStatus, 100)
+        setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, 255)
+        setStatusFramePeriod(StatusFrame.Status_10_Targets, 255)
+        setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 255)
+        setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 255)
+        setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 255)
+        setStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 255)
     }
     val motorPid = ProfiledPIDController(
         elevator.elevatorMotor.PID.kP,
@@ -114,7 +127,7 @@ class Elevator(
                 elevator.limits.topLimit
             )
         }
-
+    var previousVoltage = 0.0
     fun setMotorVoltage(voltage: Double) {
         if (RobotBase.isSimulation())
             elevatorSim.setInputVoltage(
@@ -124,7 +137,10 @@ class Elevator(
                 )
             )
         else
-            elevatorMotor.setVoltage(voltage.coerceIn(-8.0, 8.0))
+            if (previousVoltage != voltage) {
+                elevatorMotor.setVoltage(voltage.coerceIn(-8.0, 8.0))
+                previousVoltage = voltage
+            }
     }
 
     private var lastLimitSwitch: Boolean = false
