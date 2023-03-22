@@ -119,7 +119,7 @@ class RobotContainer {
                 lowIntake
                     .whileTrue(
                         SetSubsystemPosition(this@RobotContainer, { IOLevel.FloorIntake }, { wantedObject })
-                            .alongWith(SetManipulatorSpeed(manipulator, 1.0))
+                            .alongWith(SetManipulatorSpeed(manipulator, 0.6502))
                     )
 
                 // assign outtake to set manipulator speed to -0.5
@@ -132,14 +132,14 @@ class RobotContainer {
                     .onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 spinIntakeIn
-                    .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, 0.6502))
                     .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 intakeHPS
                     .whileTrue(
                         SetSubsystemPosition(this@RobotContainer, { IOLevel.HumanPlayerSlider }, { wantedObject })
                             .alongWith(
-                                SetManipulatorSpeed(manipulator, 1.0)
+                                SetManipulatorSpeed(manipulator, 0.6502)
                             )
                     )
                     .onFalse(
