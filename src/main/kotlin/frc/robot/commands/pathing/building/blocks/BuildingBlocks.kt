@@ -469,4 +469,36 @@ object BuildingBlocks {
         )
             .until { hasLeftZone() }
     }
+
+    inline fun prepAutoBalance(
+        halfpoint: Double,
+        drivetrain: Drivetrain,
+        crossinline alliance: () -> Alliance = { Game.alliance }
+    ): Command {
+        if (drivetrain.estimatedPose2d.x >= halfpoint) {
+            return MoveToPosition(
+                drivetrain,
+                halfpoint + 1.6,
+                drivetrain.estimatedPose2d.y
+            ).andThen(
+                MoveToPosition(
+                    drivetrain,
+                    halfpoint + 1.6,
+                    2.0
+                )
+            )
+        } else {
+            return MoveToPosition(
+                drivetrain,
+                halfpoint - 1.6,
+                drivetrain.estimatedPose2d.y
+            ).andThen(
+                MoveToPosition(
+                    drivetrain,
+                    halfpoint - 1.6,
+                    2.0
+                )
+            )
+        }
+    }
 }
