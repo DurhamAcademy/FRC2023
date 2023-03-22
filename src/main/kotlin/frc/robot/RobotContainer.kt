@@ -71,7 +71,7 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val elevator = Elevator(arm)
+    val elevator = Elevator(this@RobotContainer, arm)
 
     val pdh = PowerDistribution(PDH.id, kRev)
 
