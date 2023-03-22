@@ -158,7 +158,12 @@ object BuildingBlocks {
         alliance: () -> Alliance = { Game.alliance }
     ): Command {
         val hasExited: () -> Boolean = {
-            (exitPoint(alliance()) - drivetrain.estimatedPose2d.x).absoluteValue < 0.25
+            when (alliance()) {
+                Red -> drivetrain.estimatedPose2d.x < exitPoint(alliance())
+                Blue -> drivetrain.estimatedPose2d.x > exitPoint(alliance())
+                else -> true//fixme: BNOOO
+            }
+
         }
         val clearRoute: () -> Boolean = {
             (
@@ -172,7 +177,7 @@ object BuildingBlocks {
                             drivetrain.estimatedPose2d.y > clearDown - .25
                             ).and(
                             drivetrain.estimatedPose2d.y < clearDown + .25
-                        ).and(false)
+                        )
                 )
         }
         val placementX: () -> Double = {
@@ -183,11 +188,11 @@ object BuildingBlocks {
             }
         }
         val placementY: () -> Double = {
-//            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
-//                clearDown
-//            } else {
-            clearUp
-//            }
+            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
+                clearDown
+            } else {
+                clearUp
+            }
             //TODO charge station
         }
         val rotationAlliance: () -> Rotation2d = {
@@ -204,7 +209,7 @@ object BuildingBlocks {
         return MoveToPosition(
             drivetrain,
             { xPID, _, _ ->
-                if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
+                if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * -alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
                     xPID.setConstraints(
                         TrapezoidProfile.Constraints(
                             0.2,
