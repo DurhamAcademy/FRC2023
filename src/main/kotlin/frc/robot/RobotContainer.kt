@@ -588,9 +588,11 @@ class RobotContainer {
             )
                 .andThen(
                 Throw(manipulator, { cube }, { PlacementLevel.Level3 }).withTimeout(1.0).andThen(
-                    pickupObjectFromFloor(drivetrain, arm, FloorGamePiecePosition.Farthest, {Game.alliance}).alongWith(
+                    MoveToPosition(drivetrain, 5.4, 0.94, 180.0).alongWith(
                         SetSubsystemPosition(this@RobotContainer, {IOLevel.FloorIntake}, {cone})
                     ).withTimeout(3.0).andThen(
+                        MoveToPosition(drivetrain, 5.95, 0.94, 180.0).withTimeout(1.0)
+                    ).andThen(
                         SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cone}).withTimeout(2.0).andThen(
                             goToPlacementPoint(
                                 drivetrain,
