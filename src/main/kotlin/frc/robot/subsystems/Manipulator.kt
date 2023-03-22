@@ -25,7 +25,7 @@ class Manipulator: SubsystemBase() {
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
         restoreFactoryDefaults()
 //        setSmartCurrentLimit(ManipConsts.manipulatorCurrentLimit.toInt()) // add current limit to limit the torque
-        idleMode = CANSparkMax.IdleMode.kCoast
+        idleMode = CANSparkMax.IdleMode.kBrake
 //        openLoopRampRate = 0.5
         // make the motor report less often to reduce network traffic
 
