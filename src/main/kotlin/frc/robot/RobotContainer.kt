@@ -188,9 +188,9 @@ class RobotContainer {
                 selectGridDown
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, -1))
                 selectGridLeft
-                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
-                selectGridRight
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
+                selectGridRight
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
 
                 confirmGridSelection
                     .whileTrue(
