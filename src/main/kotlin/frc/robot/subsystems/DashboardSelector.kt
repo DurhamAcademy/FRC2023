@@ -31,7 +31,7 @@ class DashboardSelector {
         List(3) { y ->
             grid.add("$x,$y", false)
                 .withWidget(BuiltInWidgets.kToggleButton)
-                .withPosition(-x + 9, -y + 3)
+                .withPosition(-x + 9 - 1, -y + 3 - 1) // these are zero indexed -> should run from 0-8 and 0-2
                 .withSize(1, 1)
                 .entry
         }

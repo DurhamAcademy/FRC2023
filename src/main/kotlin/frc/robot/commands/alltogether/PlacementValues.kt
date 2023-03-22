@@ -27,15 +27,15 @@ enum class IOLevel(
         Rotation2d.fromRadians(1.2),
         .85,
         Rotation2d.fromRadians(1.32),
-        -0.15, -0.15,
+        -0.15, -0.17,
         -0.075
     ),
     Mid(
         .7,
         Rotation2d.fromRadians(1.175),
-        .85,
+        .72,
         Rotation2d.fromRadians(1.32),
-        -0.15, -0.10,
+        -0.15, -0.12,
         .2668
     ),
     Low(
