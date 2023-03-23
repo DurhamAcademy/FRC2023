@@ -480,6 +480,7 @@ class RobotContainer {
         )
         addOption(
             "Place & Mobility Far",
+            SetManipulatorSpeed(manipulator, 0.1).withTimeout(0.5).andThen(
             SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cube}).withTimeout(2.0).andThen(
                 Throw(manipulator, {cube}, {PlacementLevel.Level3}).withTimeout(1.0).andThen(
                     SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cube}).withTimeout(2.0)
@@ -495,6 +496,7 @@ class RobotContainer {
                         drivetrain.estimatedPose2d.rotation.degrees
                     ).withTimeout(5.0)
                 )
+            )
             )
         )
     }
