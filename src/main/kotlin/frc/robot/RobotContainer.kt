@@ -1,9 +1,11 @@
 package frc.robot
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
@@ -40,6 +42,7 @@ import frc.robot.commands.pathing.building.blocks.BuildingBlocks.pickupObjectFro
 import frc.robot.commands.pathing.fullAuto
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
+import frc.robot.constants.drivetrain as drivetrainValues
 import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
@@ -483,23 +486,86 @@ class RobotContainer {
             "Place & Mobility Far",
             SetManipulatorSpeed(manipulator, 0.1).withTimeout(0.5).andThen(
                 LeaveStartConfig(this@RobotContainer, arm).andThen(
-            SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cube}).withTimeout(2.0).andThen(
-                Throw(manipulator, {cube}, {PlacementLevel.Level3}).withTimeout(1.0).andThen(
-                    SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cube}).withTimeout(2.0)
+            SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cone}).withTimeout(2.0).andThen(
+                Throw(manipulator, {cone}, {PlacementLevel.Level3}).withTimeout(1.0).andThen(
+                    SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cone}).withTimeout(2.0)
                 ).andThen(
                     MoveToPosition(
                         drivetrain,
-                        when(Game.alliance){
-                            DriverStation.Alliance.Blue -> 5.81
-                            DriverStation.Alliance.Red -> 10.75
-                            else -> drivetrain.estimatedPose2d.x
-                        },
-                        4.62,
-                        drivetrain.estimatedPose2d.rotation.degrees
+                        {_,_,_->
+                            Pose2d(
+                                when (Game.alliance) {
+                                    DriverStation.Alliance.Blue -> 5.81
+                                    DriverStation.Alliance.Red -> 10.75
+                                    else -> drivetrain.estimatedPose2d.x
+                                },
+                                4.62,
+                                drivetrain.estimatedPose2d.rotation
+                            )
+                        }
                     ).withTimeout(5.0)
                 )
             )
             )
+            )
+        )
+        addOption(
+            "Place & Pickup Far",
+            SetManipulatorSpeed(manipulator, 0.1).withTimeout(0.5).andThen(
+                LeaveStartConfig(this@RobotContainer, arm).andThen(
+                    SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cone}).withTimeout(2.0).andThen(
+                        Throw(manipulator, {cone}, {PlacementLevel.Level3}).withTimeout(1.0).andThen(
+                            SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cone}).withTimeout(2.0)
+                        ).andThen(
+                            MoveToPosition(
+                                drivetrain,
+                                {_,_,_ ->
+                                    Pose2d(
+                                        when (Game.alliance) {
+                                            DriverStation.Alliance.Blue -> 5.57
+                                            DriverStation.Alliance.Red -> 10.99
+                                            else -> drivetrain.estimatedPose2d.x
+                                        },
+                                        4.62,
+                                        when (Game.alliance) {
+                                            DriverStation.Alliance.Blue -> Rotation2d.fromDegrees(180.0)
+                                            DriverStation.Alliance.Red -> Rotation2d.fromDegrees(0.0)
+                                            else -> drivetrain.estimatedPose2d.rotation
+                                        }
+                                    )
+                                }
+                            ).withTimeout(4.0).alongWith(
+                                SetSubsystemPosition(this@RobotContainer, {IOLevel.FloorIntake}, {cube})
+                            ).andThen(
+                                //6.59
+                                MoveToPosition(
+                                    drivetrain,
+                                    {xp,yp,_ ->
+                                        xp.setConstraints(TrapezoidProfile.Constraints(0.5, drivetrainValues.maxAcceleration))
+                                        yp.setConstraints(TrapezoidProfile.Constraints(0.5, drivetrainValues.maxAcceleration))
+                                        Pose2d(
+                                            when (Game.alliance) {
+                                                DriverStation.Alliance.Blue -> 5.57
+                                                DriverStation.Alliance.Red -> 10.99
+                                                else -> drivetrain.estimatedPose2d.x
+                                            },
+                                            4.62,
+                                            when (Game.alliance) {
+                                                DriverStation.Alliance.Blue -> Rotation2d.fromDegrees(180.0)
+                                                DriverStation.Alliance.Red -> Rotation2d.fromDegrees(0.0)
+                                                else -> drivetrain.estimatedPose2d.rotation
+                                            },
+                                        )
+                                    }
+                                ).withTimeout(1.0).alongWith(
+                                    SetManipulatorSpeed(manipulator, 0.6502).andThen(
+                                        SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cone}).withTimeout(2.0)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
             )
         )
     }
