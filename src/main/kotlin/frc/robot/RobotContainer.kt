@@ -468,57 +468,6 @@ class RobotContainer {
     val autoChooser = SendableChooser<Command>().apply {
         setDefaultOption("Spin", SpinCommand(drivetrain))
         addOption(
-            "1",
-            SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { cone }, true)
-                .alongWith(SetManipulatorSpeed(manipulator, 0.5).withTimeout(0.25))
-                .andThen(ZeroElevatorAndIdle(elevator, arm))
-                .andThen(
-                    goToPlacementPoint(
-                        drivetrain,
-                        arm,
-                        { PlacementLevel.Level3.ioLevel },
-                        { PlacementGroup.Farthest },
-                        { PlacementSide.FarCone }
-                    )
-                )
-                .andThen(
-                    Commands.runOnce({
-                        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), false)
-                    }, drivetrain)
-                )
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.High }, { cone }, true))
-                .andThen(Throw(manipulator, { cone }) { PlacementLevel.Level3 }.withTimeout(0.5))
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { cone }, true))
-        )
-        addOption(
-            "2",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level2.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            )
-        )
-        addOption(
-            "3",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            )
-        )
-        addOption(
-            "exit human player area",
-            BuildingBlocks.leavePickupZone(drivetrain, arm)
-        )
-        addOption(
-            "leave community zone",
-            BuildingBlocks.leaveCommunityZone(drivetrain, arm)
-        )
-        addOption(
             "full auto",
             fullAuto(
                 drivetrain, arm, elevator, manipulator, smartDashboardSelector
@@ -530,89 +479,21 @@ class RobotContainer {
                 .finallyDo { fullAuto = false }
         )
         addOption(
-            "Place Cube High Far",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            ).withTimeout(2.0).alongWith(
-                SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, { cube })
-            ).andThen(
-                (Throw(manipulator, { cube }) { PlacementLevel.Level3 }).withTimeout(4.0)
-            )
-        )
-        addOption(
-            "Place Cube High & Mobility Far",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            ).withTimeout(2.0).alongWith(
-                SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cube})
-            ).andThen(
-                Throw(manipulator, { cube }, { PlacementLevel.Level3 }).withTimeout(1.0).andThen(
-                    BuildingBlocks.leaveCommunityZone(drivetrain, arm, { Game.alliance }).withTimeout(12.0)
-                )
-            )
-        )
-        addOption(
-            "Place Cube High & Pickup Far",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            ).withTimeout(2.0).alongWith(
-                SetSubsystemPosition(this@RobotContainer, { IOLevel.High }, { cube }, true)
-            ).andThen(
-                Throw(manipulator, { cube }, { PlacementLevel.Level3 }).withTimeout(1.0).andThen(
-                    pickupObjectFromFloor(drivetrain, arm, FloorGamePiecePosition.Farthest, { Game.alliance })
-                        .deadlineWith(SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle }, { cone }, true))
-                        .andThen(
-                            SetSubsystemPosition(this@RobotContainer, { IOLevel.FloorIntake }, { cone }, true)
-                        ).withTimeout(7.0).andThen(
-                            SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle }, { cone }, true).withTimeout(2.0)
-                        )
-                )
-            )
-        )
-        addOption(
-            "Two Cycle Far",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            ).withTimeout(1.0).alongWith(
-                SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cube})
-            )
-                .andThen(
-                Throw(manipulator, { cube }, { PlacementLevel.Level3 }).withTimeout(1.0).andThen(
-                    MoveToPosition(drivetrain, 5.4, 0.94, 180.0).alongWith(
-                        SetSubsystemPosition(this@RobotContainer, {IOLevel.FloorIntake}, {cone})
-                    ).withTimeout(3.0).andThen(
-                        MoveToPosition(drivetrain, 5.95, 0.94, 180.0).withTimeout(1.0)
-                    ).andThen(
-                        SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cone}).withTimeout(2.0).andThen(
-                            goToPlacementPoint(
-                                drivetrain,
-                                arm,
-                                PlacementLevel.Level3.ioLevel,
-                                PlacementGroup.Farthest,
-                                PlacementSide.FarCone
-                            ).withTimeout(2.0).alongWith(
-                                SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cone})
-                            ).andThen(
-                                Throw(manipulator, { cone }, { PlacementLevel.Level3 }).withTimeout(1.0)
-                            )
-                        )
-                    )
+            "Place & Mobility Far",
+            SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cube}).withTimeout(2.0).andThen(
+                Throw(manipulator, {cube}, {PlacementLevel.Level3}).withTimeout(1.0).andThen(
+                    SetSubsystemPosition(this@RobotContainer, {IOLevel.Idle}, {cube}).withTimeout(2.0)
+                ).andThen(
+                    MoveToPosition(
+                        drivetrain,
+                        when(Game.alliance){
+                            DriverStation.Alliance.Blue -> 5.81
+                            DriverStation.Alliance.Red -> 10.75
+                            else -> drivetrain.estimatedPose2d.x
+                        },
+                        4.62,
+                        drivetrain.estimatedPose2d.rotation.degrees
+                    ).withTimeout(5.0)
                 )
             )
         )
