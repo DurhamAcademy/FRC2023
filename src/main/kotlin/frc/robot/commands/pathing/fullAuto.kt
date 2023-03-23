@@ -43,8 +43,7 @@ fun fullAuto(
         Throw(
             manipulator,
             { selector.placementSide.asObject },
-            { selector.placementLevel },
-        ).withTimeout(0.25)
+        ) { selector.placementLevel }.withTimeout(0.25)
             .andThen(
                 ConditionalCommand(
                     selector.moveCommand(1, -1),

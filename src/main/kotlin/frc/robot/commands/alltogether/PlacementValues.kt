@@ -24,32 +24,32 @@ enum class IOLevel(
 ) {
     High(
         topLimit - inchesToMeters(4.0),
-        Rotation2d.fromRadians(1.2),
+        Rotation2d.fromRadians(1.23),
         .85,
         Rotation2d.fromRadians(1.32),
         -0.15, -0.17,
         -0.075
     ),
     Mid(
-        .71,
-        Rotation2d.fromRadians(1.175),
         .72,
+        Rotation2d.fromRadians(1.167),
+        .7,
         Rotation2d.fromRadians(1.32),
         -0.15, -0.12,
-        .2673
+        .268
     ),
     Low(
         //for the height here is 0.88
         1.0,
-        Rotation2d.fromRadians(-2.41),
+        Rotation2d.fromRadians(-2.21),
         0.88,
-        Rotation2d.fromRadians(-2.41),
+        Rotation2d.fromRadians(-2.21),
         -0.15, -0.15,
         0.5
     ),
     HumanPlayerSlider(
-        1.3 - inchesToMeters(11.0 + 3.0 + 1.0),
-        Rotation2d.fromRadians(1.35),
+        topLimit,
+        Rotation2d.fromRadians(1.6),
         1.3 - inchesToMeters(11.0 + 2.75),
         Rotation2d.fromRadians(1.4),
         0.40, 1.0,
@@ -65,7 +65,7 @@ enum class IOLevel(
     FloorIntake(
         bottomLimit + inchesToMeters(1.0),
         Rotation2d.fromRadians(1.81),
-        bottomLimit + inchesToMeters(1.0),
+        bottomLimit + inchesToMeters(2.0),
         Rotation2d.fromRadians(1.81),
         -0.15, -0.15
     ),

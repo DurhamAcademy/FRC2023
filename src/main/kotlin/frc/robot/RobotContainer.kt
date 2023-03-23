@@ -3,7 +3,6 @@ package frc.robot
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
@@ -26,17 +25,15 @@ import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.AutoBalance
-import frc.robot.commands.drivetrain.SpinCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
+import frc.robot.commands.pathing.Auto
+import frc.robot.commands.pathing.AutoPlaceAndBalance
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks.leaveCommunityZone
-import frc.robot.commands.pathing.fullAuto
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.constants.leds.count
@@ -47,9 +44,6 @@ import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.Slider
-import frc.robot.utils.grid.PlacementGroup
-import frc.robot.utils.grid.PlacementLevel
-import frc.robot.utils.grid.PlacementSide
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -202,22 +196,22 @@ class RobotContainer {
                             { smartDashboardSelector.placementPosition },
                             { smartDashboardSelector.placementSide },
                         )
-                            .deadlineWith(
-                                SetSubsystemPosition(
-                                    elevator, arm,
-                                    drivetrain,
-                                    { IOLevel.Idle },
-                                    { smartDashboardSelector.placementSide.asObject },
-                                )
-                            )
-                            .andThen(
-                                SetSubsystemPosition(
-                                    elevator, arm,
-                                    drivetrain,
-                                    { smartDashboardSelector.placementLevel.ioLevel },
-                                    { smartDashboardSelector.placementSide.asObject },
-                                )
-                            )
+//                            .deadlineWith(
+//                                SetSubsystemPosition(
+//                                    elevator, arm,
+//                                    drivetrain,
+//                                    { IOLevel.Idle },
+//                                    { smartDashboardSelector.placementSide.asObject },
+//                                )
+//                            )
+//                            .andThen(
+//                                SetSubsystemPosition(
+//                                    elevator, arm,
+//                                    drivetrain,
+//                                    { smartDashboardSelector.placementLevel.ioLevel },
+//                                    { smartDashboardSelector.placementSide.asObject },
+//                                )
+//                            )
                     )
                 alignClosestHPS
                     .whileTrue(
@@ -461,73 +455,25 @@ class RobotContainer {
     }
 
     val auto: Command
-        get() = autoChooser.selected
+        get() {
+            var c = Commands.runOnce({ // assume the elevator is starting from the top.
+                elevator.height = frc.robot.constants.elevator.limits.topLimit
+            })
+                .andThen(Commands.runOnce({ arm.setArmPosition(-PI/2) })) // move the arm to horizontal
+                .andThen(Commands.waitUntil { arm.armPID.atGoal() })
+                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true).withTimeout(3.0)) // go to idle
+
+            if(autoChooser.selected != null) {
+                c = c.andThen(autoChooser.selected!!.getCommand())
+            }
+
+            return c
+        }
 
     // auto chooser
-    val autoChooser = SendableChooser<Command>().apply {
-        setDefaultOption("Spin", SpinCommand(drivetrain))
-        addOption(
-            "1",
-            SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { cone }, true)
-                .alongWith(SetManipulatorSpeed(manipulator, 0.5).withTimeout(0.25))
-                .andThen(ZeroElevatorAndIdle(elevator, arm))
-                .andThen(
-                    goToPlacementPoint(
-                        drivetrain,
-                        arm,
-                        { PlacementLevel.Level3.ioLevel },
-                        { PlacementGroup.Farthest },
-                        { PlacementSide.FarCone }
-                    )
-                )
-                .andThen(
-                    Commands.runOnce({
-                        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), false)
-                    }, drivetrain)
-                )
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.High }, { cone }, true))
-                .andThen(Throw(manipulator, { cone }, { PlacementLevel.Level3 }).withTimeout(0.5))
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { cone }, true))
-        )
-        addOption(
-            "2",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level2.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            )
-        )
-        addOption(
-            "3",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            )
-        )
-        addOption(
-            "exit human player area",
-            BuildingBlocks.leavePickupZone(drivetrain, arm)
-        )
-        addOption(
-            "leave community zone",
-            leaveCommunityZone(drivetrain, arm)
-        )
-        addOption(
-            "full auto",
-            fullAuto(
-                drivetrain, arm, elevator, manipulator, smartDashboardSelector
-            ) {
-                fullAuto = true
-                fullAutoObject = it
-            }
-                .beforeStarting(Runnable { fullAuto = true })
-                .finallyDo { fullAuto = false }
-        )
+    val autoChooser = SendableChooser<Auto?>().apply {
+        setDefaultOption("None", null)
+        addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
     }
 
     // shuffleboard auto chooser
