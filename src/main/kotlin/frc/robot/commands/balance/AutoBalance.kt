@@ -41,7 +41,7 @@ class AutoBalance(private val drivetrain: Drivetrain): CommandBase() {
     override fun execute() {
         if(timer.hasElapsed(0.7)) {
             drivetrain.drive(
-                ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, 0.03), 0.0), 0.0, 0.0),
+                ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, .5), 0.0), 0.0, 0.0),
                 true
             )
         }                                   else {
