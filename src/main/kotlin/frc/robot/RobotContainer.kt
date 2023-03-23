@@ -1,5 +1,6 @@
 package frc.robot
 
+import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -51,6 +52,7 @@ import frc.robot.utils.grid.FloorGamePiecePosition
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
+import frc.robot.utils.xMul
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -607,12 +609,67 @@ class RobotContainer {
                                 PlacementGroup.Farthest,
                                 PlacementSide.FarCone
                             ).withTimeout(2.0).alongWith(
-                                SetSubsystemPosition(this@RobotContainer, {IOLevel.High}, {cone})
+                                SetSubsystemPosition(this@RobotContainer, { IOLevel.High }, { cone })
                             ).andThen(
                                 Throw(manipulator, { cone }, { PlacementLevel.Level3 }).withTimeout(1.0)
                             )
                         )
                     )
+                )
+                )
+        )
+        addOption(
+            "far default",
+            goToPlacementPoint(
+                drivetrain,
+                arm,
+                PlacementLevel.Level3.ioLevel,
+                PlacementGroup.Farthest,
+                PlacementSide.Cube
+            ).andThen(
+                SetSubsystemPosition(this@RobotContainer, { IOLevel.High }, { cube }, true).withTimeout(3.0)
+            ).andThen(
+                Throw(manipulator, { cube }, { PlacementLevel.Level3 }).withTimeout(1.0)
+            ).andThen(
+                BuildingBlocks.leaveCommunityZone(drivetrain, arm, { Game.alliance }).withTimeout(12.0)
+                    .deadlineWith(SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle }, { cube }))
+            ).andThen(
+                MoveToPosition(
+                    drivetrain,
+                    { _, _, _ ->
+                        Pose2d(
+                            2.81 * -Game.alliance.xMul + Field2dLayout.xCenter,
+                            4.57,
+                            Rotation2d.fromDegrees(90 + (90 * Game.alliance.xMul))
+                        )
+                    }
+                )
+            ).andThen(
+                SetSubsystemPosition(this@RobotContainer, { IOLevel.FloorIntake }, { cone }, true)
+            ).andThen(
+                MoveToPosition(
+                    drivetrain,
+                    { _, _, _ ->
+                        Pose2d(
+                            1.0 * -Game.alliance.xMul + Field2dLayout.xCenter,
+                            4.57,
+                            Rotation2d.fromDegrees(90 + (90 * Game.alliance.xMul))
+                        )
+                    }
+                )
+            ).andThen(
+                goToPlacementPoint(
+                    drivetrain,
+                    arm,
+                    PlacementLevel.Level3.ioLevel,
+                    PlacementGroup.Farthest,
+                    PlacementSide.FarCone
+                ).deadlineWith(
+                    SetSubsystemPosition(this@RobotContainer, { IOLevel.Idle }, { cone })
+                ).andThen(
+                    SetSubsystemPosition(this@RobotContainer, { IOLevel.High }, { cone })
+                ).andThen(
+                    Throw(manipulator, { cone }, { PlacementLevel.Level3 }).withTimeout(1.0)
                 )
             )
         )

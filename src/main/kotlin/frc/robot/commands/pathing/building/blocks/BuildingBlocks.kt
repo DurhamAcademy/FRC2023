@@ -32,12 +32,13 @@ object BuildingBlocks {
      * Variables
      */
     val exitFalseGoalPoint = { alliance: Alliance ->
-        xCenter + ((2.15 - robotDiagRadius) * alliance.xMul)
+        xCenter + ((1.68 + robotDiagRadius) * -alliance.xMul)
     }
     val clearUp = 4.0 + (robotLength / 2.0) + 0.25 //Y value above charge station
     val clearDown = 1.5 - (robotLength / 2.0) - 0.25 //Y value below charge station
-    val exitPoint = { alliance: Alliance ->
-        xCenter + ((3.3 - robotDiagRadius) * -alliance.xMul)
+    val exitPoint = { y: Double, alliance: Alliance ->
+        if (y >= (4 + robotDiagRadius)) xCenter + ((5.0 - robotDiagRadius) * -alliance.xMul)
+        else xCenter + ((3.3 - robotDiagRadius) * -alliance.xMul)
     }
     val middleX = { alliance: Alliance ->
         xCenter + (6.0 * -alliance.xMul)
@@ -88,7 +89,7 @@ object BuildingBlocks {
             drivetrain.estimatedPose2d.y < clearUp + .25 && drivetrain.estimatedPose2d.y > clearUp - .25 || drivetrain.estimatedPose2d.y > clearDown - .25 && drivetrain.estimatedPose2d.y < clearDown + .25
         }
         val placementY: () -> Double = {
-            if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(alliance()))) {
+            if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(drivetrain.estimatedPose2d.y, alliance()))) {
                 if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
                     clearDown
                 } else {
@@ -101,9 +102,15 @@ object BuildingBlocks {
         }
         val placementX: () -> Double = {
             // if the robot is on the side of the field that the object is on
-            if (abs(8 - drivetrain.estimatedPose2d.x) - .2 > abs(8 - exitPoint(alliance()))) {
+            if (abs(8 - drivetrain.estimatedPose2d.x) - .2 > abs(
+                    8 - exitPoint(
+                        drivetrain.estimatedPose2d.y,
+                        alliance()
+                    )
+                )
+            ) {
                 if (clearRoute()) {
-                    exitPoint(alliance())
+                    exitPoint(drivetrain.estimatedPose2d.y, alliance())
                 } else {
                     //
                     middleX(alliance())
@@ -129,7 +136,7 @@ object BuildingBlocks {
         }
         val closestRightAngle : Double = round(drivetrain.estimatedPose2d.rotation.degrees/90) * 90
         val rotation: () -> Rotation2d = {
-            if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(alliance()))) {
+            if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(drivetrain.estimatedPose2d.y, alliance()))) {
                 Rotation2d.fromDegrees(closestRightAngle)
             } else {
                 Rotation2d.fromDegrees(
@@ -159,8 +166,8 @@ object BuildingBlocks {
     ): Command {
         val hasExited: () -> Boolean = {
             when (alliance()) {
-                Red -> drivetrain.estimatedPose2d.x < exitPoint(alliance())
-                Blue -> drivetrain.estimatedPose2d.x > exitPoint(alliance())
+                Red -> drivetrain.estimatedPose2d.x < exitPoint(drivetrain.estimatedPose2d.y, alliance())
+                Blue -> drivetrain.estimatedPose2d.x > exitPoint(drivetrain.estimatedPose2d.y, alliance())
                 else -> true//fixme: BNOOO
             }
 
