@@ -88,7 +88,7 @@ open class MoveToPosition(
 
     val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.05, TrapezoidProfile.Constraints(
-            5.0,
+            2.0,
             max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
@@ -97,7 +97,7 @@ open class MoveToPosition(
     }
     val yPIDController = ProfiledPIDController(
         Companion.yP, 0.0, 0.05, TrapezoidProfile.Constraints(
-            5.0,
+            2.0,
             max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
@@ -135,8 +135,15 @@ open class MoveToPosition(
 
     override fun execute() {
         if (!drivetrain.canTrustPose) return initialize()
+
         val current = drivetrain.estimatedPose2d
         val desired = pose(xPIDController, yPIDController, rPIDController)
+
+        // BAIL IF WANT TO MOVE REALLY FAR
+        if(desired.translation.getDistance(current.translation) > 8.0) {
+            drivetrain.drive(ChassisSpeeds(), true)
+            return
+        }
 
         visualization.pose = desired
 

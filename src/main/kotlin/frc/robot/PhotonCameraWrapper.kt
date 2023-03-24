@@ -53,7 +53,7 @@ class PhotonCameraWrapper {
         photonPoseEstimator!!.setReferencePose(prevEstimatedRobotPose)
 
         val targets = photonCamera.latestResult.targets
-        val bestTarget: PhotonTrackedTarget? = photonCamera.latestResult.bestTarget
+        val bestTarget: PhotonTrackedTarget? = if(photonCamera.latestResult.hasTargets()) photonCamera.latestResult.bestTarget else null
 
         return if (targets.size > 2) {
             update()

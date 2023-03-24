@@ -5,9 +5,11 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
+import frc.kyberlib.command.Game
 import frc.robot.subsystems.Drivetrain
 import kotlin.math.PI
 import kotlin.math.absoluteValue
@@ -39,13 +41,20 @@ class AutoBalance(private val drivetrain: Drivetrain): CommandBase() {
     }
     
     override fun execute() {
-        if(timer.hasElapsed(0.7)) {
+
+        val speedMul = when(Game.alliance) {
+            DriverStation.Alliance.Red -> -1.0
+            DriverStation.Alliance.Blue -> 1.0
+            DriverStation.Alliance.Invalid -> 0.0
+        }
+
+        if(timer.hasElapsed(0.3)) {
             drivetrain.drive(
-                ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, .5), 0.0), 0.0, 0.0),
+                ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, .03), 0.0), 0.0, 0.0),
                 true
             )
-        }                                   else {
-            drivetrain.drive(ChassisSpeeds(1.0, 0.0, 0.0), true)
+        } else {
+            drivetrain.drive(ChassisSpeeds(2.0 * speedMul, 0.0, 0.0), true)
         }
 
 

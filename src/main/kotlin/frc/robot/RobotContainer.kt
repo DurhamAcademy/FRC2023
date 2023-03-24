@@ -1,5 +1,9 @@
 package frc.robot
-
+/*
+Wrap all auto commands (in robotcontainer) with timeout for 14.5 sec, lock wheels after that
+Lock wheels should require the drivetrain and stop movement so we don't try to move with wheels locked
+Make sure auto command gets canceled going into teleop and that wheels can unlock properly
+ */
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -16,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -24,7 +29,6 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
-import frc.robot.commands.drivetrain.AutoBalance
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -174,9 +178,6 @@ class RobotContainer {
                             }
                         )
                     )
-
-                autoBalance
-                    .whileTrue(AutoBalance(drivetrain))
 
                 selectGridUp
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
@@ -457,14 +458,22 @@ class RobotContainer {
     val auto: Command
         get() {
             var c = Commands.runOnce({ // assume the elevator is starting from the top.
-                elevator.height = frc.robot.constants.elevator.limits.topLimit
+                if (!elevator.hasLimitBeenPressed) {
+                    println("RESET ELEVATOR")
+                    elevator.height = frc.robot.constants.elevator.limits.topLimit
+                }
+                elevator.setpoint = frc.robot.constants.elevator.limits.topLimit
+                elevator.motorPid.reset(elevator.height)
             })
-                .andThen(Commands.runOnce({ arm.setArmPosition(-PI/2) })) // move the arm to horizontal
-                .andThen(Commands.waitUntil { arm.armPID.atGoal() })
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true).withTimeout(3.0)) // go to idle
-
+                .andThen(PrintCommand("debug"))
+                .andThen(Commands.runOnce({ arm.setArmPosition(-PI/2) }))
+                .andThen(Commands.waitUntil { arm.armPosition > -3*PI/4 }) // move the arm to horizontal
+                .andThen(PrintCommand("debug"))
+//                .andThen(SetSubsystemPosition(elevator, arm, {
+                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)) // go to idle
+                .andThen(PrintCommand("debug"))
             if(autoChooser.selected != null) {
-                c = c.andThen(autoChooser.selected!!.getCommand())
+                c = c.andThen(autoChooser.selected!!.getCommand()) // this needs to be like this because of command composition rules. this gets a fresh one each time instead of keeping one instance in the chooser
             }
 
             return c

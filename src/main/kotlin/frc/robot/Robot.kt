@@ -31,10 +31,10 @@ class Robot : TimedRobot() {
     var auto: Command? = null
 
     override fun autonomousInit() {
-//        auto = robotContainer.auto
-        auto = Commands.runOnce({ robotContainer.arm.setArmPosition(-PI /2) }) // move the arm to horizontal
-                .andThen(Commands.waitUntil { robotContainer.arm.armPID.atGoal() })
-                .andThen(AutoBalance(robotContainer.drivetrain))
+        auto = robotContainer.auto
+//        auto = Commands.runOnce({ robotContainer.arm.setArmPosition(-PI /2) }) // move the arm to horizontal
+//                .andThen(Commands.waitUntil { robotContainer.arm.armPID.atGoal() })
+//                .andThen(AutoBalance(robotContainer.drivetrain))
         auto?.schedule()
     }
 
