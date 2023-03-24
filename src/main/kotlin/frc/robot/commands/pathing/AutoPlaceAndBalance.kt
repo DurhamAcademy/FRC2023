@@ -36,7 +36,7 @@ class AutoPlaceAndBalance(
     private fun pathRed(robotContainer: RobotContainer): Command {
         return MoveToPosition(robotContainer.drivetrain, 14.67, 2.72-0.56, 0.0).withTimeout(1.0)
             .andThen(SetSubsystemPosition(robotContainer, { IOLevel.High }, { GamePiece.cone }, true)) // get in position to place cone on L3 middle
-            .andThen(Throw(robotContainer.manipulator, { GamePiece.cone }, { PlacementLevel.Level3 }).withTimeout(1.0)) // shoot cube
+            .andThen(Throw(robotContainer.manipulator, { GamePiece.cone }, { PlacementLevel.Level3 }).withTimeout(0.5)) // shoot cube
             .andThen(
                 MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 37.5)
                     .andThen(MoveToPosition(robotContainer.drivetrain, (13.34 - 0.5), 2.72, 37.5).withTimeout(4.0))
@@ -50,7 +50,7 @@ class AutoPlaceAndBalance(
     private fun pathBlue(robotContainer: RobotContainer): Command {
         return MoveToPosition(robotContainer.drivetrain, 16.52 - 14.67, 2.72-0.56, 0.0).withTimeout(1.0)
             .andThen(SetSubsystemPosition(robotContainer, { IOLevel.High }, { GamePiece.cone }, true)) // get in position to place cone on L3 middle
-            .andThen(Throw(robotContainer.manipulator, { GamePiece.cone }, { PlacementLevel.Level3 }).withTimeout(1.0)) // shoot cube
+            .andThen(Throw(robotContainer.manipulator, { GamePiece.cone }, { PlacementLevel.Level3 }).withTimeout(0.5)) // shoot cube
             .andThen(
                 MoveToPosition(robotContainer.drivetrain, 16.52 - 14.4, 2.72, 37.5)
                     .andThen(MoveToPosition(robotContainer.drivetrain, 16.52 - (13.34 - 0.5), 2.72, 37.5).withTimeout(4.0))

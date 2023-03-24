@@ -57,14 +57,12 @@ class SetSubsystemPosition(
             goalArmPosition = ioLevel.coneArmRotation.radians
             goalElevatorPosition = ioLevel.coneElevatorHeight
         }
-        if (ioLevel == Idle)
-            arm.setArmPosition(goalArmPosition + degreesToRadians(drivetrain.gyro.pitch))
-        else
-            arm.setArmPosition(goalArmPosition)
+
+        arm.setArmPosition(goalArmPosition)
         // use arm angle to determine elevator height
-        val armAngle = arm.armPosition
-        val armHeight = armLength * sin(armAngle)
-        val elevatorMaxHeight = topLimit - armHeight
+//        val armAngle = arm.armPosition
+//        val armHeight = armLength * sin(armAngle)
+//        val elevatorMaxHeight = topLimit - armHeight
 
         SmartDashboard.putNumber("ELEVATOR GOAL", goalElevatorPosition);
         SmartDashboard.putNumber("cone elev", ioLevel.coneElevatorHeight);
@@ -74,7 +72,7 @@ class SetSubsystemPosition(
             elevator.setpoint = bottomLimit
         else
             elevator.setpoint = goalElevatorPosition
-                .coerceIn(bottomLimit, elevatorMaxHeight)
+                .coerceAtLeast(bottomLimit)
     }
 
     override fun isFinished(): Boolean = stopAtEnd &&
