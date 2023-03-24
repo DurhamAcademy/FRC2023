@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.RobotBase
 import org.photonvision.EstimatedRobotPose
 import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
+import org.photonvision.targeting.PhotonTrackedTarget
 import java.util.*
 
 class PhotonCameraWrapper {
@@ -50,16 +51,20 @@ class PhotonCameraWrapper {
     fun getEstimatedGlobalPose(prevEstimatedRobotPose: Pose2d?): Optional<EstimatedRobotPose> {
         if (photonPoseEstimator == null) return Optional.empty()
         photonPoseEstimator!!.setReferencePose(prevEstimatedRobotPose)
-        return if (photonCamera.latestResult.targets.size > 2) {
+
+        val targets = photonCamera.latestResult.targets
+        val bestTarget: PhotonTrackedTarget? = if(photonCamera.latestResult.hasTargets()) photonCamera.latestResult.bestTarget else null
+
+        return if (targets.size > 2) {
             update()
-        } else if (photonCamera.latestResult.targets.size == 2) {
-            if (photonCamera.latestResult.targets
+        } else if (targets.size == 2) {
+            if (targets
                     .minOf { it.poseAmbiguity } < 0.5
             )
                 update()
             else Optional.empty()
-        } else if (photonCamera.latestResult.targets.size == 1) {
-            if ((photonCamera.latestResult.bestTarget?.poseAmbiguity ?: 1.0) < 0.2)
+        } else if (targets.size == 1) {
+            if ((bestTarget?.poseAmbiguity ?: 1.0) < 0.2)
                 update()
             else Optional.empty()
         } else Optional.empty()

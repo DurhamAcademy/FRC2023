@@ -172,6 +172,7 @@ class Manipulator: SubsystemBase() {
         }
 
         motorCurrent.setDouble(motor.outputCurrent)
+        SmartDashboard.putNumber("INTAKETEMP", motor.motorTemperature)
 //        colorRed.setDouble(color?.red ?: 0.0)
 //        colorGreen.setDouble(color?.green ?: 0.0)
 //        colorBlue.setDouble(color?.blue ?: 0.0)

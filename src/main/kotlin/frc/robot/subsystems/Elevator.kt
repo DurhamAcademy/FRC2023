@@ -32,6 +32,7 @@ class Elevator(
     val robotContainer: RobotContainer?,
     val armController: Arm
 ) : SubsystemBase() {
+    var hasLimitBeenPressed = false
     val armLength = 1.047
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
@@ -118,10 +119,12 @@ class Elevator(
                         elevator.elevatorMotor.gearRatio *
                         elevator.sproketRadius * 2.0 * PI -
                         elevator.limits.bottomLimit
+                motorPid.reset(height)
         }
 
     var setpoint: Double = elevator.limits.bottomLimit
         set(value) {
+//            println("SETPOINT $value")
             field = value.coerceIn(
                 elevator.limits.bottomLimit,
                 elevator.limits.topLimit
@@ -143,7 +146,7 @@ class Elevator(
             }
     }
 
-    private var lastLimitSwitch: Boolean = false
+    private var lastLimitSwitch: Boolean = true // switch is normally closed, so it should start true
 
     var elevatorTab = Shuffleboard.getTab("elevator")
     var voltageSetEntry = elevatorTab.add("Voltage Set", 0.0)
@@ -190,20 +193,17 @@ class Elevator(
         get() = height > (inchesToMeters(76.0) - (arm.length * cos(armController.armPosition)))
 
     override fun periodic() {
-        SmartDashboard.putData("elevcmd", this)
+        SmartDashboard.putNumber("elevator Setpoint", setpoint)
+        SmartDashboard.putString("elevcmd", this.currentCommand?.name ?: "NONE")
         currentHeightEntry.setDouble(this.height)
         // set the setpoint to the height entry
-        if (Constants.fullDSControl)
-            setpoint = heightEntry.getDouble(elevator.limits.bottomLimit)
+//        if (Constants.fullDSControl)
+//            setpoint = heightEntry.getDouble(elevator.limits.bottomLimit)
         // set motor voltage
         
         if (zeroElevator) {
             setMotorVoltage(
-                motorPid.calculate(
-                    height,
-                    TrapezoidProfile.State(-50.0, 0.0),
-                    TrapezoidProfile.Constraints(0.2, 10.0)
-                )
+                -1.5
             )
         } else {
             setMotorVoltage(
@@ -230,6 +230,8 @@ class Elevator(
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 
+        SmartDashboard.putBoolean("LIMIT", limitSwitch.get())
+
 //        setMotorVoltage(voltageSetEntry.getDouble(0.0))
 
         // check if its in teleop
@@ -237,6 +239,8 @@ class Elevator(
 //        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
         if (limitSwitch.get() != lastLimitSwitch) {
             this.height = elevator.limits.bottomLimit
+            println("LIMIT PRESSED: ${limitSwitch.get()}")
+            hasLimitBeenPressed = true
         }
         lastLimitSwitch = limitSwitch.get()
     }

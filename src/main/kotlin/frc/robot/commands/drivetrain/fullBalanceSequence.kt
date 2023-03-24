@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.robot.subsystems.Drivetrain
 import kotlin.math.absoluteValue
 
+/*
 fun fullBalanceSequence(
     drivetrain: Drivetrain,
     fromCenter: Boolean = false,
@@ -42,3 +43,4 @@ fun fullBalanceSequence(
         { state == 1 }
     )
 }
+        */

@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units
 
 object arm {
     object motor {
-        const val positionTolerance = 0.05
+        const val positionTolerance = 0.08
         const val velocityTolerance = 0.05
         const val id = 34
         const val currentLimit = 40
