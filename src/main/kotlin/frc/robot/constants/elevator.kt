@@ -9,7 +9,7 @@ object elevator {
 
     object elevatorMotor {
         object Feedforward {
-            val kG: Double = 0.092925
+            val kG: Double = 0.092925 //0.047
             val kS = 0.16
             val kV = 11.477
             val kA = 0.18208

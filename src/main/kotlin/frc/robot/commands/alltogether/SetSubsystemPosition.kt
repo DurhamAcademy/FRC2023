@@ -1,6 +1,7 @@
 package frc.robot.commands.alltogether
 
 import edu.wpi.first.math.util.Units.degreesToRadians
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
 import frc.robot.commands.alltogether.IOLevel.Idle
@@ -56,19 +57,22 @@ class SetSubsystemPosition(
             goalArmPosition = ioLevel.coneArmRotation.radians
             goalElevatorPosition = ioLevel.coneElevatorHeight
         }
-        if (ioLevel == Idle)
-            arm.setArmPosition(goalArmPosition + degreesToRadians(drivetrain.gyro.pitch))
-        else
-            arm.setArmPosition(goalArmPosition)
+
+        arm.setArmPosition(goalArmPosition)
         // use arm angle to determine elevator height
-        val armAngle = arm.armPosition
-        val armHeight = armLength * sin(armAngle)
-        val elevatorMaxHeight = topLimit - armHeight
+//        val armAngle = arm.armPosition
+//        val armHeight = armLength * sin(armAngle)
+//        val elevatorMaxHeight = topLimit - armHeight
+
+        SmartDashboard.putNumber("ELEVATOR GOAL", goalElevatorPosition);
+        SmartDashboard.putNumber("cone elev", ioLevel.coneElevatorHeight);
+        SmartDashboard.putString("Wanted", wantedObject().name);
+
         if (arm.armPosition > .2 && goalArmPosition < -.2 || arm.armPosition < -.2 && goalArmPosition > .2)
             elevator.setpoint = bottomLimit
         else
             elevator.setpoint = goalElevatorPosition
-                .coerceIn(bottomLimit, elevatorMaxHeight)
+                .coerceAtLeast(bottomLimit)
     }
 
     override fun isFinished(): Boolean = stopAtEnd &&
