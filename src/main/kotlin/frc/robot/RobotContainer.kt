@@ -28,6 +28,7 @@ import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
+import frc.robot.commands.alltogether.LeaveStartConfig
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.ManipulatorIO
@@ -40,6 +41,7 @@ import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayer
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
+import frc.robot.constants.drivetrain as drivetrainValues
 import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
@@ -68,7 +70,7 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val elevator = Elevator(this, arm)
+    val elevator = Elevator(this@RobotContainer, arm)
 
     val pdh = PowerDistribution(PDH.id, kRev)
 

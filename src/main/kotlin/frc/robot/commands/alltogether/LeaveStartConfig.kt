@@ -18,5 +18,5 @@ class LeaveStartConfig (
         override fun end(interrupted: Boolean) {
             SetSubsystemPosition(robotContainer, { IOLevel.Idle }, { GamePiece.cone })
         }
-        override fun isFinished(): Boolean = abs(arm.armPosition) < PI + degreesToRadians(5.0)
+        override fun isFinished(): Boolean = abs(arm.armPosition) < PI/2 + degreesToRadians(5.0)
 }
