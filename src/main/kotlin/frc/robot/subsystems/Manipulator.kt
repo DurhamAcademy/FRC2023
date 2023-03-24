@@ -2,25 +2,17 @@ package frc.robot.subsystems
 
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
-import com.revrobotics.ColorMatch
 import com.revrobotics.ColorSensorV3
 import edu.wpi.first.math.filter.Debouncer
-import edu.wpi.first.math.filter.LinearFilter
-import edu.wpi.first.wpilibj.I2C
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj.util.Color
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.kyberlib.command.Game
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.constants.manipulator.motorId
-import frc.robot.utils.GamePiece
-import kotlin.math.absoluteValue
-import kotlin.math.pow
-import frc.robot.constants.manipulator as ManipConsts
 
 
-class Manipulator: SubsystemBase() {
+class Manipulator : SubsystemBase() {
 
     private val motor = CANSparkMax(motorId, CANSparkMaxLowLevel.MotorType.kBrushless).apply {
         restoreFactoryDefaults()
@@ -41,7 +33,8 @@ class Manipulator: SubsystemBase() {
 
     var lastPercent = 0.0
     var lastIdleMode = CANSparkMax.IdleMode.kBrake
-//    var idleMode: CANSparkMax.IdleMode
+
+    //    var idleMode: CANSparkMax.IdleMode
 //        get() = motor.idleMode
 //        set(value) {
 //            if (lastIdleMode != value) {

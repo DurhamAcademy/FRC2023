@@ -1,12 +1,5 @@
 package frc.robot.commands.drivetrain
 
-import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.ConditionalCommand
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import frc.robot.subsystems.Drivetrain
-import kotlin.math.absoluteValue
-
 /*
 fun fullBalanceSequence(
     drivetrain: Drivetrain,

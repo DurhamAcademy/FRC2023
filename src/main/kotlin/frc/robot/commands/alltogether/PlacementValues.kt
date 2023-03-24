@@ -79,9 +79,9 @@ enum class IOLevel(
     ),
     Balance(
         bottomLimit,
-        Rotation2d.fromRadians(-PI/2),
+        Rotation2d.fromRadians(-PI / 2),
         bottomLimit,
-        Rotation2d.fromRadians(-PI/2),
+        Rotation2d.fromRadians(-PI / 2),
         0.0, 0.0
     )
 }

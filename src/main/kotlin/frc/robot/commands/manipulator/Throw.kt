@@ -1,7 +1,6 @@
 package frc.robot.commands.manipulator
 
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.constants.manipulator
 import frc.robot.subsystems.Manipulator
 import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.cone

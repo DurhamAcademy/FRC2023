@@ -5,6 +5,7 @@ package frc.kyberlib.math
  */
 class Interpolator(private val data: Map<Double, Double>) {
     private val keys = data.keys.toTypedArray()
+
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
@@ -31,6 +32,7 @@ class Interpolator(private val data: Map<Double, Double>) {
     }
 
     operator fun get(x: Double) = calculate(x)
+
     /**
      * Approximate the value of x using the stored Data
      * @param x the value to use
@@ -38,18 +40,18 @@ class Interpolator(private val data: Map<Double, Double>) {
      */
     fun calculate(x: Double): Double {
         val i = index(x)
-        if(i == -1) return data[keys.first()]!!  // datum below table
-        if(i == -2) return data[keys.last()]!!  // datum above table
+        if (i == -1) return data[keys.first()]!!  // datum below table
+        if (i == -2) return data[keys.last()]!!  // datum above table
         val lowVal = data[keys[i]]!!
-        val highVal = data[keys[i+1]]!!
+        val highVal = data[keys[i + 1]]!!
 
-        val alpha = (x-keys[i]) / (keys[i+1] - keys[i])  // percent distance from low to high
+        val alpha = (x - keys[i]) / (keys[i + 1] - keys[i])  // percent distance from low to high
         return lowVal + alpha * (highVal - lowVal)  // weighted average
     }
 
     private fun index(x: Double): Int {
         keys.forEachIndexed { index, d ->
-            if(x<d) return index - 1
+            if (x < d) return index - 1
         }
         return -2  // the condition if x is greater than all values
     }

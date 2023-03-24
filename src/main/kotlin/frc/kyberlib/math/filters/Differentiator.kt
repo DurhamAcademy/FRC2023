@@ -25,6 +25,7 @@ class Differentiator : Filter {
     }
 
     fun calculate(angle: Angle): AngularVelocity = calculate(angle.radians).radiansPerSecond
+
     @JvmName("calculate1")
     fun calculate(dis: Length): LinearVelocity = calculate(dis.meters).metersPerSecond
 

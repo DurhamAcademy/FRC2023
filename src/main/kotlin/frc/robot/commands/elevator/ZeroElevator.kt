@@ -12,7 +12,7 @@ class ZeroElevatorAndIdle(
     init {
         addRequirements(elevator)
         if (armZero)
-        addRequirements(arm)
+            addRequirements(arm)
     }
 
     override fun initialize() {
@@ -22,7 +22,7 @@ class ZeroElevatorAndIdle(
     override fun execute() {
         elevator.zeroElevator = true
         if (armZero)
-        arm.setArmPosition(0.0)
+            arm.setArmPosition(0.0)
     }
 
     override fun end(interrupted: Boolean) {

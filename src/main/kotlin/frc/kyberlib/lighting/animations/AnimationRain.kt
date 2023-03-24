@@ -5,7 +5,14 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.pow
 
-class AnimationRain(private val color: Color, private val dropLength: Int, val secondsPerMovement: Time, val reversed: Boolean = false, enableTransparency: Boolean = false, condition: ()->Boolean = { true }) : LEDAnimation(condition, enableTransparency) {
+class AnimationRain(
+    private val color: Color,
+    private val dropLength: Int,
+    val secondsPerMovement: Time,
+    val reversed: Boolean = false,
+    enableTransparency: Boolean = false,
+    condition: () -> Boolean = { true }
+) : LEDAnimation(condition, enableTransparency) {
 
     private fun constructInitialBuffer(length: Int): MutableList<Color> {
 

@@ -1,17 +1,14 @@
 package frc.robot.commands.alltogether
 
-import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
-import frc.robot.commands.alltogether.IOLevel.Idle
 import frc.robot.constants.FieldConstants
 import frc.robot.subsystems.Arm
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.Elevator
 import frc.robot.utils.GamePiece
 import kotlin.math.absoluteValue
-import kotlin.math.sin
 
 class SetSubsystemPosition(
     val elevator: Elevator,
@@ -45,6 +42,7 @@ class SetSubsystemPosition(
         addRequirements(arm)
         addRequirements(elevator)
     }
+
     override fun execute() {
         val ioLevel = level()
         if (ioLevel == IOLevel.StartingConfig) {
@@ -64,9 +62,9 @@ class SetSubsystemPosition(
 //        val armHeight = armLength * sin(armAngle)
 //        val elevatorMaxHeight = topLimit - armHeight
 
-        SmartDashboard.putNumber("ELEVATOR GOAL", goalElevatorPosition);
-        SmartDashboard.putNumber("cone elev", ioLevel.coneElevatorHeight);
-        SmartDashboard.putString("Wanted", wantedObject().name);
+        SmartDashboard.putNumber("ELEVATOR GOAL", goalElevatorPosition)
+        SmartDashboard.putNumber("cone elev", ioLevel.coneElevatorHeight)
+        SmartDashboard.putString("Wanted", wantedObject().name)
 
         if (arm.armPosition > .2 && goalArmPosition < -.2 || arm.armPosition < -.2 && goalArmPosition > .2)
             elevator.setpoint = bottomLimit

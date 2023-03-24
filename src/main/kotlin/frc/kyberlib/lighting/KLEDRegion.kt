@@ -7,21 +7,23 @@ import java.awt.Color
 class KLEDRegion(val start: Int, val end: Int, vararg val animations: LEDAnimation, val reversed: Boolean = false) {
     val length = end - start
     var transparent = true
+
     companion object {
         fun composite(length: Int, time: Time, regions: List<KLEDRegion>): Array<Color> {
             var mutableBuffer = Array<Color>(length) { Color.BLACK }
             optimizedComposite(mutableBuffer, time, regions)
             return mutableBuffer
         }
+
         fun optimizedComposite(mutableBuffer: Array<Color>, time: Time, regions: List<KLEDRegion>) {
             for (region in regions) {
                 val b = region.getBuffer(time)
                 for (i in b.indices) {
                     if (b[i].alpha < 255 && region.transparent) {
                         mutableBuffer[region.start + i] = Color(
-                                (b[i].red / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].red / 255F) * (1 - b[i].alpha / 255F),
-                                (b[i].green / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].green / 255F) * (1 - b[i].alpha / 255F),
-                                (b[i].blue / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].blue / 255F) * (1 - b[i].alpha / 255F)
+                            (b[i].red / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].red / 255F) * (1 - b[i].alpha / 255F),
+                            (b[i].green / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].green / 255F) * (1 - b[i].alpha / 255F),
+                            (b[i].blue / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].blue / 255F) * (1 - b[i].alpha / 255F)
                         )
                     } else {
                         mutableBuffer[region.start + i] = Color(b[i].red, b[i].green, b[i].blue)
@@ -34,7 +36,7 @@ class KLEDRegion(val start: Int, val end: Int, vararg val animations: LEDAnimati
     fun getBuffer(time: Time): List<Color> {
         val mutableBuffer = Array<Color>(length) { Color.BLACK }
         animations.reversed().forEach { animation: LEDAnimation ->
-            if(animation.condition()) {
+            if (animation.condition()) {
                 // get buffer
                 val buffer = animation.getBuffer(time, length)
                 if (buffer.size != length) {

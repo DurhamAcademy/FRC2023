@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.RobotContainer
 import frc.robot.commands.alltogether.IOLevel
-import frc.robot.constants.Constants
 import frc.robot.constants.arm
 import frc.robot.constants.elevator
 import frc.robot.constants.elevator.elevatorMotor.tolerance.positionTolerance
@@ -119,7 +118,7 @@ class Elevator(
                         elevator.elevatorMotor.gearRatio *
                         elevator.sproketRadius * 2.0 * PI -
                         elevator.limits.bottomLimit
-                motorPid.reset(height)
+            motorPid.reset(height)
         }
 
     var setpoint: Double = elevator.limits.bottomLimit
@@ -200,7 +199,7 @@ class Elevator(
 //        if (Constants.fullDSControl)
 //            setpoint = heightEntry.getDouble(elevator.limits.bottomLimit)
         // set motor voltage
-        
+
         if (zeroElevator) {
             setMotorVoltage(
                 -1.5
@@ -219,14 +218,14 @@ class Elevator(
                     ),
                     TrapezoidProfile.Constraints(
                         elevator.elevatorMotor.PID.TrapezoidProfile.maxVelocity,
-                        (if(overHeight) 2 else 1) * elevator.elevatorMotor.PID.TrapezoidProfile.maxAcceleration
+                        (if (overHeight) 2 else 1) * elevator.elevatorMotor.PID.TrapezoidProfile.maxAcceleration
                     )
                 ) + feedforward.calculate(
                     motorPid.setpoint.velocity,
                 )
             )
         }
-        
+
         lastVel = motorPid.goal.velocity
         lastTime = Timer.getFPGATimestamp()
 

@@ -8,15 +8,17 @@ import frc.robot.utils.GamePiece
 import kotlin.math.PI
 import kotlin.math.abs
 
-class LeaveStartConfig (
+class LeaveStartConfig(
     val robotContainer: RobotContainer,
     val arm: Arm
 ) : CommandBase() {
-        override fun execute() {
-            SetSubsystemPosition(robotContainer, { IOLevel.StartingConfig }, { GamePiece.cone })
-        }
-        override fun end(interrupted: Boolean) {
-            SetSubsystemPosition(robotContainer, { IOLevel.Idle }, { GamePiece.cone })
-        }
-        override fun isFinished(): Boolean = abs(arm.armPosition) < PI/2 + degreesToRadians(5.0)
+    override fun execute() {
+        SetSubsystemPosition(robotContainer, { IOLevel.StartingConfig }, { GamePiece.cone })
+    }
+
+    override fun end(interrupted: Boolean) {
+        SetSubsystemPosition(robotContainer, { IOLevel.Idle }, { GamePiece.cone })
+    }
+
+    override fun isFinished(): Boolean = abs(arm.armPosition) < PI / 2 + degreesToRadians(5.0)
 }

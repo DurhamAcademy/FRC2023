@@ -21,7 +21,7 @@ import frc.robot.constants.drivetrain as drivetrainConstants
 val Pose2d.flipped: Pose2d
     get() = Pose2d(
         Translation2d(
-            -(this.translation.x-8.3) + 8.3,
+            -(this.translation.x - 8.3) + 8.3,
             this.translation.y
         ),
         -rotation
@@ -140,7 +140,7 @@ open class MoveToPosition(
         val desired = pose(xPIDController, yPIDController, rPIDController)
 
         // BAIL IF WANT TO MOVE REALLY FAR
-        if(desired.translation.getDistance(current.translation) > 8.0) {
+        if (desired.translation.getDistance(current.translation) > 8.0) {
             drivetrain.drive(ChassisSpeeds(), true)
             return
         }
@@ -244,6 +244,7 @@ open class MoveToPosition(
             tolerancervel,
             snapMode
         )
+
     companion object {
         const val rP = 8.0
         const val yP = 5.0
@@ -275,12 +276,18 @@ open class MoveToPosition(
         /**
          * @param rotValues The angle in radians
          */
-        fun snapToScoring(drivetrain: Drivetrain, yValues: () -> Iterable<Double>, rotValues: () -> Iterable<Double>): Command =
+        fun snapToScoring(
+            drivetrain: Drivetrain,
+            yValues: () -> Iterable<Double>,
+            rotValues: () -> Iterable<Double>
+        ): Command =
             snapToYValue(
                 drivetrain,
-                {yValues().minByOrNull { value ->
-                    (value - drivetrain.estimatedPose2d.y).absoluteValue
-                }?: drivetrain.estimatedPose2d.y},
+                {
+                    yValues().minByOrNull { value ->
+                        (value - drivetrain.estimatedPose2d.y).absoluteValue
+                    } ?: drivetrain.estimatedPose2d.y
+                },
                 yTolerance = 0.05,
                 {
                     Rotation2d.fromRadians(
@@ -292,7 +299,7 @@ open class MoveToPosition(
                                                 drivetrain.estimatedPose2d.rotation.radians
                                             )
                                     ).absoluteValue
-                        }?: drivetrain.estimatedPose2d.rotation.radians
+                        } ?: drivetrain.estimatedPose2d.rotation.radians
                     )
                 },
                 rTolerance = 0.15
@@ -300,12 +307,13 @@ open class MoveToPosition(
 
     }
 }
+
 //this function should be used when copying and pasting an auto function, and you need to flip the x-coordinates.
 fun flipped(x: Double): Double {
     val newX: Double
-    if(x<8.3)
-        newX=8.3+(8.3-x)
+    if (x < 8.3)
+        newX = 8.3 + (8.3 - x)
     else
-        newX=8.3-(x-8.3)
+        newX = 8.3 - (x - 8.3)
     return newX
 }

@@ -121,7 +121,7 @@ class SwerveModule(
     private val angleFF = SimpleMotorFeedforward(Constants.angleKS, Constants.angleKV, Constants.angleKA)
 
 
-//    class SwerveModuleSetpoint(
+    //    class SwerveModuleSetpoint(
 //        var driveSetpoint: Double?,
 //        var angleSetpoint: Rotation2d?,
 //    ) : SwerveModuleState(
@@ -154,12 +154,14 @@ class SwerveModule(
             if (value) {
                 driveMotor.setNeutralMode(NeutralMode.Coast)
                 turnMotor.setNeutralMode(NeutralMode.Coast)
-                driveMotor.configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(
-                    true,
-                    10.0,
-                    20.0,
-                    0.0
-                ))
+                driveMotor.configSupplyCurrentLimit(
+                    SupplyCurrentLimitConfiguration(
+                        true,
+                        10.0,
+                        20.0,
+                        0.0
+                    )
+                )
             } else {
                 driveMotor.setNeutralMode(NeutralMode.Brake)
                 turnMotor.setNeutralMode(NeutralMode.Brake)

@@ -78,19 +78,19 @@ fun main() {
     val testCases = 1000000000
     val s = Stopwatch()
     s.loop()
-    for(i in 0 until testCases) {
+    for (i in 0 until testCases) {
         accept(0.rpm)
     }
     println(s.loop())
-    for(j in 0 until testCases) {
+    for (j in 0 until testCases) {
         accept(0.0)
     }
     println(s.loop())
-    for(k in 0 until testCases) {
+    for (k in 0 until testCases) {
         accept(0.radians)
     }
     println(s.loop())
 }
 
-fun accept(x: Double) = x*x
+fun accept(x: Double) = x * x
 fun accept(x: KUnit<*>) = x.value * x.value

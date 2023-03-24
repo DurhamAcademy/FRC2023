@@ -18,10 +18,10 @@ val Angle.w inline get() = Rotation2d(value)
 
 val Angle.sin inline get() = sin(value)
 val Angle.cos inline get() = cos(value)
-val Angle.sec inline get() = 1/cos
-val Angle.csc inline get() = 1/sin
-val Angle.tan inline get() = sin/cos
-val Angle.cot inline get() = cos/sin
+val Angle.sec inline get() = 1 / cos
+val Angle.csc inline get() = 1 / sin
+val Angle.tan inline get() = sin / cos
+val Angle.cot inline get() = cos / sin
 
 fun Angle.toCircumference(radius: Length) = (radians * radius.meters).meters
 fun Angle.subtractNearest(other: Angle): Angle {

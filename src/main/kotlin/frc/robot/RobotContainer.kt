@@ -4,7 +4,6 @@ Wrap all auto commands (in robotcontainer) with timeout for 14.5 sec, lock wheel
 Lock wheels should require the drivetrain and stop movement so we don't try to move with wheels locked
 Make sure auto command gets canceled going into teleop and that wheels can unlock properly
  */
-import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -21,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
-import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -29,7 +27,6 @@ import frc.kyberlib.lighting.animations.*
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
-import frc.robot.commands.alltogether.LeaveStartConfig
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
@@ -43,7 +40,6 @@ import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayer
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
-import frc.robot.constants.drivetrain as drivetrainValues
 import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
@@ -56,7 +52,6 @@ import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-import frc.robot.subsystems.DashboardSelector
 
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
@@ -470,14 +465,15 @@ class RobotContainer {
                 elevator.setpoint = frc.robot.constants.elevator.limits.topLimit
                 elevator.motorPid.reset(elevator.height)
             })
-                .andThen(Commands.runOnce({ arm.setArmPosition(-PI/2) }))
-                .andThen(Commands.waitUntil { arm.armPosition > -3*PI/4 }) // move the arm to horizontal
+                .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
+                .andThen(Commands.waitUntil { arm.armPosition > -3 * PI / 4 }) // move the arm to horizontal
                 .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)))
                 .withTimeout(14.5) // go to idle
-                .andThen(DriveCommand(drivetrain, rotation = {0.0001}))
+                .andThen(DriveCommand(drivetrain, rotation = { 0.0001 }))
 
-            if(autoChooser.selected != null) {
-                c = c.andThen(autoChooser.selected!!.getCommand()) // this needs to be like this because of command composition rules. this gets a fresh one each time instead of keeping one instance in the chooser
+            if (autoChooser.selected != null) {
+                c =
+                    c.andThen(autoChooser.selected!!.getCommand()) // this needs to be like this because of command composition rules. this gets a fresh one each time instead of keeping one instance in the chooser
             }
 
             return c
@@ -490,6 +486,7 @@ class RobotContainer {
     }
 
     val field2dwidget = Field2d()
+
     //val camera = Camera
     val grid = DashboardSelector()
 
@@ -506,9 +503,14 @@ class RobotContainer {
     val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
     val autoChoice = DriveTab.add("Autonomous", autoChooser)
     val fieldWidget = DriveTab.add("Field", field2dwidget)
+
     //val CameraWidget = DriveTab.add("Camera", )
     val gridWidget = DriveTab.add("Grid", grid)
-    val cameraWidget = DriveTab.addCamera("Photon", "photonvision_Port_1182_MJPEG_Server", "http://photonvision.local:1182/stream.mjpg")
+    val cameraWidget = DriveTab.addCamera(
+        "Photon",
+        "photonvision_Port_1182_MJPEG_Server",
+        "http://photonvision.local:1182/stream.mjpg"
+    )
 
     fun update() {
         leds.update()

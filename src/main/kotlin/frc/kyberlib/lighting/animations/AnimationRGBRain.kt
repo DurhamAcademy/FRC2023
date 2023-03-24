@@ -5,7 +5,14 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.pow
 
-class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength: Int, val secondsPerMovement: Time, val reversed: Boolean = false, enableTransparency: Boolean = false, condition: ()->Boolean = { true }) : LEDAnimation(condition, enableTransparency) {
+class AnimationRGBRain(
+    private val cycles: Double = 1.0,
+    private val dropLength: Int,
+    val secondsPerMovement: Time,
+    val reversed: Boolean = false,
+    enableTransparency: Boolean = false,
+    condition: () -> Boolean = { true }
+) : LEDAnimation(condition, enableTransparency) {
 
     private fun constructInitialBuffer(length: Int): MutableList<Color> {
 
@@ -42,7 +49,12 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
 
         val trimmed = b.take(length).toMutableList()
         for (i in trimmed.indices) {
-            trimmed[i] = Color((trimmed[i].red * rgb[i].red / 255.0).toInt(), (trimmed[i].green * rgb[i].green / 255.0).toInt(), (trimmed[i].blue * rgb[i].blue / 255.0).toInt(), trimmed[i].alpha)
+            trimmed[i] = Color(
+                (trimmed[i].red * rgb[i].red / 255.0).toInt(),
+                (trimmed[i].green * rgb[i].green / 255.0).toInt(),
+                (trimmed[i].blue * rgb[i].blue / 255.0).toInt(),
+                trimmed[i].alpha
+            )
         }
 
         if (reversed) {

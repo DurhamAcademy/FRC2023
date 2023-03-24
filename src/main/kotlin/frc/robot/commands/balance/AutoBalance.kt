@@ -2,7 +2,6 @@ package frc.robot.commands.balance
 
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.PIDController
-import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.DriverStation
@@ -11,11 +10,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.kyberlib.command.Game
 import frc.robot.subsystems.Drivetrain
-import kotlin.math.PI
-import kotlin.math.absoluteValue
-import kotlin.math.sign
 
-class AutoBalance(private val drivetrain: Drivetrain): CommandBase() {
+class AutoBalance(private val drivetrain: Drivetrain) : CommandBase() {
 
     init {
         addRequirements(drivetrain)
@@ -39,16 +35,16 @@ class AutoBalance(private val drivetrain: Drivetrain): CommandBase() {
     override fun initialize() {
         timer.start()
     }
-    
+
     override fun execute() {
 
-        val speedMul = when(Game.alliance) {
+        val speedMul = when (Game.alliance) {
             DriverStation.Alliance.Red -> -1.0
             DriverStation.Alliance.Blue -> 1.0
             DriverStation.Alliance.Invalid -> 0.0
         }
 
-        if(timer.hasElapsed(0.3)) {
+        if (timer.hasElapsed(0.3)) {
             drivetrain.drive(
                 ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, .03), 0.0), 0.0, 0.0),
                 true
@@ -58,16 +54,13 @@ class AutoBalance(private val drivetrain: Drivetrain): CommandBase() {
         }
 
 
-
-
-
-
 //        val correctiveFactor = MathUtil.applyDeadband(xTilt, 0.05)
         SmartDashboard.putNumber("xTilt", xTilt)
 //        SmartDashboard.putNumber("dTilt", dTilt)       
 //        SmartDashboard.putBoolean("level", isLevel)
 
     }
+
     override fun isFinished() = false
 
 }

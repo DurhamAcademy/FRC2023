@@ -1,4 +1,5 @@
 package frc.kyberlib.math.threeD
+
 import frc.kyberlib.math.units.extensions.cos
 import frc.kyberlib.math.units.extensions.radians
 import frc.kyberlib.math.units.extensions.sin
@@ -12,17 +13,39 @@ import kotlin.math.*
  * @property y The third component.
  * @property z The fourth component.
  */
-data class Quaternion(val w: Double=0.0, val x: Double=0.0, val y: Double=0.0, val z: Double=0.0) {
-    private constructor(cy: Double, sy: Double, cp: Double, sp: Double, cr: Double, sr: Double) : this(cr * cp * cy + sr * sp * sy, sr * cp * cy - cr * sp * sy, cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy)
-    constructor(rotation3d: Rotation3d) : this ((rotation3d.yaw * 0.5).cos, (rotation3d.yaw * 0.5).sin, (rotation3d.pitch * 0.5).cos, (rotation3d.pitch * 0.5).sin, (rotation3d.roll * 0.5).cos, (rotation3d.roll * 0.5).sin)
-
-    fun interpolate(other: Quaternion, alpha: Double=0.5) = this * (1-alpha) + other * alpha
-
-    inline val rotation get() = Rotation3d(
-        atan2(2*(w*x+y*z), 1-2*(x*x+y*y)).radians,
-        asin(2*(w*y-z*x)).radians,
-        atan2(2*(w*z+y*x), 1-2*(z*z+y*y)).radians
+data class Quaternion(val w: Double = 0.0, val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0) {
+    private constructor(
+        cy: Double,
+        sy: Double,
+        cp: Double,
+        sp: Double,
+        cr: Double,
+        sr: Double
+    ) : this(
+        cr * cp * cy + sr * sp * sy,
+        sr * cp * cy - cr * sp * sy,
+        cr * sp * cy + sr * cp * sy,
+        cr * cp * sy - sr * sp * cy
     )
+
+    constructor(rotation3d: Rotation3d) : this(
+        (rotation3d.yaw * 0.5).cos,
+        (rotation3d.yaw * 0.5).sin,
+        (rotation3d.pitch * 0.5).cos,
+        (rotation3d.pitch * 0.5).sin,
+        (rotation3d.roll * 0.5).cos,
+        (rotation3d.roll * 0.5).sin
+    )
+
+    fun interpolate(other: Quaternion, alpha: Double = 0.5) = this * (1 - alpha) + other * alpha
+
+    inline val rotation
+        get() = Rotation3d(
+            atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y)).radians,
+            asin(2 * (w * y - z * x)).radians,
+            atan2(2 * (w * z + y * x), 1 - 2 * (z * z + y * y)).radians
+        )
+
     // operations
     operator fun plus(other: Quaternion) = Quaternion(w + other.w, x + other.x, y + other.y, z + other.z)
     operator fun minus(other: Quaternion) = Quaternion(w - other.w, x - other.x, y - other.y, z - other.z)
@@ -32,6 +55,7 @@ data class Quaternion(val w: Double=0.0, val x: Double=0.0, val y: Double=0.0, v
         w * other.y - x * other.z + y * other.w + z * other.x,
         w * other.z + x * other.y - y * other.x + z * other.w,
     )
+
     operator fun div(other: Quaternion): Quaternion {
         val s = other.w * other.w + other.x * other.x + other.y * other.y + other.z * other.z
 
@@ -42,9 +66,10 @@ data class Quaternion(val w: Double=0.0, val x: Double=0.0, val y: Double=0.0, v
             (other.w * z - other.x * y + other.y * x - other.z * w) / s,
         )
     }
+
     operator fun unaryMinus(): Quaternion = Quaternion(-w, -x, -y, -z)
     operator fun times(number: Double) = scale(number)
-    operator fun div(number: Double) = scale(1/number)
+    operator fun div(number: Double) = scale(1 / number)
 
     fun scale(value: Double): Quaternion = Quaternion(w * value, x * value, y * value, z * value)
     fun ln(): Quaternion {
@@ -71,6 +96,7 @@ data class Quaternion(val w: Double=0.0, val x: Double=0.0, val y: Double=0.0, v
     inline val conjugate get() = Quaternion(z, -x, -y, -z)
     inline val reciprocal get() = this / r.pow(2)
     inline val norm get() = this / r
+
     companion object {
         val one = Quaternion(1.0)
 
