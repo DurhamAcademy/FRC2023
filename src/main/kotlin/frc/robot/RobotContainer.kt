@@ -59,6 +59,7 @@ import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import frc.robot.subsystems.DashboardSelector
 
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
@@ -570,6 +571,10 @@ class RobotContainer {
 //        )
     }
 
+    val field2dwidget = Field2d()
+    //val camera = Camera
+    val grid = DashboardSelector()
+
     // shuffleboard auto chooser
     val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
     val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
@@ -579,6 +584,13 @@ class RobotContainer {
     val elevatorLine = armVisual.getObject("elevator")
 
     val armFieldPosition = drivetrain.field2d.getObject("arm")
+
+    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
+    val autoChoice = DriveTab.add("Autonomous", autoChooser)
+    val fieldWidget = DriveTab.add("Field", field2dwidget)
+    //val CameraWidget = DriveTab.add("Camera", )
+    val gridWidget = DriveTab.add("Grid", grid)
+    val cameraWidget = DriveTab.addCamera("Photon", "photonvision_Port_1182_MJPEG_Server", "http://photonvision.local:1182/stream.mjpg")
 
     fun update() {
         leds.update()
