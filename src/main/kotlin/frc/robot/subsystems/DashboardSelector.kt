@@ -1,9 +1,11 @@
 package frc.robot.subsystems
 
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import frc.kyberlib.command.Game
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
@@ -137,9 +139,17 @@ class DashboardSelector {
 
     val placementSide: PlacementSide
         get() = when (selected.first) {
-            0, 3, 6 -> PlacementSide.CloseCone
+            0, 3, 6 -> when (Game.alliance) {
+                DriverStation.Alliance.Blue -> PlacementSide.CloseCone
+                DriverStation.Alliance.Red -> PlacementSide.FarCone
+                else -> PlacementSide.CloseCone
+            }
             1, 4, 7 -> PlacementSide.Cube
-            2, 5, 8 -> PlacementSide.FarCone
+            2, 5, 8 ->  when (Game.alliance) {
+                DriverStation.Alliance.Blue -> PlacementSide.FarCone
+                DriverStation.Alliance.Red -> PlacementSide.CloseCone
+                else -> PlacementSide.CloseCone
+            }
             else -> PlacementSide.CloseCone
         }
 }
