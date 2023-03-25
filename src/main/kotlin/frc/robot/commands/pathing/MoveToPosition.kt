@@ -88,7 +88,7 @@ open class MoveToPosition(
 
     val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.05, TrapezoidProfile.Constraints(
-            2.0,
+            3.0,
             max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
@@ -97,7 +97,7 @@ open class MoveToPosition(
     }
     val yPIDController = ProfiledPIDController(
         Companion.yP, 0.0, 0.05, TrapezoidProfile.Constraints(
-            2.0,
+            3.0,
             max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
