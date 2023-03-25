@@ -3,6 +3,9 @@ package frc.robot
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.kyberlib.command.Game
+import frc.kyberlib.math.units.extensions.seconds
+import frc.robot.commands.drivetrain.DriveCommand
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,6 +26,10 @@ class Robot : TimedRobot() {
         CommandScheduler.getInstance().run()
 
         robotContainer.update()
+
+        if (Game.matchTime.seconds <= .5) {
+            DriveCommand(robotContainer.drivetrain, rotation = { 0.0001 })
+        }
     }
 
     var auto: Command? = null
