@@ -29,7 +29,7 @@ class AutoPlaceAndBalance(
     }
 
     private fun pathRed(robotContainer: RobotContainer): Command {
-        return MoveToPosition(robotContainer.drivetrain, 14.67, 2.72 - 0.56, 0.0).withTimeout(1.0)
+        return MoveToPosition(robotContainer.drivetrain, 14.67, 2.72 - 0.56, 180.0).withTimeout(1.0)
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,
@@ -45,8 +45,15 @@ class AutoPlaceAndBalance(
                     { PlacementLevel.Level3 }).withTimeout(0.5)
             ) // shoot cube
             .andThen(
-                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, -37.5)
-                    .andThen(MoveToPosition(robotContainer.drivetrain, (13.34 - 0.5), 2.72, -37.5).withTimeout(4.0))
+                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180 - 37.5)
+                    .andThen(
+                        MoveToPosition(
+                            robotContainer.drivetrain,
+                            (13.34 - 0.5),
+                            2.72,
+                            180 - 37.5
+                        ).withTimeout(4.0)
+                    )
                     .alongWith(
                         SetSubsystemPosition(robotContainer, { IOLevel.Balance }, { GamePiece.cone }, true)
                     )
