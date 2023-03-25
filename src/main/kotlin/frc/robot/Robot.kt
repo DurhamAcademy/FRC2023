@@ -1,5 +1,6 @@
 package frc.robot
 
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
@@ -27,9 +28,9 @@ class Robot : TimedRobot() {
 
         robotContainer.update()
 
-        if (Game.matchTime.seconds <= .5) {
-            DriveCommand(robotContainer.drivetrain, rotation = { 0.0001 })
-        }
+//        if (DriverStation.getMatchTime() <= .5) {
+//            DriveCommand(robotContainer.drivetrain, rotation = { 0.0001 })
+//        }
     }
 
     var auto: Command? = null
