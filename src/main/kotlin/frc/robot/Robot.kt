@@ -28,8 +28,11 @@ class Robot : TimedRobot() {
 
         robotContainer.update()
 
-//        if (DriverStation.getMatchTime() <= .5) {
+//        if (DriverStation.getMatchTime() <= .25 && Game.OPERATED) {
 //            DriveCommand(robotContainer.drivetrain, rotation = { 0.0001 })
+//                .until {
+//                    DriverStation.getMatchTime() > 0.25
+//                }
 //        }
     }
 

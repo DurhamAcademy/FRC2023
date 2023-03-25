@@ -42,7 +42,7 @@ class AutoPlaceAndBalance(
                 Throw(
                     robotContainer.manipulator,
                     { GamePiece.cone },
-                    { PlacementLevel.Level3 }).withTimeout(0.5)
+                    { PlacementLevel.Level3 }).withTimeout(0.75)
             ) // shoot cube
             .andThen(
                 MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0, maxPosSpeed = 3.7)
