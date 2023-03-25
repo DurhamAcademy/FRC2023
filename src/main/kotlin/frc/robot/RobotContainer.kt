@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
+import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
@@ -52,6 +54,7 @@ import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance as commandSchedulerInstance
 
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
@@ -540,6 +543,18 @@ class RobotContainer {
 
         // put the arm position on the field
         armFieldPosition.pose = armPos
+
+        if (Game.COMPETITION && Game.disabled &&
+            listOf(controlScheme0, controlScheme1).any {
+                if (it.xbox == null) false
+                else (0 until ((it.xbox?.hid?.buttonCount) ?: 0)).any { i ->
+                    it.xbox?.hid?.button(
+                        i, commandSchedulerInstance().defaultButtonLoop
+                    )?.asBoolean == true
+                }
+            }
+        ) controlScheme0.xbox?.hid?.setRumble(GenericHID.RumbleType.kBothRumble, .3)
+        else controlScheme0.xbox?.hid?.setRumble(GenericHID.RumbleType.kBothRumble, .0)
     }
 }
 

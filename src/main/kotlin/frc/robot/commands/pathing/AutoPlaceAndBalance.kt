@@ -45,13 +45,14 @@ class AutoPlaceAndBalance(
                     { PlacementLevel.Level3 }).withTimeout(0.5)
             ) // shoot cube
             .andThen(
-                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0)
+                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0, maxPosSpeed = 3.7)
                     .andThen(
                         MoveToPosition(
                             robotContainer.drivetrain,
                             (13.34 - 0.5),
                             2.72,
-                            180.0
+                            180.0,
+                            maxPosSpeed = 3.7
                         ).withTimeout(4.0)
                     )
                     .alongWith(
@@ -78,11 +79,14 @@ class AutoPlaceAndBalance(
                     { PlacementLevel.Level3 }).withTimeout(0.5)
             ) // shoot cube
             .andThen(
-                MoveToPosition(robotContainer.drivetrain, 16.52 - 14.4, 2.72, 0.0)
+                MoveToPosition(robotContainer.drivetrain,  1.95/*16.52 - 14.4*/, 2.72, 0.0,
+                    maxPosSpeed = 3.7
+                )
                     .andThen(
-                        MoveToPosition(robotContainer.drivetrain, 16.52 - (13.34 - 0.5), 2.72, 0.0).withTimeout(
-                            4.0
+                        MoveToPosition(robotContainer.drivetrain, 16.52 - (13.34 - 0.5), 2.72, 0.0,
+                            maxPosSpeed = 3.7
                         )
+                            .withTimeout(4.0)
                     )
                     .alongWith(
                         SetSubsystemPosition(robotContainer, { IOLevel.Balance }, { GamePiece.cone }, true)
