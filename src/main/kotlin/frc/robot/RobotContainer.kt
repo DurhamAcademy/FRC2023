@@ -468,15 +468,15 @@ class RobotContainer {
                 .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
                 .andThen(Commands.waitUntil { arm.armPosition > -3 * PI / 4 }) // move the arm to horizontal
                 .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)))
-                .withTimeout(14.5) // go to idle
-                .andThen(DriveCommand(drivetrain, rotation = { 0.0001 }))
+
 
             if (autoChooser.selected != null) {
                 c =
                     c.andThen(autoChooser.selected!!.getCommand()) // this needs to be like this because of command composition rules. this gets a fresh one each time instead of keeping one instance in the chooser
             }
 
-            return c
+            return c.withTimeout(14.5) // go to idle
+                .andThen(DriveCommand(drivetrain, rotation = { 0.0001 }))
         }
 
 

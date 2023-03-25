@@ -139,10 +139,7 @@ class Elevator(
                 )
             )
         else
-            if (previousVoltage != voltage) {
-                elevatorMotor.setVoltage(voltage.coerceIn(-8.0, 8.0))
-                previousVoltage = voltage
-            }
+            elevatorMotor.setVoltage(voltage.coerceIn(-8.0, 8.0))
     }
 
     private var lastLimitSwitch: Boolean = true // switch is normally closed, so it should start true
@@ -204,6 +201,8 @@ class Elevator(
             setMotorVoltage(
                 -1.5
             )
+        } else if (armController.armPosition <= -2.38) {
+            setMotorVoltage(0.0) // this is a nasty hack, need to investigate why we need this
         } else {
             setMotorVoltage(
                 motorPid.calculate(
