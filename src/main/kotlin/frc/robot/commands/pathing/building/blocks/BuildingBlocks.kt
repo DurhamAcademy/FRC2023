@@ -161,7 +161,7 @@ object BuildingBlocks {
             when (alliance()) {
                 Red -> drivetrain.estimatedPose2d.x < exitPoint(alliance())
                 Blue -> drivetrain.estimatedPose2d.x > exitPoint(alliance())
-                else -> true//fixme: BNOOO
+                else -> true//fixme: NOOO
             }
 
         }
