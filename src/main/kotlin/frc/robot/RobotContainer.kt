@@ -489,25 +489,23 @@ class RobotContainer {
     val field2dwidget = Field2d()
 
     // shuffleboard auto chooser
-    val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
-    val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
-
-    val armVisual = Field2d()
-    val armLine = armVisual.getObject("arm")
-    val elevatorLine = armVisual.getObject("elevator")
-
+//    val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
+//    val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
+//
+//    val armVisual = Field2d()
+//    val armLine = armVisual.getObject("arm")
+//    val elevatorLine = armVisual.getObject("elevator")
+//
     val armFieldPosition = drivetrain.field2d.getObject("arm")
 
-//    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
-//    val autoChoice = DriveTab.add("Autonomous", autoChooser)
-//    val fieldWidget = DriveTab.add("Field", field2dwidget)
-
-    //val CameraWidget = DriveTab.add("Camera", )
-//    val cameraWidget = DriveTab.addCamera(
-//        "Photon",
-//        "photonvision_Port_1182_MJPEG_Server",
-//        "http://photonvision.local:1182/stream.mjpg"
-//    )
+    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
+    val autoChoice = DriveTab.add("Autonomous", autoChooser)
+    val fieldWidget = DriveTab.add("Field", field2dwidget)
+    val cameraWidget = DriveTab.addCamera(
+        "Photon",
+        "photonvision_Port_1182_MJPEG_Server",
+        "http://photonvision.local:1182/stream.mjpg"
+    )
 
     fun update() {
         leds.update()

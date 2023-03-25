@@ -11,7 +11,7 @@ import frc.robot.utils.wrap
 import kotlin.math.roundToInt
 
 class DashboardSelector {
-    val tab = Shuffleboard.getTab("Selector")
+    val tab = Shuffleboard.getTab("DriveTab")
 
     /**
      * the grid that will hold the buttons
