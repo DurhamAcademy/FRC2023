@@ -4,7 +4,7 @@ import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.util.Color
 
 object manipulator {
-    const val motorId = 33
+    const val motorId = 31
     const val leftSolenoidForward = 0
     const val leftSolenoidReverse = 1
     const val rightSolenoidForward = 3
