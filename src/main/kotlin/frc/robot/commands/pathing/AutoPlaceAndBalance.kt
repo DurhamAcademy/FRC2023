@@ -45,13 +45,13 @@ class AutoPlaceAndBalance(
                     { PlacementLevel.Level3 }).withTimeout(0.5)
             ) // shoot cube
             .andThen(
-                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180 - 37.5)
+                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0)
                     .andThen(
                         MoveToPosition(
                             robotContainer.drivetrain,
                             (13.34 - 0.5),
                             2.72,
-                            180 - 37.5
+                            180.0
                         ).withTimeout(4.0)
                     )
                     .alongWith(
@@ -78,9 +78,9 @@ class AutoPlaceAndBalance(
                     { PlacementLevel.Level3 }).withTimeout(0.5)
             ) // shoot cube
             .andThen(
-                MoveToPosition(robotContainer.drivetrain, 16.52 - 14.4, 2.72, 37.5)
+                MoveToPosition(robotContainer.drivetrain, 16.52 - 14.4, 2.72, 0.0)
                     .andThen(
-                        MoveToPosition(robotContainer.drivetrain, 16.52 - (13.34 - 0.5), 2.72, 37.5).withTimeout(
+                        MoveToPosition(robotContainer.drivetrain, 16.52 - (13.34 - 0.5), 2.72, 0.0).withTimeout(
                             4.0
                         )
                     )
