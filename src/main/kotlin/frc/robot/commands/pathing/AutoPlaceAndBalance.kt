@@ -29,7 +29,8 @@ class AutoPlaceAndBalance(
     }
 
     private fun pathRed(robotContainer: RobotContainer): Command {
-        return MoveToPosition(robotContainer.drivetrain, 14.67, 2.72 - 0.56, 180.0).withTimeout(1.0)
+        return MoveToPosition(robotContainer.drivetrain, 14.67, 2.72 - 0.56, 180.0)
+            .withTimeout(1.0)
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,
