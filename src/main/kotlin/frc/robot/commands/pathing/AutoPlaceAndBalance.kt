@@ -33,7 +33,7 @@ class AutoPlaceAndBalance(
     }
 
     private fun pathRed(robotContainer: RobotContainer): Command {
-        return MoveToPosition(robotContainer.drivetrain, 14.67, 2.72 - 0.56, 180.0)
+        return BuildingBlocks.goToPlacementPoint(robotContainer.drivetrain, robotContainer.arm, IOLevel.High, PlacementGroup.Middle, PlacementSide.CloseCone)
             .withTimeout(1.0)
             .andThen(
                 SetSubsystemPosition(
@@ -68,7 +68,8 @@ class AutoPlaceAndBalance(
     }
 
     private fun pathBlue(robotContainer: RobotContainer): Command {
-        return MoveToPosition(robotContainer.drivetrain, 1.85 /*16.52 - 14.67*/, 2.16 /*2.72 - 0.56*/, 0.0).withTimeout(
+        return BuildingBlocks.goToPlacementPoint(robotContainer.drivetrain, robotContainer.arm, IOLevel.High, PlacementGroup.Middle, PlacementSide.CloseCone)
+            .withTimeout(
             1.0
         )
             .andThen(
