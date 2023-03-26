@@ -51,4 +51,6 @@ abstract class ControlScheme {
     open val confirmGridSelection: Trigger = Trigger { false }
 
     open val throwObject: Trigger = Trigger { false }
+
+    open val lockSwerveModulesCircle: Trigger = Trigger { false }
 }

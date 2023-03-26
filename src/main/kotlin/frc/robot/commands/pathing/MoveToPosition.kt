@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
@@ -26,7 +27,12 @@ val Pose2d.flipped: Pose2d
         ),
         -rotation
     )
-
+//var lastPrintTime: Double = Timer.getFPGATimestamp()
+//var queuedPrints: String = ""
+//
+//fun safePrint(vararg message: String, separator: String = "") {
+//    message.joinToString {  }
+//}
 open class MoveToPosition(
     private val drivetrain: Drivetrain,
     /**

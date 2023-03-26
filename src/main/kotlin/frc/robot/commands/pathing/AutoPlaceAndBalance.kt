@@ -43,7 +43,7 @@ class AutoPlaceAndBalance(
                 Throw(
                     robotContainer.manipulator,
                     { GamePiece.cone },
-                    { PlacementLevel.Level3 }).withTimeout(0.5)
+                    { PlacementLevel.Level3 }).withTimeout(0.75)
             ) // shoot cube
             .andThen(
                 MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0, maxPosSpeed = 3.7)
@@ -64,7 +64,9 @@ class AutoPlaceAndBalance(
     }
 
     private fun pathBlue(robotContainer: RobotContainer): Command {
-        return MoveToPosition(robotContainer.drivetrain, 16.52 - 14.67, 2.72 - 0.56, 0.0).withTimeout(1.0)
+        return MoveToPosition(robotContainer.drivetrain, 1.85 /*16.52 - 14.67*/, 2.16 /*2.72 - 0.56*/, 0.0).withTimeout(
+            1.0
+        )
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,

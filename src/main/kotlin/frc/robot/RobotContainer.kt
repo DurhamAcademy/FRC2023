@@ -289,6 +289,9 @@ class RobotContainer {
                                 )
                             )
                     )
+
+                lockSwerveModulesCircle
+                    .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
             }
         }
     }
