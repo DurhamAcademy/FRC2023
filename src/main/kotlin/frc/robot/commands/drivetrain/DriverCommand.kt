@@ -28,10 +28,15 @@ class DriverCommand(
             .times(3.5)
         drivetrain.drive(
             ChassisSpeeds(
-                vec.x * Constants.powerPercent * alianceMulitplier * (if (drivetrain.invertx.getBoolean(false)) -1 else 1),
-                vec.y * Constants.powerPercent * alianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1),
+                vec.x * Constants.powerPercent *
+                        alianceMulitplier * (if (drivetrain.invertx.getBoolean(false)) -1 else 1)
+                        * controlScheme.speedMutiplier,
+                vec.y * Constants.powerPercent *
+                        alianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1)
+                        * controlScheme.speedMutiplier,
                 -controlScheme.rotation * 2 * Math.PI *
                         Constants.powerPercent * .5 * (if (drivetrain.invertrot.getBoolean(false)) -1 else 1)
+                        * controlScheme.speedMutiplier
             ).slewLimited(drivetrain.xSlewRateLimiter, drivetrain.ySlewRateLimiter, drivetrain.rotSlewRateLimiter),
             true,
             Translation2d() // chris wants in the middle

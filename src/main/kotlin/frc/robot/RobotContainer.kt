@@ -491,7 +491,7 @@ class RobotContainer {
     val autoChooser = SendableChooser<Auto?>().apply {
         setDefaultOption("None", null)
         addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
-        addOption("Place and Taxi", TaxiAndSomethingOrOther(this@RobotContainer))
+        addOption("Place and Taxi farthest from judges", TaxiAndSomethingOrOther(this@RobotContainer))
 
     }
 
