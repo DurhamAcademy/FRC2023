@@ -38,6 +38,7 @@ import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.Auto
 import frc.robot.commands.pathing.AutoPlaceAndBalance
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.TaxiAndSomethingOrOther
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
@@ -487,6 +488,8 @@ class RobotContainer {
     val autoChooser = SendableChooser<Auto?>().apply {
         setDefaultOption("None", null)
         addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
+        addOption("Place and Taxi", TaxiAndSomethingOrOther(this@RobotContainer))
+
     }
 
     val field2dwidget = Field2d()
