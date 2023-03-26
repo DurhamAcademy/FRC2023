@@ -49,28 +49,28 @@ class TaxiAndSomethingOrOther(
                     { GamePiece.cone },
                     { PlacementLevel.Level3 }
                 )
-                    .withTimeout(0.5)
+                    .withTimeout(0.75)
             ) // shoot cube
             .andThen(
                 MoveToPosition(
                     robotContainer.drivetrain,
                     {_,_,_ ->
                         Pose2d(
-                            if (Game.alliance == Blue) 3.7
-                            else if (Game.alliance == Red) 12.77
+                            if (Game.alliance == Blue) 6.1
+                            else if (Game.alliance == Red) 10.5
                             else robotContainer.drivetrain.estimatedPose2d.x,
                             4.75,
                             if (Game.alliance == Blue) fromDegrees(.0)
                             else if (Game.alliance == Red) fromDegrees(180.0)
                             else robotContainer.drivetrain.estimatedPose2d.rotation,
                         )
-                    }
-                )
-            )
-            .andThen(
-                SetSubsystemPosition(
-                    robotContainer.elevator, robotContainer.arm,robotContainer.drivetrain, {IOLevel.Idle},
-                    {GamePiece.cone}, true
+                    },
+                    maxPosSpeed = 2.0
+                ).alongWith(
+                    SetSubsystemPosition(
+                        robotContainer.elevator, robotContainer.arm,robotContainer.drivetrain, {IOLevel.Idle},
+                        {GamePiece.cone}, true
+                    )
                 )
             )
             .andThen(
@@ -78,12 +78,10 @@ class TaxiAndSomethingOrOther(
                     robotContainer.drivetrain,
                     {_,_,_ ->
                         Pose2d(
-                            if (Game.alliance == Blue) 5.0
-                            else if (Game.alliance == Red) 10.0
-                            else robotContainer.drivetrain.estimatedPose2d.x,
-                            5.75,
-                            if (Game.alliance == Blue) fromDegrees(140.0)
-                            else if (Game.alliance == Red) fromDegrees(60.0)
+                            robotContainer.drivetrain.estimatedPose2d.x,
+                            robotContainer.drivetrain.estimatedPose2d.y,
+                            if (Game.alliance == Blue) fromDegrees(180.0)
+                            else if (Game.alliance == Red) fromDegrees(0.0)
                             else robotContainer.drivetrain.estimatedPose2d.rotation,
                         )
                     }
