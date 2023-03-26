@@ -11,7 +11,7 @@ class ChrisControlScheme(
     override val xbox = CommandXboxController(xboxNum)
 
     override val speedMutiplier: Double
-        get() = (1.0 - (0.8*(round(xbox.leftTriggerAxis * 3)/3.0)))
+        get() = (1.0 - (0.8*(round(xbox.rightTriggerAxis * 3)/3.0)))
             .coerceIn(0.0, 1.0)
 
     override val rotation: Double

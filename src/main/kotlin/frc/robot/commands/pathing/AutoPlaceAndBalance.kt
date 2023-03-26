@@ -10,8 +10,12 @@ import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.manipulator.Throw
+import frc.robot.commands.pathing.building.blocks.BuildingBlocks
+import frc.robot.constants.drivetrain
 import frc.robot.utils.GamePiece
+import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
+import frc.robot.utils.grid.PlacementSide
 
 class AutoPlaceAndBalance(
     private val robotContainer: RobotContainer,
