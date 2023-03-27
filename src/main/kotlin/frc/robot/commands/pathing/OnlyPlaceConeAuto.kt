@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import frc.kyberlib.command.Game
 import frc.robot.RobotContainer
+import frc.robot.commands.alltogether.IOLevel
+import frc.robot.commands.alltogether.SetSubsystemPosition
+import frc.robot.utils.GamePiece
 
 class OnlyPlaceConeAuto(
     private var robotContainer: RobotContainer,
@@ -24,10 +27,22 @@ class OnlyPlaceConeAuto(
     }
 
 
-    fun pathRed(robo) {
-
+    fun pathRed(robotContainer: RobotContainer): Command {
+        return SetSubsystemPosition(
+            robotContainer,
+            { IOLevel.High },
+            { GamePiece.cone },
+            true
+        )
     }
 
 
-    fun pathBlue
+    fun pathBlue(robotContainer: RobotContainer): Command {
+        return SetSubsystemPosition(
+            robotContainer,
+            { IOLevel.High },
+            { GamePiece.cone },
+            true
+        )
+    }
 }
