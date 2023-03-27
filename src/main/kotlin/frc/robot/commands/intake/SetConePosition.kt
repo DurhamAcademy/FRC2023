@@ -10,7 +10,8 @@ class SetConePosition(
         addRequirements(intake)
     }
     override fun execute() {
-        intake.systemMotorPercentage = -1.0
+        //intake.systemMotorPercentage = -1.0
+        //@TODO Set the right position using shuffleboard details
     }
 
     override fun end(interrupted: Boolean) {

@@ -1,7 +1,6 @@
 package frc.robot.commands.intake
 
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.constants.intake
 import frc.robot.subsystems.Intake
 
 class SetCubePosition(
@@ -13,7 +12,8 @@ class SetCubePosition(
     }
 
     override fun execute() {
-        intake.modeMotorPercentage = 1.0
+        //intake.modeMotorPercentage = 1.0
+        //@TODO Set the right position using shuffleboard details
     }
 
     override fun end(interrupted: Boolean) {

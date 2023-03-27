@@ -1,17 +1,14 @@
 package frc.robot.subsystems
 
-import com.ctre.phoenix.sensors.AbsoluteSensorRange
-import com.ctre.phoenix.sensors.CANCoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.AnalogEncoder
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.robot.constants.arm
-import frc.robot.constants.elevator
 import frc.robot.constants.intake
 
 class Intake : SubsystemBase()  {
@@ -21,21 +18,21 @@ class Intake : SubsystemBase()  {
         idleMode = CANSparkMax.IdleMode.kBrake
     }
     private val modeMotor = CANSparkMax(intake.modeMotorId,
-        CANSparkMaxLowLevel.MotorType.kBrushless).apply {
+        CANSparkMaxLowLevel.MotorType.kBrushless
+    ).apply {
         setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val systemMotor = CANSparkMax(intake.systemMotorId,
-        CANSparkMaxLowLevel.MotorType.kBrushless).apply {
+    private val systemMotor = CANSparkMax(
+        intake.systemMotorId,
+        CANSparkMaxLowLevel.MotorType.kBrushless
+    ).apply {
         setSmartCurrentLimit(intake.systemMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
 
-    val systemEncoder = CANCoder(intake.systemencoder.id).apply {
-        configFactoryDefault()
-        configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        configMagnetOffset(intake.systemencoder.offset)
-        configSensorDirection(intake.systemencoder.inverted)
+    val systemEncoder = AnalogEncoder(intake.systemEncoder.id).apply {
+        //@TODO config analog bore encoder
     }
 
     val modeEncoder = modeMotor.getEncoder()
@@ -59,18 +56,33 @@ class Intake : SubsystemBase()  {
         intake.limitSwitch.intakeLimitSwitch
     )
 
-    val intakeSystemPID = ProfiledPIDController(
-        intake.systemmotor.kP,
-        intake.systemmotor.kI,
-        intake.systemmotor.kD,
+    val systemPID = ProfiledPIDController(
+        intake.systemMotor.kP,
+        intake.systemMotor.kI,
+        intake.systemMotor.kD,
         TrapezoidProfile.Constraints(
-            intake.systemmotor.maxVelocity,
-            intake.systemmotor.maxAcceleration
+            intake.systemMotor.maxVelocity,
+            intake.systemMotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.systemmotor.positionTolerance,
-            intake.systemmotor.velocityTolerance
+            intake.systemMotor.positionTolerance,
+            intake.systemMotor.velocityTolerance
+        )
+    }
+
+    val modePID = ProfiledPIDController(
+        intake.systemMotor.kP,
+        intake.systemMotor.kI,
+        intake.systemMotor.kD,
+        TrapezoidProfile.Constraints(
+            intake.systemMotor.maxVelocity,
+            intake.systemMotor.maxAcceleration
+        )
+    ).apply {
+        setTolerance(
+            intake.systemMotor.positionTolerance,
+            intake.systemMotor.velocityTolerance
         )
     }
 
@@ -79,11 +91,13 @@ class Intake : SubsystemBase()  {
 
     val modeMotorPosition: Double
         get() = Math.toRadians(modeEncoder.position)
+    //@TODO Setter
 
     val systemMotorPosition: Double
         get() = Math.toRadians(systemEncoder.absolutePosition)
+    //@TODO Setter
 
-    val tab = Shuffleboard.getTab("Manipulator")
+    val tab = Shuffleboard.getTab("Intake")
     val driveMotorCurrent = tab.add("Motor Current", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
@@ -111,7 +125,7 @@ class Intake : SubsystemBase()  {
     }
 
     val intakePosition: Double
-        get() = if (RobotBase.isSimulation()) intakeSystemPID.setpoint.position//simArmSystem.angleRads
+        get() = if (RobotBase.isSimulation()) systemPID.setpoint.position//simArmSystem.angleRads
         else Math.toRadians(systemEncoder.absolutePosition)
 
     override fun periodic() {
@@ -119,7 +133,7 @@ class Intake : SubsystemBase()  {
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
         systemMotorCurrent.setDouble(systemMotor.outputCurrent)
 
-        val calculate = intakeSystemPID.calculate(
+        val calculate = systemPID.calculate(
             intakePosition,
             intakeSetpoint ?: intakePosition
         )

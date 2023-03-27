@@ -14,7 +14,7 @@ object intake {
     const val minAngle = 0.0
 
 
-    object systemmotor{
+    object systemMotor {
         const val positionTolerance = 0.0
         const val velocityTolerance = 0.0
         const val id = 0
@@ -32,7 +32,7 @@ object intake {
         const val kA = 0.0
     }
 
-    object modemotor{
+    object modeMotor {
         const val positionTolerance = 0.0
         const val velocityTolerance = 0.0
         const val id = 0
@@ -50,13 +50,13 @@ object intake {
         const val kA = 0.0
     }
 
-    object systemencoder{
+    object systemEncoder {
         const val id = 0
         const val offset = 0.0
         const val inverted = false
     }
 
-    object modeencoder {
+    object modeEncoder {
         const val id = 0
         const val offset = 0.0
         const val inverted = false
