@@ -29,9 +29,9 @@ enum class IOLevel(val coneElevatorHeight: Double, val coneArmRotation: Rotation
     Low(
         //for the height here is 0.88
         1.0,
-        Rotation2d.fromRadians(2.61),
+        Rotation2d.fromRadians(-2.21),
         0.88,
-        Rotation2d.fromRadians(2.61)
+        Rotation2d.fromRadians(-2.21)
     ),
     HumanPlayerSlider(
         1.3 - inchesToMeters(11.0),

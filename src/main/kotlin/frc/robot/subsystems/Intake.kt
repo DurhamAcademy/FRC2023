@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.kyberlib.command.Game
 import frc.robot.constants.intake
 
 class Intake(
@@ -28,8 +29,8 @@ class Intake(
         setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val systemMotor = CANSparkMax(
-        intake.systemMotorId,
+    private val baseMotor = CANSparkMax(
+        intake.baseMotor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
         setSmartCurrentLimit(intake.systemMotorLimit) // add current limit to limit the torque
@@ -53,15 +54,15 @@ class Intake(
             modeMotor.set(value)
         }
     var systemMotorPercentage: Double
-        get() = systemMotor.get()
+        get() = baseMotor.get()
         set(value) {
-            systemMotor.set(value)
+            baseMotor.set(value)
         }
     val limitSwitch = DigitalInput(
         intake.limitSwitch.intakeLimitSwitch
     )
 
-    val systemPID = ProfiledPIDController(
+    val basePID = ProfiledPIDController(
         intake.baseMotor.kP,
         intake.baseMotor.kI,
         intake.baseMotor.kD,
@@ -130,20 +131,20 @@ class Intake(
     }
 
     val intakePosition: Double
-        get() = if (RobotBase.isSimulation()) systemPID.setpoint.position//simArmSystem.angleRads
+        get() = if (RobotBase.isSimulation()) basePID.setpoint.position//simArmSystem.angleRads
         else Math.toRadians(systemEncoder.absolutePosition)
 
     override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
-        systemMotorCurrent.setDouble(systemMotor.outputCurrent)
+        systemMotorCurrent.setDouble(baseMotor.outputCurrent)
 
-        val calculate = systemPID.calculate(
+        val calculate = basePID.calculate(
             intakePosition,
             intakeSetpoint ?: intakePosition
         )
         if (arm.armPosition > 0.15) (
-                setIntakePosition(0.0)
-                )
+            baseMotor.setVoltage(0.0) //Kanishk fix pls
+        )
     }
 }
