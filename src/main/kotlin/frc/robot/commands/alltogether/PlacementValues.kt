@@ -49,12 +49,12 @@ enum class IOLevel(
         0.5
     ),
     HumanPlayerSlider(
-        topLimit,
+        topLimit- inchesToMeters(2.0),
         Rotation2d.fromRadians(1.6),
         1.3 - inchesToMeters(11.0 + 2.75),
         Rotation2d.fromRadians(1.4),
         0.40, 1.0,
-        inchesToMeters(24.0)
+        inchesToMeters(23.5)
     ),
     Idle(
         bottomLimit,

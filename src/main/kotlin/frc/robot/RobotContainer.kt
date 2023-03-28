@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
+import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
@@ -36,6 +38,7 @@ import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.Auto
 import frc.robot.commands.pathing.AutoPlaceAndBalance
 import frc.robot.commands.pathing.MoveToPosition
+import frc.robot.commands.pathing.TaxiAndSomethingOrOther
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
@@ -52,6 +55,7 @@ import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance as commandSchedulerInstance
 
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
@@ -285,6 +289,9 @@ class RobotContainer {
                                 )
                             )
                     )
+
+                lockSwerveModulesCircle
+                    .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
             }
         }
     }
@@ -468,15 +475,15 @@ class RobotContainer {
                 .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
                 .andThen(Commands.waitUntil { arm.armPosition > -3 * PI / 4 }) // move the arm to horizontal
                 .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)))
-                .withTimeout(14.5) // go to idle
-                .andThen(DriveCommand(drivetrain, rotation = { 0.0001 }))
+
 
             if (autoChooser.selected != null) {
                 c =
                     c.andThen(autoChooser.selected!!.getCommand()) // this needs to be like this because of command composition rules. this gets a fresh one each time instead of keeping one instance in the chooser
             }
 
-            return c
+            return c.withTimeout(14.5) // go to idle
+                .andThen(DriveCommand(drivetrain, rotation = { 0.0001 }))
         }
 
 
@@ -484,6 +491,8 @@ class RobotContainer {
     val autoChooser = SendableChooser<Auto?>().apply {
         setDefaultOption("None", null)
         addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
+        addOption("Place and Taxi farthest from judges", TaxiAndSomethingOrOther(this@RobotContainer))
+
     }
 
     val field2dwidget = Field2d()
@@ -538,6 +547,18 @@ class RobotContainer {
 
         // put the arm position on the field
         armFieldPosition.pose = armPos
+
+        if (Game.COMPETITION && Game.disabled &&
+            listOf(controlScheme0, controlScheme1).any {
+                if (it.xbox == null) false
+                else (0 until ((it.xbox?.hid?.buttonCount) ?: 0)).any { i ->
+                    it.xbox?.hid?.button(
+                        i, commandSchedulerInstance().defaultButtonLoop
+                    )?.asBoolean == true
+                }
+            }
+        ) controlScheme0.xbox?.hid?.setRumble(GenericHID.RumbleType.kBothRumble, .3)
+        else controlScheme0.xbox?.hid?.setRumble(GenericHID.RumbleType.kBothRumble, .0)
     }
 }
 

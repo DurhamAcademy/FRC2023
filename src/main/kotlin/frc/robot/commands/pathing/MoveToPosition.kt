@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
@@ -26,7 +27,12 @@ val Pose2d.flipped: Pose2d
         ),
         -rotation
     )
-
+//var lastPrintTime: Double = Timer.getFPGATimestamp()
+//var queuedPrints: String = ""
+//
+//fun safePrint(vararg message: String, separator: String = "") {
+//    message.joinToString {  }
+//}
 open class MoveToPosition(
     private val drivetrain: Drivetrain,
     /**
@@ -45,12 +51,20 @@ open class MoveToPosition(
     private val tolerancepvel: Double = 0.1,
     private val tolerancerpos: Double = 0.01,
     private val tolerancervel: Double = 0.1,
-    private val snapMode: Boolean = false
+    private val snapMode: Boolean = false,
+    private val maxPosSpeed: Double = 3.0,
+    private val maxRotSpeed: Double = PI / 2.0,
 ) : CommandBase() {
-    constructor(drivetrain: Drivetrain, x: Double = 0.0, y: Double = 0.0, angle: Double = 0.0) : this(
+    constructor(drivetrain: Drivetrain, x: Double = 0.0, y: Double = 0.0, angle: Double = 0.0, maxPosSpeed: Double = 3.0,
+                maxRotSpeed: Double = PI / 2.0,) : this(
         drivetrain,
         Pose2d(x, y, Rotation2d.fromDegrees(angle)),
-        Transform2d(Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)),
+        Transform2d(
+            Translation2d(0.0, 0.0),
+            Rotation2d.fromDegrees(0.0)
+        ),
+        maxPosSpeed,
+        maxRotSpeed
     )
 
     constructor(
@@ -88,7 +102,7 @@ open class MoveToPosition(
 
     val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.05, TrapezoidProfile.Constraints(
-            2.0,
+            maxPosSpeed,
             max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
@@ -97,7 +111,7 @@ open class MoveToPosition(
     }
     val yPIDController = ProfiledPIDController(
         Companion.yP, 0.0, 0.05, TrapezoidProfile.Constraints(
-            2.0,
+            maxPosSpeed,
             max(10.0, drivetrainConstants.maxAcceleration)
         )
     ).also {
@@ -106,7 +120,7 @@ open class MoveToPosition(
     }
     val rPIDController = ProfiledPIDController(
         Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
-            PI / 2.0, max(PI, drivetrainConstants.maxAngularAcceleration)
+            maxRotSpeed, max(PI, drivetrainConstants.maxAngularAcceleration)
         )
     ).also {
         it.enableContinuousInput(-PI, PI)

@@ -5,12 +5,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger
 
 abstract class ControlScheme {
     abstract val xbox: CommandXboxController?
+
+    open val speedMutiplier: Double
+        get() = 0.0
+
     open val rotation: Double
         get() = 0.0
     open val strafe: Double
         get() = 0.0
     open val forward: Double
         get() = 0.0
+
+
     open val toggleManipulator: Trigger = Trigger { false }
 
     open val idleConfiguration: Trigger = Trigger { false }
@@ -51,4 +57,6 @@ abstract class ControlScheme {
     open val confirmGridSelection: Trigger = Trigger { false }
 
     open val throwObject: Trigger = Trigger { false }
+
+    open val lockSwerveModulesCircle: Trigger = Trigger { false }
 }
