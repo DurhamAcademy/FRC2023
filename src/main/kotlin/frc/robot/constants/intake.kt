@@ -13,18 +13,18 @@ object intake {
     const val maxAngle = 0.0
     const val minAngle = 0.0
 
-
-    object systemMotor {
-        const val positionTolerance = 0.0
-        const val velocityTolerance = 0.0
-        const val id = 0
-        const val inverted = true
-        const val gearRatio = 1 / 2
-        const val maxVelocity = 0.0
-        const val maxAcceleration = 0.0
-        const val kP = 0.0
-        const val kI = 0.0
-        const val kD = 0.0
+//turns whole intake
+object baseMotor {
+    const val positionTolerance = 0.0
+    const val velocityTolerance = 0.0
+    const val id = 0
+    const val inverted = true
+    const val gearRatio = 1 / 2
+    const val maxVelocity = 0.0
+    const val maxAcceleration = 0.0
+    const val kP = 0.0
+    const val kI = 0.0
+    const val kD = 0.0
 
         const val kS = 0.0
         const val kG = 0.0
@@ -32,6 +32,7 @@ object intake {
         const val kA = 0.0
     }
 
+    //switches in between cone and cube
     object modeMotor {
         const val positionTolerance = 0.0
         const val velocityTolerance = 0.0
@@ -50,7 +51,7 @@ object intake {
         const val kA = 0.0
     }
 
-    object systemEncoder {
+    object baseEncoder {
         const val id = 0
         const val offset = 0.0
         const val inverted = false

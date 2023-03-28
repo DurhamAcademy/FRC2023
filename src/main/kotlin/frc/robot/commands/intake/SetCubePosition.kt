@@ -14,6 +14,7 @@ class SetCubePosition(
     override fun execute() {
         //intake.modeMotorPercentage = 1.0
         //@TODO Set the right position using shuffleboard details
+        //intake.setIntakePosition(shuffleboard position)
     }
 
     override fun end(interrupted: Boolean) {
@@ -21,7 +22,6 @@ class SetCubePosition(
     }
 
     override fun isFinished(): Boolean {
-        //TODO CHANGE THIS VALUE TO WHAT IS THE ACTUAL VALUE
-        return intake.modeMotorPosition >= 180.0
+        return intake.limitSwitchPressed
     }
 }

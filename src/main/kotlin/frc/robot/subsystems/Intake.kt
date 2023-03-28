@@ -31,7 +31,7 @@ class Intake : SubsystemBase()  {
         idleMode = CANSparkMax.IdleMode.kBrake
     }
 
-    val systemEncoder = AnalogEncoder(intake.systemEncoder.id).apply {
+    val systemEncoder = AnalogEncoder(intake.baseEncoder.id).apply {
         //@TODO config analog bore encoder
     }
 
@@ -57,32 +57,32 @@ class Intake : SubsystemBase()  {
     )
 
     val systemPID = ProfiledPIDController(
-        intake.systemMotor.kP,
-        intake.systemMotor.kI,
-        intake.systemMotor.kD,
+        intake.baseMotor.kP,
+        intake.baseMotor.kI,
+        intake.baseMotor.kD,
         TrapezoidProfile.Constraints(
-            intake.systemMotor.maxVelocity,
-            intake.systemMotor.maxAcceleration
+            intake.baseMotor.maxVelocity,
+            intake.baseMotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.systemMotor.positionTolerance,
-            intake.systemMotor.velocityTolerance
+            intake.baseMotor.positionTolerance,
+            intake.baseMotor.velocityTolerance
         )
     }
 
     val modePID = ProfiledPIDController(
-        intake.systemMotor.kP,
-        intake.systemMotor.kI,
-        intake.systemMotor.kD,
+        intake.baseMotor.kP,
+        intake.baseMotor.kI,
+        intake.baseMotor.kD,
         TrapezoidProfile.Constraints(
-            intake.systemMotor.maxVelocity,
-            intake.systemMotor.maxAcceleration
+            intake.baseMotor.maxVelocity,
+            intake.baseMotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.systemMotor.positionTolerance,
-            intake.systemMotor.velocityTolerance
+            intake.baseMotor.positionTolerance,
+            intake.baseMotor.velocityTolerance
         )
     }
 

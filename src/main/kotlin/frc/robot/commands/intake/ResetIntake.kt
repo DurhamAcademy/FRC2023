@@ -1,18 +1,16 @@
-package frc.robot.commands.intake
-
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Intake
 
 class SetConePosition(
     val intake: Intake
 ) : CommandBase() {
-    init{
+    init {
         addRequirements(intake)
     }
+
     override fun execute() {
-        //intake.systemMotorPercentage = -1.0
         //@TODO Set the right position using shuffleboard details
-        //intake.setIntakePosition(shuffleboard position)
+        //intake.setIntakePosition(idle intake position)
     }
 
     override fun end(interrupted: Boolean) {
