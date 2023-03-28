@@ -11,13 +11,18 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.constants.intake
 
-class Intake : SubsystemBase()  {
-    private val driveMotor = CANSparkMax(intake.driveMotorId,
-        CANSparkMaxLowLevel.MotorType.kBrushless).apply {
+class Intake(
+    var arm: Arm,
+) : SubsystemBase() {
+    private val driveMotor = CANSparkMax(
+        intake.driveMotorId,
+        CANSparkMaxLowLevel.MotorType.kBrushless
+    ).apply {
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
-    private val modeMotor = CANSparkMax(intake.modeMotorId,
+    private val modeMotor = CANSparkMax(
+        intake.modeMotorId,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
         setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
@@ -137,5 +142,8 @@ class Intake : SubsystemBase()  {
             intakePosition,
             intakeSetpoint ?: intakePosition
         )
+        if (arm.armPosition > 0.15) (
+                setIntakePosition(0.0)
+                )
     }
 }
