@@ -35,10 +35,7 @@ import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
-import frc.robot.commands.pathing.Auto
-import frc.robot.commands.pathing.AutoPlaceAndBalance
-import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.TaxiAndSomethingOrOther
+import frc.robot.commands.pathing.*
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
@@ -492,6 +489,7 @@ class RobotContainer {
         setDefaultOption("None", null)
         addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
         addOption("Place and Taxi farthest from judges", TaxiAndSomethingOrOther(this@RobotContainer))
+        addOption("Place -> Pick -> Place -> Taxi", PlacePickPlaceTaxi(this@RobotContainer))
 
     }
 
