@@ -67,7 +67,17 @@ interface UomConverter<Q : Quan<Q>> {
 //fun <Q : Quan<Q>> box(x: Q) = x as Quan<Q>
 
 
-data class Dimension(val name: String="Unitless", val L: Int = 0, val A: Int = 0, val M: Int = 0, val T: Int = 0, val I: Int = 0, val Theta: Int = 0, val N: Int = 0, val J: Int = 0) : Serializable {
+data class Dimension(
+    val name: String = "Unitless",
+    val L: Int = 0,
+    val A: Int = 0,
+    val M: Int = 0,
+    val T: Int = 0,
+    val I: Int = 0,
+    val Theta: Int = 0,
+    val N: Int = 0,
+    val J: Int = 0
+) : Serializable {
 
     init {
         if (name != "Unitless") {
@@ -75,6 +85,7 @@ data class Dimension(val name: String="Unitless", val L: Int = 0, val A: Int = 0
             InternationalSystemOfUnits.units.add(UnitOfMeasure(unitType[name]!!, 1.0, this))
         }
     }
+
     val safeName by lazy {
         val (numerator, denominator) = mapOf(
             "L" to L,
@@ -157,10 +168,29 @@ data class Dimension(val name: String="Unitless", val L: Int = 0, val A: Int = 0
     override fun toString() = "`$fancyName`"
 
     operator fun div(other: Dimension): Dimension {
-        return Dimension(L = L - other.L, A = A - other.A, M = M - other.M, T = T - other.T, I = I - other.I, Theta = Theta - other.Theta, N = N - other.N, J = J - other.J)
+        return Dimension(
+            L = L - other.L,
+            A = A - other.A,
+            M = M - other.M,
+            T = T - other.T,
+            I = I - other.I,
+            Theta = Theta - other.Theta,
+            N = N - other.N,
+            J = J - other.J
+        )
     }
+
     operator fun times(other: Dimension): Dimension {
-        return Dimension(L = L + other.L, A = A + other.A, M = M + other.M, T = T + other.T, I = I + other.I, Theta = Theta + other.Theta, N = N + other.N, J = J + other.J)
+        return Dimension(
+            L = L + other.L,
+            A = A + other.A,
+            M = M + other.M,
+            T = T + other.T,
+            I = I + other.I,
+            Theta = Theta + other.Theta,
+            N = N + other.N,
+            J = J + other.J
+        )
     }
 }
 
@@ -202,12 +232,14 @@ class $safeName(internal val $underlying: Double) : ${quan(this)} {
     override fun toString() = "${'$'}$underlying ${'$'}abrev"
     // override fun equals(other: Any?) = other is $this && this.siValue == other.siValue
 }
-${units.joinToString(separator = "") {
-        it.src(quantities
-            .takeIf { it.size == 1 }
-            ?.run(Set<Quantity>::first)
-        )
-    }}
+${
+        units.joinToString(separator = "") {
+            it.src(quantities
+                .takeIf { it.size == 1 }
+                ?.run(Set<Quantity>::first)
+            )
+        }
+    }
 ${quantities.joinToString(separator = "", transform = Quantity::src)}
 ${relations.joinToString(separator = "\n", transform = Relation::src)}
 """
@@ -228,6 +260,7 @@ private fun Relation.src(): String {
             fun p(thiz: ${quan(a)}, op: $divOperationProof, that: ${quan(b)}) = thiz.run { $logic }
         """.trimIndent()
         }
+
         RelationType.Multiply -> {
             val logic = "$result(this.$siValue * that.$siValue)"
             """
@@ -310,8 +343,12 @@ data class Relation(val a: Dimension, val f: RelationType, val b: Dimension) : S
 }
 
 enum class RelationType : (Dimension, Dimension) -> Dimension {
-    Divide { override fun invoke(a: Dimension, b: Dimension) = a / b },
-    Multiply { override fun invoke(a: Dimension, b: Dimension) = a * b }
+    Divide {
+        override fun invoke(a: Dimension, b: Dimension) = a / b
+    },
+    Multiply {
+        override fun invoke(a: Dimension, b: Dimension) = a * b
+    }
 }
 
 data class UnitOfMeasure(val name: String, val factorToSI: Double, val dimension: Dimension) : Serializable {
@@ -323,13 +360,15 @@ object InternationalSystemOfUnits {
     fun main(args: Array<String>) {
         generate()
     }
+
     fun generate() {
         val srcWriter = File("src/main/kotlin/kyberlib/math/units/test/SI.kt")
 //        writeBase(srcWriter)
 
-        val allRelations = Relation.closedPermute(mathDependencies +
-                quantities.map(Quantity::dimension) +
-                units.map(UnitOfMeasure::dimension)
+        val allRelations = Relation.closedPermute(
+            mathDependencies +
+                    quantities.map(Quantity::dimension) +
+                    units.map(UnitOfMeasure::dimension)
         )
 
         val allDimensions = (mathDependencies +
@@ -374,19 +413,22 @@ object InternationalSystemOfUnits {
 
     private val Frequency = Dimension("Frequency", T = -1)
     private val Angle = Dimension("Angle", A = 1)
-//    private val SolidAngle = Dimension("SolidAngle", A = 2)
+
+    //    private val SolidAngle = Dimension("SolidAngle", A = 2)
     private val Force = Dimension("Force", M = 1, L = 1, T = -2)
     private val Pressure = Dimension("Pressure", M = 1, L = -1, T = -2)
     private val Energy = Dimension("Energy", M = 1, L = 2, T = -2)
     private val Heat = Dimension("Heat", M = 1, L = 2, T = -2)
     private val Power = Dimension("Power", M = 1, L = 2, T = -3)
-//    private val RadiantFlux = Dimension("RadiantFlux", M = 1, L = 2, T = -3)
+
+    //    private val RadiantFlux = Dimension("RadiantFlux", M = 1, L = 2, T = -3)
 //    private val ElectricCharge = Dimension("ElectricCharge", T = 1, I = 1)
     private val ElectricalPotential = Dimension("ElectricalPotential", M = 1, L = 2, T = -3, I = -1)
     private val ElectricalCapacitance = Dimension("ElectricalCapacitance", M = -1, L = -2, T = 4, I = 2)
     private val ElectricalResistance = Dimension("ElectricalResistance", M = 1, L = 2, T = -3, I = -2)
     private val ElectricalConductance = Dimension("ElectricalConductance", M = -1, L = -2, T = 3, I = 2)
-//    private val MagneticFlux = Dimension("MagneticFlux", M = 1, L = 2, T = -2, I = -1)
+
+    //    private val MagneticFlux = Dimension("MagneticFlux", M = 1, L = 2, T = -2, I = -1)
 //    private val MagneticFieldStrength = Dimension("MagneticFieldStrength", M = 1, T = -2, I = -1)
 //    private val MagneticFluxDensity = Dimension("MagneticFluxDensity", M = 1, T = -2, I = -1)
     private val ElectricalInductance = Dimension("ElectricalInductance", M = 1, L = 2, T = -2, I = -2)
@@ -399,7 +441,8 @@ object InternationalSystemOfUnits {
     private val Area = Dimension("Area", L = 2)
     private val Volume = Dimension("Volume", L = 3)
     private val Velocity = Dimension("Velocity", L = 1, T = -1)
-//    private val VolumetricFlow = Dimension("VolumetricFlow", L = 3, T = -1)
+
+    //    private val VolumetricFlow = Dimension("VolumetricFlow", L = 3, T = -1)
     private val Acceleration = Dimension("Acceleration", L = 1, T = -2)
 //    private val Jerk = Dimension(L = 1, T = -3)
 //    private val Jolt = Dimension(L = 1, T = -3)
@@ -492,7 +535,7 @@ object InternationalSystemOfUnits {
     private val Radiance = Dimension(A = -2, M = 1, T = -3)
     private val SpectralRadiance = Dimension(A = -2, L = -1, M = 1, T = -3)
     private val SpectralPower = Dimension(L = 1, M = 1, T = -3)
-    */
+     */
 
     val quantities = mutableSetOf<Quantity>()
 

@@ -34,6 +34,12 @@ class Arm : SubsystemBase() {
         setSmartCurrentLimit(arm.motor.currentLimit)
         inverted = arm.motor.inverted
         this.serialNumber
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 255)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 255)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus3, 255)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus4, 255)
+        setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus6, 255)
     }
     val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
@@ -98,9 +104,15 @@ class Arm : SubsystemBase() {
     val armVelocity: Double
         get() = toRadians(armEncoder.velocity)
     private var armSetpoint: Double? = null
+
+    var lastVoltage = 0.0
     fun setArmVoltage(voltage: Double) {
         if (Game.sim) simArmSystem.setInputVoltage(voltage)
-        else armMotor.setVoltage(voltage)
+        else
+            if (lastVoltage != voltage) {
+                armMotor.setVoltage(voltage)
+                lastVoltage = voltage
+            }
     }
 
     fun reset() {

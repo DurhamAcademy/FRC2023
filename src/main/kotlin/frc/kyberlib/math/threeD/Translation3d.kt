@@ -2,8 +2,9 @@ package frc.kyberlib.math.threeD
 
 import edu.wpi.first.math.MatBuilder
 import edu.wpi.first.math.Matrix
-import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.numbers.*
+import edu.wpi.first.math.numbers.N1
+import edu.wpi.first.math.numbers.N3
+import edu.wpi.first.math.numbers.N4
 import frc.kyberlib.math.units.extensions.Length
 import frc.kyberlib.math.units.extensions.meters
 import frc.kyberlib.math.units.string
@@ -30,8 +31,8 @@ data class Translation3d(val x: Length, val y: Length, val z: Length) {
         return Translation3d(tVector.times(rotation3d.matrix))
     }
 
-    operator fun plus(other: Translation3d): Translation3d = Translation3d(x+other.x, y+other.y, z+other.z)
-    operator fun minus(other: Translation3d): Translation3d = Translation3d(x-other.x, y-other.y, z-other.z)
+    operator fun plus(other: Translation3d): Translation3d = Translation3d(x + other.x, y + other.y, z + other.z)
+    operator fun minus(other: Translation3d): Translation3d = Translation3d(x - other.x, y - other.y, z - other.z)
     operator fun unaryMinus(): Translation3d = Translation3d(-x, -y, -z)
 
     override fun toString(): String = "(${x.string()}, ${y.string()}, ${z.string()})"

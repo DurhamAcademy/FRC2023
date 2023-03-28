@@ -12,27 +12,32 @@ class Polynomial(
 ) {
 
     companion object {
-        fun regress(args: DoubleArray, outputs: DoubleArray, order: Int =1) : Polynomial {
+        fun regress(args: DoubleArray, outputs: DoubleArray, order: Int = 1): Polynomial {
             var n = order
             val datasetSize = args.size
             val X = DoubleArray(2 * n + 1)
             for (i in 0 until 2 * n + 1) {
                 X[i] = 0.0
-                for (j in 0 until datasetSize) X[i] = X[i] + args[j].pow(i.toDouble()) //consecutive positions of the array will store N,sigma(xi),sigma(xi^2),sigma(xi^3)....sigma(xi^2n)
+                for (j in 0 until datasetSize) X[i] =
+                    X[i] + args[j].pow(i.toDouble()) //consecutive positions of the array will store N,sigma(xi),sigma(xi^2),sigma(xi^3)....sigma(xi^2n)
             }
             val B = Array(n + 1) { DoubleArray(n + 2) }
-            val a = DoubleArray(n + 1) //B is the Normal matrix(augmented) that will store the equations, 'a' is for value of the final coefficients
+            val a =
+                DoubleArray(n + 1) //B is the Normal matrix(augmented) that will store the equations, 'a' is for value of the final coefficients
 
             for (i in 0..n) for (j in 0..n) B[i][j] =
                 X[i + j] //Build the Normal matrix by storing the corresponding coefficients at the right positions except the last column of the matrix
 
-            val Y = DoubleArray(n + 1) //Array to store the values of sigma(yi),sigma(xi*yi),sigma(xi^2*yi)...sigma(xi^n*yi)
+            val Y =
+                DoubleArray(n + 1) //Array to store the values of sigma(yi),sigma(xi*yi),sigma(xi^2*yi)...sigma(xi^n*yi)
 
             for (i in 0 until n + 1) {
                 Y[i] = 0.0
-                for (j in 0 until datasetSize) Y[i] = Y[i] + args[j].pow(i.toDouble()) * outputs[j] //consecutive positions will store sigma(yi),sigma(xi*yi),sigma(xi^2*yi)...sigma(xi^n*yi)
+                for (j in 0 until datasetSize) Y[i] =
+                    Y[i] + args[j].pow(i.toDouble()) * outputs[j] //consecutive positions will store sigma(yi),sigma(xi*yi),sigma(xi^2*yi)...sigma(xi^n*yi)
             }
-            for (i in 0..n) B[i][n + 1] = Y[i] //load the values of Y as the last column of B(Normal Matrix but augmented)
+            for (i in 0..n) B[i][n + 1] =
+                Y[i] //load the values of Y as the last column of B(Normal Matrix but augmented)
 
             n += 1
             for (i in 0 until n)  //From now Gaussian Elimination starts(can be ignored) to solve the set of linear equations (Pivotisation)
@@ -77,8 +82,8 @@ class Polynomial(
 
     fun r(data: DoubleArray, actualResults: DoubleArray): Double {
         val n = data.size
-        return (n*(data.zip(actualResults).sumOf { it.first * it.second }) - data.sum() * actualResults.sum()) /
-                sqrt(n*(data.sumOf { it*it }-data.sum())) / n*(actualResults.sumOf { it*it }-actualResults.sum())
+        return (n * (data.zip(actualResults).sumOf { it.first * it.second }) - data.sum() * actualResults.sum()) /
+                sqrt(n * (data.sumOf { it * it } - data.sum())) / n * (actualResults.sumOf { it * it } - actualResults.sum())
     }
 
     override fun toString(): String {

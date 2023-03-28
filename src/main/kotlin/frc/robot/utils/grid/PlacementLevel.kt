@@ -21,7 +21,7 @@ object GridConstants {
  * @param x the x value of the object
  * @param y the y value of the object
  */
-enum class FloorGamePiecePosition(val x: Double, val y: Double){
+enum class FloorGamePiecePosition(val x: Double, val y: Double) {
     Closest(inchesToMeters(47.36), inchesToMeters(36.19)), //x 6.934 y 36.19 in
     MiddleClose(inchesToMeters(47.36), inchesToMeters(84.19)), // 47.36in y + 48in
     MiddleFar(inchesToMeters(47.36), inchesToMeters(132.19)), //y 3.517
@@ -118,5 +118,5 @@ fun getPlacementTransform(
     val x = GridConstants.centerX + (GridConstants.centerDistX * allianceMultiplier) + level.depth
     val y = side.offset + group.offset
     val z = level.height
-    return Translation3d(x,y,z)//fixme BADDD PLEASE FIX
+    return Translation3d(x, y, z)//fixme BADDD PLEASE FIX
 }

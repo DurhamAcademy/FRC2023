@@ -7,10 +7,12 @@ import frc.robot.subsystems.Elevator
 class ZeroElevatorAndIdle(
     val elevator: Elevator,
     val arm: Arm,
+    val armZero: Boolean = true
 ) : CommandBase() {
     init {
         addRequirements(elevator)
-        addRequirements(arm)
+        if (armZero)
+            addRequirements(arm)
     }
 
     override fun initialize() {
@@ -19,12 +21,14 @@ class ZeroElevatorAndIdle(
 
     override fun execute() {
         elevator.zeroElevator = true
-        arm.setArmPosition(0.0)
+        if (armZero)
+            arm.setArmPosition(0.0)
     }
 
     override fun end(interrupted: Boolean) {
         elevator.zeroElevator = false
-        println("Elevator Zeroed")
+        if (!interrupted)
+            println("Elevator Zeroed")
     }
 
     override fun isFinished(): Boolean = elevator.limitSwitchPressed

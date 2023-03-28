@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.*
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import com.ctre.phoenix.sensors.AbsoluteSensorRange
 import com.ctre.phoenix.sensors.CANCoder
+import com.ctre.phoenix.sensors.CANCoderStatusFrame
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.controller.SimpleMotorFeedforward
@@ -13,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units.degreesToRadians
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -40,23 +42,44 @@ class SwerveModule(
         setNeutralMode(NeutralMode.Brake)
         // Configure the encoders for both motors
 //        configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0)
+        // set status frames
+        setStatusFramePeriod(StatusFrame.Status_1_General, 10)
+        setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20)
+        setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 100)
+        setStatusFramePeriod(StatusFrame.Status_6_Misc, 100)
+        setStatusFramePeriod(StatusFrame.Status_7_CommStatus, 100)
+        setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, 255)
+        setStatusFramePeriod(StatusFrame.Status_10_Targets, 255)
+        setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 255)
+        setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 255)
+        setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 255)
+        setStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 255)
     }
     private val turnMotor = WPI_TalonFX(turnMotorId).apply {
         // TODO:  ctrl click on configFactory default and check if the timeout is too long
         configFactoryDefault()
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 255)
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 255)
-//        setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 255)
+        // set status frames
+        setStatusFramePeriod(StatusFrame.Status_1_General, 10)
+        setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 20)
+        setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 100)
+        setStatusFramePeriod(StatusFrame.Status_6_Misc, 100)
+        setStatusFramePeriod(StatusFrame.Status_7_CommStatus, 100)
+        setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, 255)
+        setStatusFramePeriod(StatusFrame.Status_10_Targets, 255)
+        setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 255)
+        setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 255)
+        setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 255)
+        setStatusFramePeriod(StatusFrame.Status_15_FirmwareApiStatus, 255)
+
         configStatorCurrentLimit(StatorCurrentLimitConfiguration(true, 30.0, 35.0, 0.5))
         setNeutralMode(NeutralMode.Brake)
     }
     private val turnEncoder = CANCoder(encoderId).apply {
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
         configMagnetOffset(-1 * angleZero)
-//        setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 100)
-
+        setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10, 100)
+        setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 100, 100)
         configSensorDirection(false)
-
     }
 
     // smartdashboard
@@ -98,7 +121,7 @@ class SwerveModule(
     private val angleFF = SimpleMotorFeedforward(Constants.angleKS, Constants.angleKV, Constants.angleKA)
 
 
-//    class SwerveModuleSetpoint(
+    //    class SwerveModuleSetpoint(
 //        var driveSetpoint: Double?,
 //        var angleSetpoint: Rotation2d?,
 //    ) : SwerveModuleState(
@@ -131,33 +154,46 @@ class SwerveModule(
             if (value) {
                 driveMotor.setNeutralMode(NeutralMode.Coast)
                 turnMotor.setNeutralMode(NeutralMode.Coast)
-                driveMotor.configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(
-                    true,
-                    10.0,
-                    20.0,
-                    0.0
-                ))
+                driveMotor.configSupplyCurrentLimit(
+                    SupplyCurrentLimitConfiguration(
+                        true,
+                        10.0,
+                        20.0,
+                        0.0
+                    )
+                )
             } else {
                 driveMotor.setNeutralMode(NeutralMode.Brake)
                 turnMotor.setNeutralMode(NeutralMode.Brake)
-                driveMotor.configSupplyCurrentLimit(SupplyCurrentLimitConfiguration(
-                    true,
-                    40.0,
-                    45.0,
-                    0.0
-                ))
+                driveMotor.configSupplyCurrentLimit(
+                    SupplyCurrentLimitConfiguration(
+                        true,
+                        40.0,
+                        45.0,
+                        0.0
+                    )
+                )
             }
         }
+
+    val previousDriveVoltage = 0.0
+    val previousTurnVoltage = 0.0
     private fun setMotorVoltage(drive: Double, angle: Double) {
-        driveMotor.setVoltage(drive)
-        turnMotor.setVoltage(angle)
+        if (drive != previousDriveVoltage) {
+            driveMotor.setVoltage(drive)
+        }
+        if (angle != previousTurnVoltage) {
+            turnMotor.setVoltage(angle)
+        }
 
         // Shuffleboard
         driveMotorVoltageEntry.setDouble(drive)
         turnMotorVoltageEntry.setDouble(angle)
     }
 
+    var lastTime = Timer.getFPGATimestamp()
     fun move() {
+        // if encoder is not updating, stop the motor
         val drivePower =
             drivePid.calculate(
                 currentPosition.speedMetersPerSecond,
@@ -167,18 +203,21 @@ class SwerveModule(
                 drivePid.setpoint.velocity
             )
         val lastVel = anglePid.setpoint.velocity
-        val t = .02//Timer.getFPGATimestamp()
+        val t = Timer.getFPGATimestamp()
+        val dt = t - lastTime
         val anglePower = -(anglePid.calculate(
             degreesToRadians(this.turnEncoder.absolutePosition),
             setpoint.angle.radians
         ) + angleFF.calculate(
             lastVel,
             anglePid.setpoint.velocity,
-            t// - Timer.getFPGATimestamp()
+            0.02//minOf(dt,0.001) // stop possible divide by zero?
         ))
         setMotorVoltage(drivePower, anglePower)
+        lastTime = t
     }
 
+    var lastMotorTimestamp = 0.0
     override fun periodic() {
         move()
         SmartDashboard.putNumber("$mname Encoder", turnEncoder.absolutePosition)

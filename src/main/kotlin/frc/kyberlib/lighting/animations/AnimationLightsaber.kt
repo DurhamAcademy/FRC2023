@@ -6,7 +6,8 @@ import frc.kyberlib.math.units.extensions.Time
 import frc.kyberlib.math.units.extensions.seconds
 import java.awt.Color
 
-class AnimationLightsaber(val color: Color, transparency: Boolean= false, condition: ()->Boolean = {true}) : LEDAnimation(condition, transparency) {
+class AnimationLightsaber(val color: Color, transparency: Boolean = false, condition: () -> Boolean = { true }) :
+    LEDAnimation(condition, transparency) {
     var startTime = -1.seconds
     var lastUpdate = Game.time
 
@@ -17,6 +18,7 @@ class AnimationLightsaber(val color: Color, transparency: Boolean= false, condit
     private fun length(t: Time): Double {
         return t.seconds.coerceAtMost(1.0)
     }
+
     var buffer = mutableListOf<Color>()
     override fun getBuffer(time: Time, length: Int): List<Color> {
         if (startTime < 0.seconds || Game.time - lastUpdate > 3.seconds)

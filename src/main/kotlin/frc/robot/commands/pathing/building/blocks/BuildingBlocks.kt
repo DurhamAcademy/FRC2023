@@ -127,7 +127,7 @@ object BuildingBlocks {
                 posX
             }
         }
-        val closestRightAngle : Double = round(drivetrain.estimatedPose2d.rotation.degrees/90) * 90
+        val closestRightAngle: Double = round(drivetrain.estimatedPose2d.rotation.degrees / 90) * 90
         val rotation: () -> Rotation2d = {
             if (abs(8 - drivetrain.estimatedPose2d.x) > abs(8 - exitPoint(alliance()))) {
                 Rotation2d.fromDegrees(closestRightAngle)
@@ -158,7 +158,12 @@ object BuildingBlocks {
         alliance: () -> Alliance = { Game.alliance }
     ): Command {
         val hasExited: () -> Boolean = {
-            (exitPoint(alliance()) - drivetrain.estimatedPose2d.x).absoluteValue < 0.25
+            when (alliance()) {
+                Red -> drivetrain.estimatedPose2d.x < exitPoint(alliance())
+                Blue -> drivetrain.estimatedPose2d.x > exitPoint(alliance())
+                else -> true//fixme: NOOO
+            }
+
         }
         val clearRoute: () -> Boolean = {
             (
@@ -172,7 +177,7 @@ object BuildingBlocks {
                             drivetrain.estimatedPose2d.y > clearDown - .25
                             ).and(
                             drivetrain.estimatedPose2d.y < clearDown + .25
-                        ).and(false)
+                        )
                 )
         }
         val placementX: () -> Double = {
@@ -183,11 +188,11 @@ object BuildingBlocks {
             }
         }
         val placementY: () -> Double = {
-//            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
-//                clearDown
-//            } else {
-            clearUp
-//            }
+            if (abs(clearUp - drivetrain.estimatedPose2d.y) > abs(clearDown - drivetrain.estimatedPose2d.y)) {
+                clearDown
+            } else {
+                clearUp
+            }
             //TODO charge station
         }
         val rotationAlliance: () -> Rotation2d = {
@@ -204,7 +209,7 @@ object BuildingBlocks {
         return MoveToPosition(
             drivetrain,
             { xPID, _, _ ->
-                if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
+                if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * -alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
                     xPID.setConstraints(
                         TrapezoidProfile.Constraints(
                             0.2,
@@ -243,7 +248,7 @@ object BuildingBlocks {
         crossinline alliance: () -> Alliance = { Game.alliance },
     ): Command {
         val correctStartingPos: () -> Boolean = {
-            when(alliance()){
+            when (alliance()) {
                 Red -> drivetrain.estimatedPose2d.x > 8
                 Blue -> drivetrain.estimatedPose2d.x < 8
                 Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
@@ -282,24 +287,24 @@ object BuildingBlocks {
             else upperYValue
         }
 //        if(correctStartingPos()){
-            return MoveToPosition(
-                drivetrain,
-                { _, _, _ ->
-                    Pose2d(
-                        placementX(),
-                        placementY(),
-                        safeRotation(
-                            arm,
-                            when (alliance()) {
-                                Red -> Rotation2d.fromDegrees(180.0 - 2.0)
-                                Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
-                                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                            },
-                            drivetrain.estimatedPose2d.rotation
-                        )
+        return MoveToPosition(
+            drivetrain,
+            { _, _, _ ->
+                Pose2d(
+                    placementX(),
+                    placementY(),
+                    safeRotation(
+                        arm,
+                        when (alliance()) {
+                            Red -> Rotation2d.fromDegrees(180.0 - 2.0)
+                            Blue -> Rotation2d.fromDegrees(0.0 - 2.0)
+                            Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                        },
+                        drivetrain.estimatedPose2d.rotation
                     )
-                }
-            )
+                )
+            }
+        )
 //        }
 //        else return InstantCommand()
     }
@@ -329,7 +334,7 @@ object BuildingBlocks {
         endAtAlignment: Boolean = false,
     ): Command {
         val correctStartingPos: () -> Boolean = {
-            when(alliance()){
+            when (alliance()) {
                 Red -> drivetrain.estimatedPose2d.x < 8
                 Blue -> drivetrain.estimatedPose2d.x > 8
                 Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
@@ -351,24 +356,36 @@ object BuildingBlocks {
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
 //        if(correctStartingPos()){
-            return MoveToPosition(
-                drivetrain,
-                { xPid, yPid, rotPid ->
-                    Pose2d(
-                        placementX(),
-                        placementY(),
-                        safeRotation(
-                            arm,
-                            when (alliance()) {
-                                Red -> Rotation2d.fromDegrees(0.0 - 2.0)
-                                Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
-                                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-                            },
-                            drivetrain.estimatedPose2d.rotation
+        return MoveToPosition(
+            drivetrain,
+            { xPid, yPid, rotPid ->
+                if (arm == null) Unit
+                else if (arm.armPosition.absoluteValue > 0.5) {
+                    rotPid.setConstraints(
+                        TrapezoidProfile.Constraints(
+                            PI / 2,
+                            drivetrainConstraints.maxAngularAcceleration * 0.25
+                        )
+                    )
+                } else {
+                    rotPid.setConstraints(
+                        TrapezoidProfile.Constraints(
+                            PI / 2,
+                            drivetrainConstraints.maxAcceleration
                         )
                     )
                 }
-            )
+                Pose2d(
+                    placementX(),
+                    placementY(),
+                    when (alliance()) {
+                        Red -> Rotation2d.fromDegrees(0.0 - 2.0)
+                        Blue -> Rotation2d.fromDegrees(180.0 - 2.0)
+                        Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
+                    }
+                )
+            }
+        )
 //        }
 //        else return InstantCommand()
     }

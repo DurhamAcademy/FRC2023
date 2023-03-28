@@ -7,6 +7,7 @@ import frc.kyberlib.math.units.extensions.meters
 import frc.kyberlib.math.units.extensions.w
 
 typealias PoseMatrix = Matrix<N4, N4>
+
 data class Pose3d(val translation3d: Translation3d, val orientation: Rotation3d) {
     val matrix: PoseMatrix
         get() {
@@ -20,8 +21,8 @@ data class Pose3d(val translation3d: Translation3d, val orientation: Rotation3d)
 
     constructor(poseMatrix: PoseMatrix) : this(
         Translation3d(poseMatrix.block(3, 1, 3, 0)),
-        Rotation3d(poseMatrix.block(3, 3,0, 0))
-        )
+        Rotation3d(poseMatrix.block(3, 3, 0, 0))
+    )
 
     operator fun plus(other: Pose3d) = Pose3d(matrix.times(other.matrix))
     operator fun minus(other: Pose3d) = Pose3d(matrix.times(other.matrix.inv()))

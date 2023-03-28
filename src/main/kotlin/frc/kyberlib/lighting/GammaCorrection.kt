@@ -23,4 +23,4 @@ private val gamma = intArrayOf(
 )
 
 // gamma correction isn't important in sim sense it's a correction for the hardware
-fun Color.gammaCorrect() = if(Game.sim) this else Color(gamma[red], gamma[green], gamma[blue], alpha)
+fun Color.gammaCorrect() = if (Game.sim) this else Color(gamma[red], gamma[green], gamma[blue], alpha)

@@ -10,5 +10,7 @@ abstract class LEDAnimation(
     abstract fun getBuffer(time: Time, length: Int): List<Color>
 }
 
-operator fun Color.times(mult: Double) = Color((red * mult).toInt(), (green * mult).toInt(), (blue * mult).toInt(), alpha)
+operator fun Color.times(mult: Double) =
+    Color((red * mult).toInt(), (green * mult).toInt(), (blue * mult).toInt(), alpha)
+
 fun Color.withAlpha(alpha: Int) = Color(red, green, blue, alpha)

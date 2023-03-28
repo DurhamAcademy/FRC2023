@@ -21,5 +21,6 @@ class Integrator : Filter {
         value = if (prevTime != -1.0) value * dt else 0.0
         return get()
     }
+
     override fun get(): Double = value
 }

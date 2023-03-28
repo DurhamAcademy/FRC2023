@@ -1,65 +1,66 @@
 package frc.robot.commands.balance
 
-import edu.wpi.first.math.filter.Debouncer
+import edu.wpi.first.math.MathUtil
+import edu.wpi.first.math.controller.PIDController
+import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.kyberlib.math.units.Div
-import frc.kyberlib.math.units.KUnit
-import frc.kyberlib.math.units.Radian
-import frc.kyberlib.math.units.Second
-import frc.kyberlib.math.units.extensions.*
+import frc.kyberlib.command.Game
 import frc.robot.subsystems.Drivetrain
-import kotlin.math.*
 
-class AutoBalance(
-    val drivetrain: Drivetrain,
-    val balanceDirection: Double //-1.0 or 1.0 are different directions
-) : CommandBase() {
+class AutoBalance(private val drivetrain: Drivetrain) : CommandBase() {
+
     init {
         addRequirements(drivetrain)
     }
 
-    val currentPitch: Angle
-        get() = drivetrain.gyro.pitch.degrees
-    val currentRoll: Angle
-        get() = drivetrain.gyro.roll.degrees
-    val currentYaw: Angle
-        get() = drivetrain.gyro.yaw.degrees
+    private var gravityVector = DoubleArray(3)
 
-    // inclination is the angle between the robot's x,y plane and the ground.
-    // given the pitch and roll, we can calculate the inclination of the robot
-    // using the following formula:
-    // inclination = arctan(pitch / sqrt(1 - pitch^2) * cos(roll) + roll * sin(roll))
-    val currentInclination: Angle
-        get() = atan2(currentPitch.radians,
-            sqrt(1 - currentPitch.radians.pow(2)) * cos(currentRoll.radians) + currentRoll.radians * sin(currentRoll.radians),
-        ).radians
-    val lastInclination = currentInclination
-    val lastTime = Timer.getFPGATimestamp().seconds
-    val globalPitchVelocity: KUnit<Div<Radian, Second>>
-        get() = (currentInclination - lastInclination) /
-                (Timer.getFPGATimestamp().seconds - lastTime)
+    private val balancePid = PIDController(1.5, 0.00, 0.002)
 
+    private val xTilt: Double // tilt along the x-axis of the field, in Gs
+        get() {
+            drivetrain.gyro.getGravityVector(gravityVector) // get the gravity vector of the pigeon
+            // flatten the gravity vector to x/y, this is robot-relative tilt on each axis
+            val tiltVec = Translation2d(gravityVector[0], gravityVector[1])
+            // rotate the tilt vector into field space
+            return tiltVec.rotateBy(drivetrain.estimatedPose2d.rotation).x
+        }
 
-    val debouncer = Debouncer(0.05)
-    override fun execute() {
-        drivetrain.drive(
-            ChassisSpeeds(
-                balanceDirection,
-                0.0,
-                0.0
-            ),
-            true
-        )
+    private val timer = Timer()
 
-        SmartDashboard.putNumber("currentPitchHeading", currentPitch.degrees)
-        SmartDashboard.putNumber("globalPitchVelocity", globalPitchVelocity.degreesPerSecond)
-        SmartDashboard.putNumber("drivetrainGlobalPitch", lastInclination.degrees)
-        SmartDashboard.putNumber("drivetrainGlobalPitch", currentInclination.degrees)
+    override fun initialize() {
+        timer.start()
     }
 
-    override fun isFinished(): Boolean =
-        debouncer.calculate(globalPitchVelocity.absoluteValue.degreesPerSecond > 10)
+    override fun execute() {
+
+        val speedMul = when (Game.alliance) {
+            DriverStation.Alliance.Red -> -1.0
+            DriverStation.Alliance.Blue -> 1.0
+            DriverStation.Alliance.Invalid -> 0.0
+        }
+
+        if (timer.hasElapsed(0.3)) {
+            drivetrain.drive(
+                ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, .03), 0.0), 0.0, 0.0),
+                true
+            )
+        } else {
+            drivetrain.drive(ChassisSpeeds(2.0 * speedMul, 0.0, 0.0), true)
+        }
+
+
+//        val correctiveFactor = MathUtil.applyDeadband(xTilt, 0.05)
+        SmartDashboard.putNumber("xTilt", xTilt)
+//        SmartDashboard.putNumber("dTilt", dTilt)       
+//        SmartDashboard.putBoolean("level", isLevel)
+
+    }
+
+    override fun isFinished() = false
+
 }

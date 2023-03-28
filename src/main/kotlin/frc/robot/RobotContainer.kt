@@ -1,20 +1,26 @@
 package frc.robot
-
+/*
+Wrap all auto commands (in robotcontainer) with timeout for 14.5 sec, lock wheels after that
+Lock wheels should require the drivetrain and stop movement so we don't try to move with wheels locked
+Make sure auto command gets canceled going into teleop and that wheels can unlock properly
+ */
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.util.Units.inchesToMeters
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
+import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
@@ -24,17 +30,17 @@ import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
-import frc.robot.commands.drivetrain.AutoBalance
-import frc.robot.commands.drivetrain.SpinCommand
+import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
+import frc.robot.commands.pathing.Auto
+import frc.robot.commands.pathing.AutoPlaceAndBalance
 import frc.robot.commands.pathing.MoveToPosition
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks
+import frc.robot.commands.pathing.TaxiAndSomethingOrOther
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
-import frc.robot.commands.pathing.fullAuto
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
 import frc.robot.constants.leds.count
@@ -45,13 +51,11 @@ import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.Slider
-import frc.robot.utils.grid.PlacementGroup
-import frc.robot.utils.grid.PlacementLevel
-import frc.robot.utils.grid.PlacementSide
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance as commandSchedulerInstance
 
 class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
@@ -68,7 +72,7 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val elevator = Elevator(this, arm)
+    val elevator = Elevator(this@RobotContainer, arm)
 
     val pdh = PowerDistribution(PDH.id, kRev)
 
@@ -82,9 +86,18 @@ class RobotContainer {
 
                 idleConfiguration
                     .whileTrue(
-                        SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { wantedObject }, true)
+                        SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)
                             .andThen(ZeroElevatorAndIdle(elevator, arm))
-                            .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { wantedObject }, false))
+                            .andThen(
+                                SetSubsystemPosition(
+                                    elevator,
+                                    arm,
+                                    drivetrain,
+                                    { IOLevel.Idle },
+                                    { wantedObject },
+                                    false
+                                )
+                            )
                     )
 
                 // assign l1
@@ -109,7 +122,7 @@ class RobotContainer {
                 lowIntake
                     .whileTrue(
                         SetSubsystemPosition(this@RobotContainer, { IOLevel.FloorIntake }, { wantedObject })
-                            .alongWith(SetManipulatorSpeed(manipulator, 1.0))
+                            .alongWith(SetManipulatorSpeed(manipulator, 0.6502))
                     )
 
                 // assign outtake to set manipulator speed to -0.5
@@ -122,14 +135,14 @@ class RobotContainer {
                     .onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 spinIntakeIn
-                    .whileTrue(SetManipulatorSpeed(manipulator, 1.0))
+                    .whileTrue(SetManipulatorSpeed(manipulator, 0.6502))
                     .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 intakeHPS
                     .whileTrue(
                         SetSubsystemPosition(this@RobotContainer, { IOLevel.HumanPlayerSlider }, { wantedObject })
                             .alongWith(
-                                SetManipulatorSpeed(manipulator, 1.0)
+                                SetManipulatorSpeed(manipulator, 0.6502)
                             )
                     )
                     .onFalse(
@@ -170,17 +183,14 @@ class RobotContainer {
                         )
                     )
 
-                autoBalance
-                    .whileTrue(AutoBalance(drivetrain))
-
                 selectGridUp
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
                 selectGridDown
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, -1))
                 selectGridLeft
-                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
-                selectGridRight
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
+                selectGridRight
+                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
 
                 confirmGridSelection
                     .whileTrue(
@@ -191,20 +201,22 @@ class RobotContainer {
                             { smartDashboardSelector.placementPosition },
                             { smartDashboardSelector.placementSide },
                         )
-                            .deadlineWith(
-                                SetSubsystemPosition(
-                                    elevator, arm,
-                                    { IOLevel.Idle },
-                                    { smartDashboardSelector.placementSide.asObject },
-                                )
-                            )
-                            .andThen(
-                                SetSubsystemPosition(
-                                    elevator, arm,
-                                    { smartDashboardSelector.placementLevel.ioLevel },
-                                    { smartDashboardSelector.placementSide.asObject },
-                                )
-                            )
+//                            .deadlineWith(
+//                                SetSubsystemPosition(
+//                                    elevator, arm,
+//                                    drivetrain,
+//                                    { IOLevel.Idle },
+//                                    { smartDashboardSelector.placementSide.asObject },
+//                                )
+//                            )
+//                            .andThen(
+//                                SetSubsystemPosition(
+//                                    elevator, arm,
+//                                    drivetrain,
+//                                    { smartDashboardSelector.placementLevel.ioLevel },
+//                                    { smartDashboardSelector.placementSide.asObject },
+//                                )
+//                            )
                     )
                 alignClosestHPS
                     .whileTrue(
@@ -216,6 +228,7 @@ class RobotContainer {
                         ).deadlineWith(
                             SetSubsystemPosition(
                                 elevator, arm,
+                                drivetrain,
                                 { IOLevel.Idle },
                                 { smartDashboardSelector.placementSide.asObject },
                             )
@@ -223,6 +236,7 @@ class RobotContainer {
                             .andThen(
                                 SetSubsystemPosition(
                                     elevator, arm,
+                                    drivetrain,
                                     { IOLevel.HumanPlayerSlider },
                                     { smartDashboardSelector.placementSide.asObject },
                                     stopAtEnd = true
@@ -230,6 +244,7 @@ class RobotContainer {
                                     .andThen(
                                         SetSubsystemPosition(
                                             elevator, arm,
+                                            drivetrain,
                                             { IOLevel.HumanPlayerSlider },
                                             { smartDashboardSelector.placementSide.asObject },
                                             stopAtEnd = false
@@ -260,6 +275,7 @@ class RobotContainer {
                             ).andThen(
                                 SetSubsystemPosition(
                                     elevator, arm,
+                                    drivetrain,
                                     { IOLevel.Idle },
                                     { smartDashboardSelector.placementSide.asObject },
                                     stopAtEnd = true
@@ -273,6 +289,9 @@ class RobotContainer {
                                 )
                             )
                     )
+
+                lockSwerveModulesCircle
+                    .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
             }
         }
     }
@@ -322,9 +341,13 @@ class RobotContainer {
 
             else -> Unknown
         }
+    var fullAuto = false
+    var fullAutoObject: GamePiece = none
 
     val wantedObject: GamePiece
-        get() = smartDashboardSelector.placementSide.asObject
+        get() =
+            if (fullAuto) fullAutoObject
+            else smartDashboardSelector.placementSide.asObject
 
     val leds = KLEDStrip(9, count).apply {
         val coral = Color(255, 93, 115)
@@ -349,13 +372,13 @@ class RobotContainer {
             { lightStatus == EStopped }
         val autoNoFMS =
             AnimationBlink(Color.white, 0.5.seconds)
-            { lightStatus == AutoNoFMS }
+            { lightStatus == AutoNoFMS && !fullAuto }
         val autoFMSRed =
             AnimationLightsaber(allianceRed)
-            { lightStatus == AutoFMSRed }
+            { lightStatus == AutoFMSRed && !fullAuto }
         val autoFMSBlue =
             AnimationLightsaber(allianceBlue)
-            { lightStatus == AutoFMSBlue }
+            { lightStatus == AutoFMSBlue && !fullAuto }
         val teleopNoFMSRed =
             AnimationCylon(
                 allianceRed,
@@ -394,6 +417,22 @@ class RobotContainer {
                 else -> false
             } && (wantedObject == cube)
         }
+        val autoCone = AnimationPulse(coneColor, 1.0.seconds) {
+            when (lightStatus) {
+                AutoFMSRed -> true
+                AutoFMSBlue -> true
+                AutoNoFMS -> true
+                else -> false
+            } && (fullAutoObject == cone) && fullAuto
+        }
+        val autoCube = AnimationPulse(cubeColor, 1.0.seconds) {
+            when (lightStatus) {
+                AutoFMSRed -> true
+                AutoFMSBlue -> true
+                AutoNoFMS -> true
+                else -> false
+            } && (fullAutoObject == cube) && fullAuto
+        }
         val noDriverStation =
             AnimationSparkle(Color.orange)
             { lightStatus == NoDriverStation }
@@ -415,75 +454,51 @@ class RobotContainer {
         val body = KLEDRegion(
             0,
             count,
-            cameraReady, noFMSDisabled, fmsRedDisabled, fmsBlueDisabled, eStopped, autoNoFMS,
-            autoFMSRed, autoFMSBlue, noDriverStation, teleopCone, teleopCube,
-            teleopFMSRed, teleopFMSBlue, teleopNoFMSRed, teleopNoFMSBlue,
-            nothing,
+            cameraReady, noFMSDisabled, fmsRedDisabled, fmsBlueDisabled,
+            eStopped, autoCone, autoCube, autoNoFMS, autoFMSRed, autoFMSBlue,
+            noDriverStation, teleopCone, teleopCube, teleopFMSRed, teleopFMSBlue,
+            teleopNoFMSRed, teleopNoFMSBlue, nothing, cameraReady
         )
         this += body
     }
 
     val auto: Command
-        get() = autoChooser.selected
+        get() {
+            var c = (Commands.runOnce({ // assume the elevator is starting from the top.
+                if (!elevator.hasLimitBeenPressed) {
+                    println("RESET ELEVATOR")
+                    elevator.height = frc.robot.constants.elevator.limits.topLimit
+                }
+                elevator.setpoint = frc.robot.constants.elevator.limits.topLimit
+                elevator.motorPid.reset(elevator.height)
+            })
+                .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
+                .andThen(Commands.waitUntil { arm.armPosition > -3 * PI / 4 }) // move the arm to horizontal
+                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)))
+
+
+            if (autoChooser.selected != null) {
+                c =
+                    c.andThen(autoChooser.selected!!.getCommand()) // this needs to be like this because of command composition rules. this gets a fresh one each time instead of keeping one instance in the chooser
+            }
+
+            return c.withTimeout(14.5) // go to idle
+                .andThen(DriveCommand(drivetrain, rotation = { 0.0001 }))
+        }
+
 
     // auto chooser
-    val autoChooser = SendableChooser<Command>().apply {
-        setDefaultOption("Spin", SpinCommand(drivetrain))
-        addOption(
-            "1",
-            SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true)
-                .alongWith(SetManipulatorSpeed(manipulator, 0.5).withTimeout(0.25))
-                .andThen(ZeroElevatorAndIdle(elevator, arm))
-                .andThen(
-                    goToPlacementPoint(
-                        drivetrain,
-                        arm,
-                        { PlacementLevel.Level3.ioLevel },
-                        { PlacementGroup.Farthest },
-                        { PlacementSide.FarCone }
-                    )
-                )
-                .andThen(
-                    Commands.runOnce({
-                        drivetrain.drive(ChassisSpeeds(0.0, 0.0, 0.0), false)
-                    }, drivetrain)
-                )
-                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.High }, { cone }, true))
-                .andThen(Throw(manipulator, { cone }, { PlacementLevel.Level3 }).withTimeout(0.5))
-                .andThen(SetSubsystemPosition(elevator, arm, { IOLevel.Idle }, { cone }, true))
-        )
-        addOption(
-            "2",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level2.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            )
-        )
-        addOption(
-            "3",
-            goToPlacementPoint(
-                drivetrain,
-                arm,
-                PlacementLevel.Level3.ioLevel,
-                PlacementGroup.Farthest,
-                PlacementSide.Cube
-            )
-        )
-        addOption(
-            "exit human player area",
-            BuildingBlocks.leavePickupZone(drivetrain, arm)
-        )
-        addOption(
-            "full auto",
-            fullAuto(drivetrain, arm, elevator, manipulator, smartDashboardSelector)
-        )
+    val autoChooser = SendableChooser<Auto?>().apply {
+        setDefaultOption("None", null)
+        addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
+        addOption("Place and Taxi farthest from judges", TaxiAndSomethingOrOther(this@RobotContainer))
+
     }
 
+    val field2dwidget = Field2d()
+
     // shuffleboard auto chooser
-    val autoChooserTab = Shuffleboard.getTab("Autonomous")
+    val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
     val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
 
     val armVisual = Field2d()
@@ -491,6 +506,17 @@ class RobotContainer {
     val elevatorLine = armVisual.getObject("elevator")
 
     val armFieldPosition = drivetrain.field2d.getObject("arm")
+
+//    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
+//    val autoChoice = DriveTab.add("Autonomous", autoChooser)
+//    val fieldWidget = DriveTab.add("Field", field2dwidget)
+
+    //val CameraWidget = DriveTab.add("Camera", )
+//    val cameraWidget = DriveTab.addCamera(
+//        "Photon",
+//        "photonvision_Port_1182_MJPEG_Server",
+//        "http://photonvision.local:1182/stream.mjpg"
+//    )
 
     fun update() {
         leds.update()
@@ -512,7 +538,8 @@ class RobotContainer {
         // armLen * sin(armAngle) = z
         val armX = armLength * sin(armAngle)
         val armZ = armLength * cos(armAngle)
-        if(armZ + elevator.height > inchesToMeters(76.0)){ elevator.setpoint = inchesToMeters(76.0) - armZ }
+        if (armZ + elevator.height > inchesToMeters(76.0))
+            elevator.setpoint = inchesToMeters(76.0) - armZ
 
         // transform the arm position to the robot's position
         val armPos = drivetrain.estimatedPose2d + Transform2d(
@@ -522,6 +549,18 @@ class RobotContainer {
 
         // put the arm position on the field
         armFieldPosition.pose = armPos
+
+        if (Game.COMPETITION && Game.disabled &&
+            listOf(controlScheme0, controlScheme1).any {
+                if (it.xbox == null) false
+                else (0 until ((it.xbox?.hid?.buttonCount) ?: 0)).any { i ->
+                    it.xbox?.hid?.button(
+                        i, commandSchedulerInstance().defaultButtonLoop
+                    )?.asBoolean == true
+                }
+            }
+        ) controlScheme0.xbox?.hid?.setRumble(GenericHID.RumbleType.kBothRumble, .3)
+        else controlScheme0.xbox?.hid?.setRumble(GenericHID.RumbleType.kBothRumble, .0)
     }
 }
 
