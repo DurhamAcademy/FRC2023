@@ -8,7 +8,9 @@ import frc.kyberlib.command.Game
 import frc.robot.RobotContainer
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
+import frc.robot.commands.manipulator.Throw
 import frc.robot.utils.GamePiece
+import frc.robot.utils.grid.PlacementLevel
 
 class OnlyPlaceConeAuto(
     private var robotContainer: RobotContainer,
@@ -34,6 +36,13 @@ class OnlyPlaceConeAuto(
             { GamePiece.cone },
             true
         )
+        .andThen(
+            Throw(
+            robotContainer.manipulator,
+            { GamePiece.cone },
+            { PlacementLevel.Level3 }
+        )
+            .withTimeout(1.5))
     }
 
 
@@ -44,5 +53,12 @@ class OnlyPlaceConeAuto(
             { GamePiece.cone },
             true
         )
+        .andThen(
+            Throw(
+                robotContainer.manipulator,
+                { GamePiece.cone },
+                { PlacementLevel.Level3 }
+            )
+                .withTimeout(1.5))
     }
 }
