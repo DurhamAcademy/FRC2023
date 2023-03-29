@@ -1,35 +1,42 @@
-package frc.robot.commands.alltogether
+package frc.robot.commands.intake
 
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
 import frc.robot.subsystems.Intake
 
-class SetIntakePosition(
+
+open class SetIntakePosition(
     val intake: Intake,
-    val intakePosition: Double,
+    /** deploy angle in radians */
+    val deployAngle: Double,
+    /** cube arm angle in radians */
+    val cubeArmAngle: Double,
+    /** intake speed in percent */
+    val intakePercentage: Double
 ) : CommandBase() {
     constructor(
         robotContainer: RobotContainer,
-        intakePosition: Double
+        deployAngle: Double,
+        cubeArmAngle: Double,
+        intakePercentage: Double
     ) : this(
         robotContainer.intake,
-        intakePosition
+        deployAngle,
+        cubeArmAngle,
+        intakePercentage
     )
 
-    companion object {
-        fun deploy(intake: Intake) = SetIntakePosition(
-            intake, 0.0 //TODO Change this to actual pos
-        )
-
-        fun retract(intake: Intake) = SetIntakePosition(
-            intake, 0.0 //TODO Change this to actual pos
-        )
-    }
     init {
         addRequirements(intake)
     }
 
-    override fun execute() {
-        intake.setIntakePosition(intakePosition)
+    override fun initialize() {
+        intake.setDeployAngle(deployAngle)
+        intake.setCubeArmAngle(cubeArmAngle)
+        intake.intakePercentage = intakePercentage
     }
+
+    override fun isFinished() =
+        intake.deployPID.atGoal() &&
+        intake.cubeArmPID.atGoal()
 }

@@ -182,4 +182,16 @@ class Intake(
             // todo: set cube arm motor to position
         }
     }
+
+    fun setIntakePercentage(percentage: Double) {
+        intakePercentage = percentage
+    }
+
+    fun setCubeArmAngle(angle: Double) {
+        intakePositionSetpoint = angle
+    }
+
+    fun setDeployAngle(angle: Double) {
+        intakePositionSetpoint = angle
+    }
 }

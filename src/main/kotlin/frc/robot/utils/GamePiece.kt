@@ -4,5 +4,5 @@ enum class GamePiece {
     cone,
     cube,
     unknown,
-    none
+    none;
 }
