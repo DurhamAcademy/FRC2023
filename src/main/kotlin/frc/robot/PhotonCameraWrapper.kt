@@ -9,18 +9,21 @@ import org.photonvision.PhotonPoseEstimator
 import org.photonvision.targeting.PhotonTrackedTarget
 import java.util.*
 
-class PhotonCameraWrapper {
+class PhotonCameraWrapper(
+    cameraName: String = VisionConstants.cameraName,
+    val tagCountRequirement: ULong = 64UL
+) {
     var photonCamera = PhotonCamera(
-        VisionConstants.cameraName
+        cameraName
     )
 
     var validPoseCount = 0UL
 
     val canTrustPose: Boolean
-        get() = validPoseCount > 100UL
+        get() = validPoseCount > tagCountRequirement
 
     val percentage: Double
-        get() = validPoseCount.toDouble() / 100.0
+        get() = validPoseCount.toDouble() / tagCountRequirement.toDouble()
 
     //if is simulation, don't use photon camera
     /**

@@ -24,6 +24,8 @@ import frc.robot.constants.Constants
 import frc.robot.constants.drivetrain
 import frc.robot.controls.ControlScheme
 import java.lang.Math.PI
+import java.lang.Math.pow
+import kotlin.math.max
 
 class Drivetrain(
     controlScheme: ControlScheme,
@@ -120,7 +122,7 @@ class Drivetrain(
         }.toTypedArray(),
         Pose2d(),
         VecBuilder.fill(0.1, 0.1, 0.1),
-        VecBuilder.fill(1.8, 1.8, 1.8)
+        VecBuilder.fill(0.2, 0.2, PI / 4)
     )
 
     @Deprecated("Use estimatedPose2d instead, this is only for internal drivetrain use")
@@ -216,7 +218,8 @@ class Drivetrain(
                 // add the vision measurement to the drivetrain pose estimator
                 poseEstimator.addVisionMeasurement(
                     estimatedRobotPose.estimatedPose.toPose2d(),
-                    estimatedRobotPose.timestampSeconds
+                    estimatedRobotPose.timestampSeconds,
+                    if (estimatedRobotPose.targetsUsed.)
                 )
             }
         }
