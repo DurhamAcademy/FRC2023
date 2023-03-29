@@ -1,6 +1,7 @@
 package frc.robot.constants
 
 object intake {
+    val driveMotorEncoderCPR: Int = 0
     const val driveMotorId = 0 //turns wheels
     const val driveMotorLimit = 0
 
@@ -14,7 +15,7 @@ object intake {
     const val minAngle = 0.0
 
 //turns whole intake
-object baseMotor {
+object deployMotor {
     const val positionTolerance = 0.0
     const val velocityTolerance = 0.0
     const val id = 0

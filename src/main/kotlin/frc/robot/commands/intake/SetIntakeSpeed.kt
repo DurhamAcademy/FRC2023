@@ -12,6 +12,6 @@ class SetIntakeSpeed(
     }
 
     override fun execute() {
-        intake.driveMotorPercentage = speed
+        intake.intakePercentage = speed
     }
 }
