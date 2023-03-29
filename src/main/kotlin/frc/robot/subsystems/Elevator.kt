@@ -22,7 +22,6 @@ import frc.robot.commands.alltogether.IOLevel
 import frc.robot.constants.arm
 import frc.robot.constants.elevator
 import frc.robot.constants.elevator.elevatorMotor.tolerance.positionTolerance
-import frc.robot.constants.intake
 import frc.robot.utils.GamePiece
 import kotlin.math.PI
 import kotlin.math.absoluteValue
@@ -244,8 +243,8 @@ class Elevator(
         }
         lastLimitSwitch = limitSwitch.get()
 
-        if(intake.intakePosition in 0.5..1.0 && height <= 27.0){
-            if(armController.armPosition <= 0.0){
+        if (intake.deployPosition in 0.5..1.0 && height <= 27.0) {
+            if (armController.armPosition <= 0.0) {
                 armController.setArmPosition(0.0)
             }
         }

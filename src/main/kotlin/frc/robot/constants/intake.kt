@@ -3,7 +3,6 @@ package frc.robot.constants
 import edu.wpi.first.math.util.Units
 
 object intake {
-    val driveMotorEncoderCPR: Int = 0
     const val driveMotorId = 48
     const val driveMotorLimit = 0
 
@@ -21,20 +20,20 @@ object deployMotor {
     const val pidOnRio = true
     const val positionTolerance = 0.0
     const val velocityTolerance = 0.0
-    const val id = 0
+    const val id = 49
     const val inverted = true
     const val gearRatio = 1 / 2
-    const val maxVelocity = 0.0
-    const val maxAcceleration = 0.0
-    const val kP = 0.0
+    const val maxVelocity = 1.0
+    const val maxAcceleration = 1.0
+    const val kP = 1.0
     const val kI = 0.0
     const val kD = 0.0
 
-        const val kS = 0.0
-        const val kG = 0.0
-        const val kV = 0.0
-        const val kA = 0.0
-    }
+    const val kS = 0.0
+    const val kG = 0.0
+    const val kV = 0.0
+    const val kA = 0.0
+}
 
     //switches in between cone and cube
     object modeMotor {
@@ -44,9 +43,9 @@ object deployMotor {
         const val id = 0
         const val inverted = true
         const val gearRatio = 1 / 120
-        const val maxVelocity = 0.0
-        const val maxAcceleration = 0.0
-        const val kP = 0.0
+        const val maxVelocity = 1.0
+        const val maxAcceleration = 1.0
+        const val kP = 1.05
         const val kI = 0.0
         const val kD = 0.0
 
@@ -56,20 +55,8 @@ object deployMotor {
         const val kA = 0.0
     }
 
-    object baseEncoder {
-        const val id = 0
-        const val offset = 0.0
-        const val inverted = false
-    }
-
-    object modeEncoder {
-        const val id = 0
-        const val offset = 0.0
-        const val inverted = false
-    }
-
     object limitSwitch{
-        const val intakeLimitSwitch = 0
+        const val intakeLimitSwitch = 1
     }
 
     object limits{

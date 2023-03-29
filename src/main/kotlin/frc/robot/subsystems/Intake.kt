@@ -7,11 +7,13 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type.kDutyCycle
 import com.revrobotics.SparkMaxPIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.util.Units.radiansToRotations
 import edu.wpi.first.math.util.Units.rotationsToRadians
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.constants.intake
+import kotlin.math.PI
 
 class Intake(
     var arm: Arm,
@@ -25,9 +27,6 @@ class Intake(
         idleMode = kBrake
     }
 
-    private val objectEngagementAlternateEncoder = intakeMotor.getAbsoluteEncoder(
-        kDutyCycle
-    )
     private val cubeArmMotor = CANSparkMax(
         intake.modeMotorId,
         kBrushless
@@ -45,7 +44,7 @@ class Intake(
         pidController.setSmartMotionMaxVelocity(intake.modeMotor.maxVelocity, 0)
         pidController.setSmartMotionMinOutputVelocity(0.0, 0)
         pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
-
+        this.encoder.setPositionConversionFactor(1 / 30.0)
     }
     private val deployMotor = CANSparkMax(
         intake.deployMotor.id,
@@ -66,6 +65,12 @@ class Intake(
         pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
     }
 
+    private val objectEngagementAlternateEncoder = deployMotor.getAbsoluteEncoder(
+        kDutyCycle
+    ).apply {
+        this.inverted = true
+        this.setZeroOffset(radiansToRotations(deployOffset))
+    }
     var intakePercentage: Double
         get() = intakeMotor.get()
         set(value) {
@@ -88,6 +93,7 @@ class Intake(
             intake.deployMotor.positionTolerance,
             intake.deployMotor.velocityTolerance
         )
+        enableContinuousInput(0.0, PI * 2)
     }
 
     val cubeArmPID = ProfiledPIDController(
@@ -139,29 +145,22 @@ class Intake(
     val voltage: Double
         get() = cubeArmMotor.busVoltage
 
-    private var intakeSetpoint: Double? = null
+    private var cubeArmPositionSetpoint: Double = PI / 2
 
-    private var intakePositionSetpoint: Double
-        get() = intakeSetpoint ?: intakePosition
-        set(value) {
-            intakeSetpoint = value.coerceIn(
-                intake.minAngle,
-                intake.maxAngle
-            )
-        }
+    private var deployPositionSetpoint: Double = 0.0
 
-    private var deployOffset = 0.0
+    private var deployOffset = -.7
     var deployPosition: Double
-        get() = rotationsToRadians(deployMotor.encoder.position) + deployOffset
+        get() = rotationsToRadians(objectEngagementAlternateEncoder.position)
         set(value) {
-            intakeOffset = value - rotationsToRadians(deployMotor.encoder.position)
+            intakeOffset = rotationsToRadians(objectEngagementAlternateEncoder.position)
         }
 
     private var intakeOffset = 0.0
-    var intakePosition: Double
-        get() = rotationsToRadians(objectEngagementAlternateEncoder.position) + intakeOffset
+    var cubeArmPosition: Double
+        get() = rotationsToRadians(cubeArmMotor.encoder.position)
         set(value) {
-            intakeOffset = value - rotationsToRadians(objectEngagementAlternateEncoder.position)
+            cubeArmMotor.encoder.setPosition(radiansToRotations(value))
         }
 
     override fun periodic() {
@@ -169,27 +168,24 @@ class Intake(
         modeMotorCurrent.setDouble(cubeArmMotor.outputCurrent)
         systemMotorCurrent.setDouble(deployMotor.outputCurrent)
 
-        val calculatea = deployPID.calculate(
-            intakePosition,
-            intakeSetpoint ?: intakePosition
+        val deployVoltage = deployPID.calculate(
+            deployPosition,
+            deployPositionSetpoint
         )
-        deployMotor.set(0.01)
-        if (arm.armPosition > 0.15)
-            deployMotor.set(0.0)
-        val calculate = cubeArmPID.calculate(
-            intakePosition,
-            intakeSetpoint ?: intakePosition
-        )
-        cubeArmMotor.set(0.01)
+        deployMotor.setVoltage(deployVoltage.coerceIn(-0.5, 0.5))
 
-        intakeMotor.set(0.01)
+        val intakeVoltage = cubeArmPID.calculate(
+            cubeArmPosition,
+            cubeArmPositionSetpoint
+        )
+        cubeArmMotor.setVoltage(intakeVoltage.coerceIn(-0.5, 0.5))
     }
 
     fun setCubeArmAngle(angle: Double) {
-        intakePositionSetpoint = angle
+        cubeArmPositionSetpoint = angle
     }
 
     fun setDeployAngle(angle: Double) {
-        intakePositionSetpoint = angle
+        cubeArmPositionSetpoint = angle
     }
 }
