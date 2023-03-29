@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMax.IdleMode.kBrake
 import com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless
 import com.revrobotics.SparkMaxAlternateEncoder.Type.kQuadrature
+import com.revrobotics.SparkMaxPIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units
@@ -34,6 +35,18 @@ class Intake(
     ).apply {
         setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
         idleMode = kBrake
+        pidController.p = intake.modeMotor.kP
+        pidController.i = intake.modeMotor.kI
+        pidController.d = intake.modeMotor.kD
+        pidController.setSmartMotionAccelStrategy(
+            SparkMaxPIDController.AccelStrategy.kTrapezoidal,
+            0
+        )
+        pidController.setSmartMotionMaxAccel(intake.modeMotor.maxAcceleration, 0)
+        pidController.setSmartMotionMaxVelocity(intake.modeMotor.maxVelocity, 0)
+        pidController.setSmartMotionMinOutputVelocity(0.0, 0)
+        pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
+
     }
     private val deployMotor = CANSparkMax(
         intake.deployMotor.id,
@@ -41,6 +54,17 @@ class Intake(
     ).apply {
         setSmartCurrentLimit(intake.systemMotorLimit) // add current limit to limit the torque
         idleMode = kBrake
+        pidController.p = intake.deployMotor.kP
+        pidController.i = intake.deployMotor.kI
+        pidController.d = intake.deployMotor.kD
+        pidController.setSmartMotionAccelStrategy(
+            SparkMaxPIDController.AccelStrategy.kTrapezoidal,
+            0
+        )
+        pidController.setSmartMotionMaxAccel(intake.deployMotor.maxAcceleration, 0)
+        pidController.setSmartMotionMaxVelocity(intake.deployMotor.maxVelocity, 0)
+        pidController.setSmartMotionMinOutputVelocity(0.0, 0)
+        pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
     }
 
     var intakePercentage: Double
@@ -146,10 +170,16 @@ class Intake(
         modeMotorCurrent.setDouble(cubeArmMotor.outputCurrent)
         systemMotorCurrent.setDouble(deployMotor.outputCurrent)
 
-        val deployVoltage = deployPID.calculate(deployPosition, intakePositionSetpoint)
-        deployMotor.setVoltage(deployVoltage)
+        if (intake.deployMotor.pidOnRio) {
+            deployMotor.setVoltage(deployPID.calculate(deployPosition, intakePositionSetpoint))
+        } else {
+            // todo: set deploy motor to position
+        }
 
-        val intakeVoltage = cubeArmPID.calculate(intakePosition, intakePositionSetpoint)
-        cubeArmMotor.setVoltage(intakeVoltage)
+        if (intake.modeMotor.pidOnRio) {
+            cubeArmMotor.setVoltage(cubeArmPID.calculate(intakePosition, intakePositionSetpoint))
+        } else {
+            // todo: set cube arm motor to position
+        }
     }
 }
