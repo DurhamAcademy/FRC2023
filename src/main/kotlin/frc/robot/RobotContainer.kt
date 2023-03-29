@@ -448,7 +448,7 @@ class RobotContainer {
             return@AnimationCustom List<Color>(len) { i ->
                 if (i >= index) color else Color.black
             }
-        }, { !drivetrain.canTrustPose && lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue})
+        }, { !drivetrain.canTrustPose })
 
 
         val body = KLEDRegion(
