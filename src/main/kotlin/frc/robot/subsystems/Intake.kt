@@ -18,6 +18,7 @@ import frc.robot.constants.intake
 class Intake(
     var arm: Arm,
 ) : SubsystemBase() {
+
     private val intakeMotor = CANSparkMax(
         intake.driveMotorId,
         kBrushless
@@ -25,6 +26,7 @@ class Intake(
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
         idleMode = kBrake
     }
+
     private val objectEngagementAlternateEncoder = intakeMotor.getAlternateEncoder(
         kQuadrature,
         intake.driveMotorEncoderCPR
@@ -48,6 +50,7 @@ class Intake(
         pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
 
     }
+
     private val deployMotor = CANSparkMax(
         intake.deployMotor.id,
         kBrushless
@@ -187,6 +190,13 @@ class Intake(
         intakePercentage = percentage
     }
 
+        val calculate = basePID.calculate(
+            intakePosition,
+            intakeSetpoint ?: intakePosition
+        )
+        if (arm.armPosition > 0.15) (
+            setIntakePosition(0.0) //Kanishk fix pls
+        )
     fun setCubeArmAngle(angle: Double) {
         intakePositionSetpoint = angle
     }
