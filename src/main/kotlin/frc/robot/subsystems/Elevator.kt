@@ -22,6 +22,7 @@ import frc.robot.commands.alltogether.IOLevel
 import frc.robot.constants.arm
 import frc.robot.constants.elevator
 import frc.robot.constants.elevator.elevatorMotor.tolerance.positionTolerance
+import frc.robot.constants.intake
 import frc.robot.utils.GamePiece
 import kotlin.math.PI
 import kotlin.math.absoluteValue
@@ -29,7 +30,8 @@ import kotlin.math.cos
 
 class Elevator(
     val robotContainer: RobotContainer?,
-    val armController: Arm
+    val armController: Arm,
+    private val intake: Intake
 ) : SubsystemBase() {
     var hasLimitBeenPressed = false
     val armLength = 1.047
@@ -241,6 +243,12 @@ class Elevator(
             hasLimitBeenPressed = true
         }
         lastLimitSwitch = limitSwitch.get()
+
+        if(intake.intakePosition in 0.5..1.0 && height <= 27.0){
+            if(armController.armPosition <= 0.0){
+                armController.setArmPosition(0.0)
+            }
+        }
     }
 
     override fun simulationPeriodic() {

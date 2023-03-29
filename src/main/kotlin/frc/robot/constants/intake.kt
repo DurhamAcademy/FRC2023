@@ -1,5 +1,7 @@
 package frc.robot.constants
 
+import edu.wpi.first.math.util.Units
+
 object intake {
     val driveMotorEncoderCPR: Int = 0
     const val driveMotorId = 0 //turns wheels
@@ -68,5 +70,10 @@ object deployMotor {
 
     object limitSwitch{
         const val intakeLimitSwitch = 0
+    }
+
+    object limits{
+        val backlimit: Double = Units.radiansToDegrees(0.0)
+        val topLimit: Double = Units.radiansToDegrees(-1.0)
     }
 }
