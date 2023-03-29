@@ -15,7 +15,6 @@ class SetIntakePosition(
         robotContainer.intake,
         intakePosition
     )
-
     companion object {
         fun deploy(intake: Intake) = SetIntakePosition(
             intake, 0.0 //TODO Change this to actual pos

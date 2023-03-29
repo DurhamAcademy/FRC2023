@@ -15,6 +15,7 @@ import frc.robot.constants.intake
 class Intake(
     var arm: Arm,
 ) : SubsystemBase() {
+
     private val driveMotor = CANSparkMax(
         intake.driveMotorId,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -22,6 +23,7 @@ class Intake(
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
+
     private val modeMotor = CANSparkMax(
         intake.modeMotorId,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -29,6 +31,7 @@ class Intake(
         setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
         idleMode = CANSparkMax.IdleMode.kBrake
     }
+
     private val baseMotor = CANSparkMax(
         intake.baseMotor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
@@ -144,7 +147,7 @@ class Intake(
             intakeSetpoint ?: intakePosition
         )
         if (arm.armPosition > 0.15) (
-            baseMotor.setVoltage(0.0) //Kanishk fix pls
+            setIntakePosition(0.0) //Kanishk fix pls
         )
     }
 }

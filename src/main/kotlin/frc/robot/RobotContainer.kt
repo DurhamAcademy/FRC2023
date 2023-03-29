@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.Commands
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
@@ -43,6 +42,7 @@ import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayer
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.PDH
+import frc.robot.constants.intake
 import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
@@ -72,7 +72,7 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val elevator = Elevator(this@RobotContainer, arm)
+    val elevator = Elevator(this@RobotContainer, arm, intake)
 
 
     val pdh = PowerDistribution(PDH.id, kRev)
