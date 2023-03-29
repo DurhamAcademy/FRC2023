@@ -4,13 +4,13 @@ import edu.wpi.first.math.util.Units
 
 object intake {
     val driveMotorEncoderCPR: Int = 0
-    const val driveMotorId = 0 //turns wheels
+    const val driveMotorId = 48
     const val driveMotorLimit = 0
 
-    const val systemMotorId = 0 //moves the intake up and down
+    const val systemMotorId = 49 //moves the intake up and down
     const val systemMotorLimit = 0
 
-    const val modeMotorId = 0
+    const val modeMotorId = 50
     const val modeMotorLimit = 0
 
     const val maxAngle = 0.0

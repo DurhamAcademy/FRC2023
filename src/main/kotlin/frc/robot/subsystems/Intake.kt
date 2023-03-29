@@ -1,8 +1,13 @@
 package frc.robot.subsystems
 
 import com.revrobotics.CANSparkMax
+import com.revrobotics.CANSparkMax.IdleMode.kBrake
+import com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type.kDutyCycle
+import com.revrobotics.SparkMaxPIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.math.util.Units.rotationsToRadians
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -20,9 +25,8 @@ class Intake(
         idleMode = kBrake
     }
 
-    private val objectEngagementAlternateEncoder = intakeMotor.getAlternateEncoder(
-        kQuadrature,
-        intake.driveMotorEncoderCPR
+    private val objectEngagementAlternateEncoder = intakeMotor.getAbsoluteEncoder(
+        kDutyCycle
     )
     private val cubeArmMotor = CANSparkMax(
         intake.modeMotorId,
@@ -107,7 +111,7 @@ class Intake(
     var modeMotorPosition: Double
         get() = Math.toRadians(objectEngagementAlternateEncoder.position)
         set(value) {
-            objectEngagementAlternateEncoder.position = Math.toDegrees(value)
+            objectEngagementAlternateEncoder.setZeroOffset(Math.toDegrees(value) - objectEngagementAlternateEncoder.position)
         }
 
     private var systemMotorOffset = 0.0
@@ -119,15 +123,15 @@ class Intake(
     //@TODO Setter
 
     val tab = Shuffleboard.getTab("Intake")
-    val driveMotorCurrent = tab.add("Motor Current", 0.0)
+    val driveMotorCurrent = tab.add("Motor Current jerguewf", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
-    val modeMotorCurrent = tab.add("Motor Current", 0.0)
+    val modeMotorCurrent = tab.add("Motor Current lajshg", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
-    val systemMotorCurrent = tab.add("Motor Current", 0.0)
+    val systemMotorCurrent = tab.add("Motor Current ais;hljk", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
@@ -161,25 +165,24 @@ class Intake(
         }
 
     override fun periodic() {
-        driveMotorCurrent.setDouble(driveMotor.outputCurrent)
-        modeMotorCurrent.setDouble(modeMotor.outputCurrent)
+        driveMotorCurrent.setDouble(intakeMotor.outputCurrent)
+        modeMotorCurrent.setDouble(cubeArmMotor.outputCurrent)
         systemMotorCurrent.setDouble(deployMotor.outputCurrent)
 
-        val calculatea = basePID.calculate(
+        val calculatea = deployPID.calculate(
             intakePosition,
             intakeSetpoint ?: intakePosition
         )
-        deployMotor.set(calculatea)
+        deployMotor.set(0.01)
         if (arm.armPosition > 0.15)
             deployMotor.set(0.0)
-        val calculate = basePID.calculate(
+        val calculate = cubeArmPID.calculate(
             intakePosition,
             intakeSetpoint ?: intakePosition
         )
-    }
+        cubeArmMotor.set(0.01)
 
-    fun setIntakePercentage(percentage: Double) {
-        intakePercentage = percentage
+        intakeMotor.set(0.01)
     }
 
     fun setCubeArmAngle(angle: Double) {
