@@ -1,64 +1,69 @@
 package frc.robot.subsystems
 
 import com.revrobotics.CANSparkMax
-import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.wpilibj.AnalogEncoder
 import edu.wpi.first.wpilibj.DigitalInput
-import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.kyberlib.command.Game
 import frc.robot.constants.intake
 
 class Intake(
     var arm: Arm,
 ) : SubsystemBase() {
 
-    private val driveMotor = CANSparkMax(
+    private val intakeMotor = CANSparkMax(
         intake.driveMotorId,
-        CANSparkMaxLowLevel.MotorType.kBrushless
+        kBrushless
     ).apply {
         setSmartCurrentLimit(intake.driveMotorLimit) // add current limit to limit the torque
-        idleMode = CANSparkMax.IdleMode.kBrake
+        idleMode = kBrake
     }
 
-
-    private val modeMotor = CANSparkMax(
+    private val objectEngagementAlternateEncoder = intakeMotor.getAlternateEncoder(
+        kQuadrature,
+        intake.driveMotorEncoderCPR
+    )
+    private val cubeArmMotor = CANSparkMax(
         intake.modeMotorId,
-        CANSparkMaxLowLevel.MotorType.kBrushless
+        kBrushless
     ).apply {
         setSmartCurrentLimit(intake.modeMotorLimit) // add current limit to limit the torque
-        idleMode = CANSparkMax.IdleMode.kBrake
-    }
+        idleMode = kBrake
+        pidController.p = intake.modeMotor.kP
+        pidController.i = intake.modeMotor.kI
+        pidController.d = intake.modeMotor.kD
+        pidController.setSmartMotionAccelStrategy(
+            SparkMaxPIDController.AccelStrategy.kTrapezoidal,
+            0
+        )
+        pidController.setSmartMotionMaxAccel(intake.modeMotor.maxAcceleration, 0)
+        pidController.setSmartMotionMaxVelocity(intake.modeMotor.maxVelocity, 0)
+        pidController.setSmartMotionMinOutputVelocity(0.0, 0)
+        pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
 
+    }
     private val deployMotor = CANSparkMax(
         intake.deployMotor.id,
-        CANSparkMaxLowLevel.MotorType.kBrushless
+        kBrushless
     ).apply {
         setSmartCurrentLimit(intake.systemMotorLimit) // add current limit to limit the torque
-        idleMode = CANSparkMax.IdleMode.kBrake
+        idleMode = kBrake
+        pidController.p = intake.deployMotor.kP
+        pidController.i = intake.deployMotor.kI
+        pidController.d = intake.deployMotor.kD
+        pidController.setSmartMotionAccelStrategy(
+            SparkMaxPIDController.AccelStrategy.kTrapezoidal,
+            0
+        )
+        pidController.setSmartMotionMaxAccel(intake.deployMotor.maxAcceleration, 0)
+        pidController.setSmartMotionMaxVelocity(intake.deployMotor.maxVelocity, 0)
+        pidController.setSmartMotionMinOutputVelocity(0.0, 0)
+        pidController.setSmartMotionAllowedClosedLoopError(0.0, 0)
     }
 
-    val systemEncoder = AnalogEncoder(intake.baseEncoder.id).apply {
-        //@TODO config analog bore encoder
-    }
-
-    val modeEncoder = modeMotor.getEncoder()
-
-    var driveMotorPercentage: Double
-        get() = driveMotor.get()
-        set(value) {
-            driveMotor.set(value)
-        }
-    var modeMotorPercentage: Double
-        get() = modeMotor.get()
-        set(value) {
-            modeMotor.set(value)
-        }
-    var systemMotorPercentage: Double
-        get() = deployMotor.get()
+    var intakePercentage: Double
+        get() = intakeMotor.get()
         set(value) {
             deployMotor.set(value)
         }
@@ -66,7 +71,7 @@ class Intake(
         intake.limitSwitch.intakeLimitSwitch
     )
 
-    val basePID = ProfiledPIDController(
+    val deployPID = ProfiledPIDController(
         intake.deployMotor.kP,
         intake.deployMotor.kI,
         intake.deployMotor.kD,
@@ -81,7 +86,7 @@ class Intake(
         )
     }
 
-    val modePID = ProfiledPIDController(
+    val cubeArmPID = ProfiledPIDController(
         intake.deployMotor.kP,
         intake.deployMotor.kI,
         intake.deployMotor.kD,
@@ -99,12 +104,18 @@ class Intake(
     val limitSwitchPressed: Boolean
         get() = !limitSwitch.get()
 
-    val modeMotorPosition: Double
-        get() = Math.toRadians(modeEncoder.position)
-    //@TODO Setter
+    var modeMotorPosition: Double
+        get() = Math.toRadians(objectEngagementAlternateEncoder.position)
+        set(value) {
+            objectEngagementAlternateEncoder.position = Math.toDegrees(value)
+        }
 
-    val systemMotorPosition: Double
-        get() = Math.toRadians(systemEncoder.absolutePosition)
+    private var systemMotorOffset = 0.0
+    var systemMotorPosition: Double
+        get() = Math.toRadians(deployMotor.encoder.position) + systemMotorOffset
+        set(value) {
+            systemMotorOffset = value - Math.toRadians(deployMotor.encoder.position)
+        }
     //@TODO Setter
 
     val tab = Shuffleboard.getTab("Intake")
@@ -121,22 +132,33 @@ class Intake(
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
 
-    fun getVoltage(): Double {
-        return modeMotor.busVoltage
-    }
+    val voltage: Double
+        get() = cubeArmMotor.busVoltage
 
     private var intakeSetpoint: Double? = null
 
-    fun setIntakePosition(position: Double) {
-        intakeSetpoint = position.coerceIn(
-            intake.minAngle,
-            intake.maxAngle
-        )
-    }
+    private var intakePositionSetpoint: Double
+        get() = intakeSetpoint ?: intakePosition
+        set(value) {
+            intakeSetpoint = value.coerceIn(
+                intake.minAngle,
+                intake.maxAngle
+            )
+        }
 
-    val intakePosition: Double
-        get() = if (RobotBase.isSimulation()) basePID.setpoint.position//simArmSystem.angleRads
-        else Math.toRadians(systemEncoder.absolutePosition)
+    private var deployOffset = 0.0
+    var deployPosition: Double
+        get() = rotationsToRadians(deployMotor.encoder.position) + deployOffset
+        set(value) {
+            intakeOffset = value - rotationsToRadians(deployMotor.encoder.position)
+        }
+
+    private var intakeOffset = 0.0
+    var intakePosition: Double
+        get() = rotationsToRadians(objectEngagementAlternateEncoder.position) + intakeOffset
+        set(value) {
+            intakeOffset = value - rotationsToRadians(objectEngagementAlternateEncoder.position)
+        }
 
     override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
