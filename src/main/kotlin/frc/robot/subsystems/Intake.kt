@@ -89,6 +89,7 @@ class Intake(
             intake.deployMotor.maxAcceleration
         )
     ).apply {
+        enableContinuousInput(0.0, 1.0)
         setTolerance(
             intake.deployMotor.positionTolerance,
             intake.deployMotor.velocityTolerance

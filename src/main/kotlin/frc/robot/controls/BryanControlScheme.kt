@@ -24,8 +24,4 @@ class BryanControlScheme(
     //    override val stopIntake = xbox.povUp()
     override val throwObject: Trigger = xbox.rightBumper()
 
-    override val selectGridDown: Trigger = xbox.povDown()
-    override val selectGridUp: Trigger = xbox.povUp()
-    override val selectGridLeft: Trigger = xbox.povLeft()
-    override val selectGridRight: Trigger = xbox.povRight()
 }
