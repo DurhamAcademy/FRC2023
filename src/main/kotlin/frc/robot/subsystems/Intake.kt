@@ -32,8 +32,8 @@ class Intake(
         idleMode = CANSparkMax.IdleMode.kBrake
     }
 
-    private val baseMotor = CANSparkMax(
-        intake.baseMotor.id,
+    private val deployMotor = CANSparkMax(
+        intake.deployMotor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
         setSmartCurrentLimit(intake.systemMotorLimit) // add current limit to limit the torque
@@ -57,41 +57,41 @@ class Intake(
             modeMotor.set(value)
         }
     var systemMotorPercentage: Double
-        get() = baseMotor.get()
+        get() = deployMotor.get()
         set(value) {
-            baseMotor.set(value)
+            deployMotor.set(value)
         }
     val limitSwitch = DigitalInput(
         intake.limitSwitch.intakeLimitSwitch
     )
 
     val basePID = ProfiledPIDController(
-        intake.baseMotor.kP,
-        intake.baseMotor.kI,
-        intake.baseMotor.kD,
+        intake.deployMotor.kP,
+        intake.deployMotor.kI,
+        intake.deployMotor.kD,
         TrapezoidProfile.Constraints(
-            intake.baseMotor.maxVelocity,
-            intake.baseMotor.maxAcceleration
+            intake.deployMotor.maxVelocity,
+            intake.deployMotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.baseMotor.positionTolerance,
-            intake.baseMotor.velocityTolerance
+            intake.deployMotor.positionTolerance,
+            intake.deployMotor.velocityTolerance
         )
     }
 
     val modePID = ProfiledPIDController(
-        intake.baseMotor.kP,
-        intake.baseMotor.kI,
-        intake.baseMotor.kD,
+        intake.deployMotor.kP,
+        intake.deployMotor.kI,
+        intake.deployMotor.kD,
         TrapezoidProfile.Constraints(
-            intake.baseMotor.maxVelocity,
-            intake.baseMotor.maxAcceleration
+            intake.deployMotor.maxVelocity,
+            intake.deployMotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.baseMotor.positionTolerance,
-            intake.baseMotor.velocityTolerance
+            intake.deployMotor.positionTolerance,
+            intake.deployMotor.velocityTolerance
         )
     }
 
@@ -140,7 +140,7 @@ class Intake(
     override fun periodic() {
         driveMotorCurrent.setDouble(driveMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
-        systemMotorCurrent.setDouble(baseMotor.outputCurrent)
+        systemMotorCurrent.setDouble(deployMotor.outputCurrent)
 
         val calculate = basePID.calculate(
             intakePosition,
