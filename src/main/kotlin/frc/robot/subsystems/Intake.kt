@@ -143,12 +143,16 @@ class Intake(
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
         systemMotorCurrent.setDouble(deployMotor.outputCurrent)
 
-        val calculate = basePID.calculate(
+        val calculatea = basePID.calculate(
             intakePosition,
             intakeSetpoint ?: intakePosition
         )
-        if (arm.armPosition > 0.15) (
-            setIntakePosition(0.0) //Kanishk fix pls
+        deployMotor.set(calculatea)
+        if (arm.armPosition > 0.15)
+            deployMotor.set(0.0)
+        val calculate = basePID.calculate(
+            intakePosition,
+            intakeSetpoint ?: intakePosition
         )
     }
 
@@ -156,13 +160,6 @@ class Intake(
         intakePercentage = percentage
     }
 
-        val calculate = basePID.calculate(
-            intakePosition,
-            intakeSetpoint ?: intakePosition
-        )
-        if (arm.armPosition > 0.15) (
-            setIntakePosition(0.0) //Kanishk fix pls
-        )
     fun setCubeArmAngle(angle: Double) {
         intakePositionSetpoint = angle
     }
