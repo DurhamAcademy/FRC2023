@@ -12,11 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.GenericHID
-import edu.wpi.first.wpilibj.PowerDistribution
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType.kRev
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
-import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -31,6 +28,7 @@ import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
+import frc.robot.commands.intake.DeployIntake
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
@@ -38,7 +36,6 @@ import frc.robot.commands.pathing.*
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
-import frc.robot.constants.PDH
 import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
 import frc.robot.controls.ChrisControlScheme
@@ -68,9 +65,9 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val elevator = Elevator(this@RobotContainer, arm)
+    val intake = Intake(arm)
+    val elevator = Elevator(this@RobotContainer, arm, this.intake)
 
-    val pdh = PowerDistribution(PDH.id, kRev)
 
     init {
         arrayOf(controlScheme0, controlScheme1).forEachIndexed { i, it ->
@@ -288,6 +285,9 @@ class RobotContainer {
 
                 lockSwerveModulesCircle
                     .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
+
+                intakeGroundIntake
+                    .whileTrue(DeployIntake(intake, this@RobotContainer))
             }
         }
     }
@@ -491,15 +491,9 @@ class RobotContainer {
         addOption("Place Cone Only (Backup)", OnlyPlaceConeAuto(this@RobotContainer))
     }
 
-    val field2dwidget = Field2d()
-
     // shuffleboard auto chooser
     val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
     val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
-
-    val armVisual = Field2d()
-    val armLine = armVisual.getObject("arm")
-    val elevatorLine = armVisual.getObject("elevator")
 
     val armFieldPosition = drivetrain.field2d.getObject("arm")
 

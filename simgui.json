@@ -1,58 +1,46 @@
 {
   "HALProvider": {
-    "Addressable LEDs": {
-      "0": {
-        "columns": 59,
-        "serpentine": true
-      },
-      "window": {
-        "visible": true
-      }
-    },
     "Other Devices": {
       "DutyCycleEncoder[2]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "DutyCycleEncoder[3]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "DutyCycleEncoder[6]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "DutyCycleEncoder[7]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "DutyCycleEncoder[8]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "DutyCycleEncoder[9]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "Pigeon 2[0]": {
         "header": {
-          "open": true
+          "open": false
         }
-      },
-      "window": {
-        "visible": false
       }
     },
     "PowerDistributions": {
       "1": {
         "PowerDistribution[1]": {
-          "open": true
+          "open": false
         }
       }
     }
@@ -62,11 +50,7 @@
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/SwerveModule": "Subsystem",
       "/LiveWindow/Ungrouped/DigitalInput[0]": "Digital Input",
-      "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
-      "/LiveWindow/Ungrouped/PIDController[108]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[109]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[110]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
@@ -106,49 +90,12 @@
       "/LiveWindow/Ungrouped/PIDController[44]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[45]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[46]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[47]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[48]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[49]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[50]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[51]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[52]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[53]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[54]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[55]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[56]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[57]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[58]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[59]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[60]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[61]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[62]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[63]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[64]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[65]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[66]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[67]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[68]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[69]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[70]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[71]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[72]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[73]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[74]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[75]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[76]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[84]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[85]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[86]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[96]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[97]": "PIDController",
-      "/LiveWindow/Ungrouped/PIDController[98]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
-      "/LiveWindow/Ungrouped/Pigeon 2 [0]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/LiveWindow/Ungrouped/Talon FX [10]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX [11]": "Motor Controller",
@@ -162,14 +109,9 @@
       "/Shuffleboard/Autonomous/Autonomous": "String Chooser",
       "/SmartDashboard/Arm/sendable": "Subsystem",
       "/SmartDashboard/Drivetrain/sendable": "Subsystem",
-      "/SmartDashboard/Elevator/sendable": "Subsystem",
-      "/SmartDashboard/FIELD": "Field2d",
       "/SmartDashboard/Manipulator/sendable": "Subsystem",
-      "/SmartDashboard/arm visual": "Field2d",
       "/SmartDashboard/elevator/sendable": "Subsystem",
-      "/SmartDashboard/elevcmd": "Subsystem",
       "/SmartDashboard/field": "Field2d",
-      "/SmartDashboard/huh?": "Command",
       "/SmartDashboard/huhhh": "Subsystem"
     },
     "windows": {
@@ -180,40 +122,13 @@
       },
       "/SmartDashboard/arm visual": {
         "arm": {
-          "style": "Line"
+          "style": ""
         },
         "elevator": {
-          "style": "Line"
-        },
-        "window": {
-          "visible": true
+          "style": ""
         }
       },
       "/SmartDashboard/field": {
-        "MoveToPosition": {
-          "arrowSize": 22,
-          "arrowWeight": 1.0,
-          "style": "Box/Image",
-          "weight": 1.0
-        },
-        "Robot": {
-          "arrowSize": 75,
-          "arrowWeight": 1.0,
-          "weight": 1.0
-        },
-        "arm": {
-          "arrowColor": [
-            0.7212496995925903,
-            0.8382352590560913,
-            0.34104669094085693,
-            255.0
-          ],
-          "arrowSize": 100,
-          "arrowWeight": 0.10000000149011612,
-          "length": 0.10000000149011612,
-          "style": "Hidden",
-          "width": 0.10000000149011612
-        },
         "bottom": 544,
         "height": 8.013679504394531,
         "image": "/Users/24wilber/Documents/Code/FRC2023/field/2023-field.png",
@@ -230,163 +145,91 @@
   "NetworkTables": {
     "Shuffleboard": {
       "Arm": {
-        "open": true
+        "open": false
       }
     },
     "SmartDashboard": {
       "Arm": {
-        "open": true
+        "open": false
       },
       "arm": {
-        "open": true
+        "open": false
       },
       "drivetrain": {
-        "open": true
+        "open": false
       },
       "elevator": {
-        "open": true
+        "open": false
       },
       "field": {
-        "open": true
+        "open": false
       },
-      "open": true
+      "open": false
     },
-    "combined": true,
-    "createNonCanonical": true,
     "photonvision": {
       "OV9281": {
-        "open": true
+        "open": false
       }
     },
-    "precision": 4,
-    "properties": true,
+    "precision": 0,
     "retained": {
       "$sub$": {
         "FMSInfo": {
           "[...]##v_$sub$/FMSInfo/StationNumber": {
             "{...}##v_[0]": {
               "{...}##v_options": {
-                "open": true
+                "open": false
               }
             },
             "{...}##v_[2]": {
               "{...}##v_options": {
-                "open": true
+                "open": false
               }
             },
             "{...}##v_[3]": {
               "{...}##v_options": {
-                "open": true
+                "open": false
               }
             }
           }
         },
         "LiveWindow": {
-          "open": true
+          "open": false
         },
         "Shuffleboard": {
-          "open": true
+          "open": false
         },
         "SmartDashboard": {
-          "open": true
+          "open": false
         },
-        "open": true
+        "open": false
       }
     },
-    "serverTimestamp": true,
-    "special": true,
-    "timestamp": true,
     "transitory": {
-      "FMSInfo": {
-        "open": true
-      },
       "LiveWindow": {
         ".status": {
-          "open": true
-        },
-        "open": true
+          "open": false
+        }
       },
       "Shuffleboard": {
         ".metadata": {
-          "open": true
+          "open": false
         },
         ".recording": {
-          "open": true
-        },
-        "open": true
-      },
-      "SmartDashboard": {
-        "open": true
+          "open": false
+        }
       }
     }
   },
   "NetworkTables Info": {
     "Clients": {
-      "open": true
+      "open": false
     },
     "Connections": {
-      "open": true
+      "open": false
     },
     "Server": {
-      "open": true
-    }
-  },
-  "NetworkTables View": {
-    "visible": false
-  },
-  "Plot": {
-    "Plot <0>": {
-      "plots": [
-        {
-          "axis": [
-            {
-              "autoFit": true
-            }
-          ],
-          "height": -43,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/elevator Height"
-            },
-            {
-              "color": [
-                0.7686275243759155,
-                0.30588236451148987,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/elevator Setpoint"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/arm/POS"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/arm/SP"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
+      "open": false
     }
   }
 }

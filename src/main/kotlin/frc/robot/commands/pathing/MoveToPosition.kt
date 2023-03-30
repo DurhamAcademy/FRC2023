@@ -100,7 +100,7 @@ open class MoveToPosition(
 //    val speedr = drivetrain.Idrc.add("speedr1${Random.nextDouble()}", 0.0)
 //        .entry
 
-    val xPIDController = ProfiledPIDController(
+    private val xPIDController = ProfiledPIDController(
         Companion.xP, 0.0, 0.05, TrapezoidProfile.Constraints(
             maxPosSpeed,
             max(10.0, drivetrainConstants.maxAcceleration)
@@ -109,7 +109,7 @@ open class MoveToPosition(
         it.reset(drivetrain.estimatedPose2d.translation.x, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
-    val yPIDController = ProfiledPIDController(
+    private val yPIDController = ProfiledPIDController(
         Companion.yP, 0.0, 0.05, TrapezoidProfile.Constraints(
             maxPosSpeed,
             max(10.0, drivetrainConstants.maxAcceleration)
@@ -118,7 +118,7 @@ open class MoveToPosition(
         it.reset(drivetrain.estimatedPose2d.translation.y, 0.0)
         it.setTolerance(toleranceppos, tolerancepvel)
     }
-    val rPIDController = ProfiledPIDController(
+    private val rPIDController = ProfiledPIDController(
         Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
             maxRotSpeed, max(PI, drivetrainConstants.maxAngularAcceleration)
         )

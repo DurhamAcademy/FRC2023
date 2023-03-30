@@ -15,7 +15,6 @@ class BryanControlScheme(
     override val spinIntakeOut = xbox.rightBumper()
 
     override val idleConfiguration = xbox.x()
-    override val placeLvl1 = xbox.a()
     override val placeLvl2 = xbox.b()
     override val placeLvl3 = xbox.y()
 
@@ -23,9 +22,6 @@ class BryanControlScheme(
 
     //    override val stopIntake = xbox.povUp()
     override val throwObject: Trigger = xbox.rightBumper()
+    override val intakeGroundIntake = xbox.a()
 
-    override val selectGridDown: Trigger = xbox.povDown()
-    override val selectGridUp: Trigger = xbox.povUp()
-    override val selectGridLeft: Trigger = xbox.povLeft()
-    override val selectGridRight: Trigger = xbox.povRight()
 }
