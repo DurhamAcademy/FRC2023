@@ -19,20 +19,24 @@ class DeployIntake(
 
     override fun execute(){
         when (GamePiece.cone) {
+            //SWAPPED
             GamePiece.cone -> {
-                intake.setDeployAngle(PI * 2 - 1.4)
-                intake.setModeAngle(0.0)
+                intake.modeVoltage = -3.0
+                intake.setDeployAngle(PI * 2 - 1.047)
+                intake.setModeAngle(1.95)
+
             }
             GamePiece.cube -> {
-                intake.setDeployAngle(PI * 2 - 1.047)
-                intake.setModeAngle(2.45)
+                intake.modeVoltage = -3.0
+                intake.setDeployAngle(PI * 2 - 1.4)
+                intake.setModeAngle(0.0)
             }
             else -> {
                 intake.setDeployAngle(PI * 2 - 1.047)
                 intake.setModeAngle(2.45)
             }
         }
-        intake.intakePercentage = -0.5
+        intake.intakePercentage = -1.0
 
     }
 
