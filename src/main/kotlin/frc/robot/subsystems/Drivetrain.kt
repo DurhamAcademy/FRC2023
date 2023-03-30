@@ -32,7 +32,7 @@ class Drivetrain(
 ) : SubsystemBase() {
 
     init {
-        defaultCommand = DriverCommand(this, controlScheme)
+        defaultCommand = DriverCommand(this, controlScheme, { robotContainer.rotateTo180 })
     }
 
     private val swerveTab = getTab("Swerve Diagnostics")
