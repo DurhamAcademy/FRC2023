@@ -2,6 +2,7 @@ package frc.robot.commands.intake
 
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Intake
+import kotlin.math.PI
 
 class IdleIntake (
     private val intake: Intake,
@@ -12,12 +13,10 @@ class IdleIntake (
     }
 
     override fun execute() {
-        intake.setDeployAngle(0.0)
+        intake.setDeployAngle(0.3)
         intake.setModeAngle(0.0)
     }
 
-    override fun isFinished() =
-        intake.deployPID.atGoal() &&
-        intake.modePID.atGoal()
+    override fun isFinished() = false
 }
 

@@ -6,42 +6,38 @@ import frc.robot.RobotContainer
 import frc.robot.constants.intake
 import frc.robot.subsystems.Intake
 import frc.robot.utils.GamePiece
+import kotlin.math.PI
 
 class DeployIntake(
-    intake: Intake,
-    states: IntakeStates,
-    intakePercentage: Double,
+    val intake: Intake,
     val robotContainer: RobotContainer
-) : SetIntakePosition(
-    intake,
-    states.deployAngle,
-    states.cubeArmAngle,
-    intakePercentage
-) {
+): CommandBase() {
 
-    fun init(){
+    init{
         addRequirements(intake)
     }
 
     override fun execute(){
-        intake.setDeployAngle(deployAngle)
-        when (robotContainer.wantedObject) {
+        when (GamePiece.cone) {
             GamePiece.cone -> {
+                intake.setDeployAngle(PI * 2 - 1.4)
                 intake.setModeAngle(0.0)
             }
             GamePiece.cube -> {
-                intake.setModeAngle(2.88)
+                intake.setDeployAngle(PI * 2 - 1.047)
+                intake.setModeAngle(2.45)
             }
             else -> {
-                intake.setModeAngle(0.0)
+                intake.setDeployAngle(PI * 2 - 1.047)
+                intake.setModeAngle(2.45)
             }
         }
-        intake.intakePercentage = 0.5
+        intake.intakePercentage = -0.5
 
     }
 
     override fun end(interrupted: Boolean){
-
+        intake.intakePercentage = 0.0
     }
 
 }

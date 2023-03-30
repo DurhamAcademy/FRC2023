@@ -15,6 +15,7 @@ class ZeroModeMotor(private val intake: Intake): CommandBase() {
     override fun initialize() {
         timer.restart()
         intake.modeZeroed = false
+        intake.setDeployAngle(0.0)
     }
     override fun execute() {
         intake.modeVoltage = -3.0

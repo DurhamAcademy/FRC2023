@@ -146,7 +146,7 @@ class Intake(
         driveMotorCurrent.setDouble(intakeMotor.outputCurrent)
         modeMotorCurrent.setDouble(modeMotor.outputCurrent)
         systemMotorCurrent.setDouble(deployMotor.outputCurrent)
-        SmartDashboard.putNumber("intake_pos", deployEncoder.position)
+        SmartDashboard.putNumber("intake_pos", deployPosition)
         SmartDashboard.putNumber("mode_pos", modePosition)
 
         val deployVoltage = deployPID.calculate(
@@ -167,6 +167,6 @@ class Intake(
     }
 
     fun setDeployAngle(angle: Double) {
-        modePositionSetpoint = angle
+        deployPositionSetpoint = angle
     }
 }
