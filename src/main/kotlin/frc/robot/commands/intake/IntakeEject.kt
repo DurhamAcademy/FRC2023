@@ -7,7 +7,7 @@ import kotlin.math.PI
 
 class IntakeEject(
     val intake: Intake,
-    val robotContainer: RobotContainer
+    val robotContainer: RobotContainer,
 ) : CommandBase(){
 
     override fun execute(){

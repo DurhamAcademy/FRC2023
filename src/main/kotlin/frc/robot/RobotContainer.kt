@@ -67,7 +67,7 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val intake = Intake(arm)
+    val intake = Intake(arm, { wantedObject })
     val elevator = Elevator(this@RobotContainer, arm, this.intake)
 
 
@@ -299,7 +299,7 @@ class RobotContainer {
                     .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
 
                 intakeGroundIntake
-                    .whileTrue(DeployIntake(intake, this@RobotContainer))
+                    .whileTrue(DeployIntake(intake, this@RobotContainer, { wantedObject }))
 
                 intakeEject
                     .whileTrue(IntakeEject(intake, this@RobotContainer))

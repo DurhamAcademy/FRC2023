@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type.kDutyCycle
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.math.util.Units
 import edu.wpi.first.math.util.Units.rotationsToRadians
 import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -14,14 +13,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.commands.intake.IdleIntake
 import frc.robot.constants.intake
+import frc.robot.utils.GamePiece
 import kotlin.math.PI
 
 class Intake(
     var arm: Arm,
+    val wantedObject: () -> GamePiece
 ) : SubsystemBase() {
 
     init{
-        defaultCommand = IdleIntake(this)
+        defaultCommand = IdleIntake(this, wantedObject)
     }
 
     private val intakeMotor = CANSparkMax(
@@ -96,13 +97,13 @@ class Intake(
         intake.modeMotor.kI,
         intake.modeMotor.kD,
         TrapezoidProfile.Constraints(
-            intake.deployMotor.maxVelocity,
-            intake.deployMotor.maxAcceleration
+            intake.modeMotor.maxVelocity,
+            intake.modeMotor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            intake.deployMotor.positionTolerance,
-            intake.deployMotor.velocityTolerance
+            intake.modeMotor.positionTolerance,
+            intake.modeMotor.velocityTolerance
         )
     }
 
