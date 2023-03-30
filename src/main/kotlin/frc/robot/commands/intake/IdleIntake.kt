@@ -27,11 +27,11 @@ class IdleIntake (
 
     override fun initialize() {
         intake.setDeployAngle(0.0)
-        intake.setCubeArmAngle(0.0)
+        intake.setModeAngle(0.0)
     }
 
     override fun isFinished() =
         intake.deployPID.atGoal() &&
-        intake.cubeArmPID.atGoal()
+        intake.modePID.atGoal()
 }
 

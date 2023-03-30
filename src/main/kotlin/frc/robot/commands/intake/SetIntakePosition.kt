@@ -32,11 +32,11 @@ open class SetIntakePosition(
 
     override fun initialize() {
         intake.setDeployAngle(deployAngle)
-        intake.setCubeArmAngle(cubeArmAngle)
+        intake.setModeAngle(cubeArmAngle)
         intake.intakePercentage = intakePercentage
     }
 
     override fun isFinished() =
         intake.deployPID.atGoal() &&
-        intake.cubeArmPID.atGoal()
+        intake.modePID.atGoal()
 }

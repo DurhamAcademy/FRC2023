@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.kyberlib.command.Game
 import frc.kyberlib.math.units.extensions.seconds
 import frc.robot.commands.drivetrain.DriveCommand
+import frc.robot.commands.intake.ZeroModeMotor
+import frc.robot.constants.intake
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -48,5 +50,9 @@ class Robot : TimedRobot() {
 
     override fun autonomousExit() {
         auto?.cancel()
+    }
+
+    override fun disabledExit() {
+        ZeroModeMotor(robotContainer.intake).schedule()
     }
 }

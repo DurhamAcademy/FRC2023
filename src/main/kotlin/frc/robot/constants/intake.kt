@@ -10,7 +10,7 @@ object intake {
     const val systemMotorLimit = 0
 
     const val modeMotorId = 50
-    const val modeMotorLimit = 0
+    const val modeMotorLimit = 20
 
     const val maxAngle = 0.0
     const val minAngle = 0.0
@@ -22,10 +22,9 @@ object deployMotor {
     const val velocityTolerance = 0.0
     const val id = 49
     const val inverted = true
-    const val gearRatio = 1 / 2
     const val maxVelocity = 1.0
     const val maxAcceleration = 1.0
-    const val kP = 1.0
+    const val kP = 4.0
     const val kI = 0.0
     const val kD = 0.0
 
@@ -42,10 +41,10 @@ object deployMotor {
         const val velocityTolerance = 0.0
         const val id = 0
         const val inverted = true
-        const val gearRatio = 1 / 120
+        const val gearRatio = 1 / 30
         const val maxVelocity = 1.0
         const val maxAcceleration = 1.0
-        const val kP = 1.05
+        const val kP = 3.05
         const val kI = 0.0
         const val kD = 0.0
 
