@@ -1,31 +1,17 @@
 package frc.robot.commands.intake
 
+import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Intake
 
 class IdleIntake (
-    intake: Intake,
-    states: IntakeStates,
-    intakePercentage: Double
-) : SetIntakePosition(
-    intake,
-    states.deployAngle,
-    states.cubeArmAngle,
-    intakePercentage
-) {
-    constructor(
-        intake: Intake,
-        states: IntakeStates
-    ) : this(
-        intake,
-        states,
-        0.0
-    )
+    private val intake: Intake,
+) : CommandBase() {
 
-    fun init(){
+    init{
         addRequirements(intake)
     }
 
-    override fun initialize() {
+    override fun execute() {
         intake.setDeployAngle(0.0)
         intake.setModeAngle(0.0)
     }

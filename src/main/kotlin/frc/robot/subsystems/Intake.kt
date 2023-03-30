@@ -12,12 +12,17 @@ import edu.wpi.first.wpilibj.DigitalInput
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.robot.commands.intake.IdleIntake
 import frc.robot.constants.intake
 import kotlin.math.PI
 
 class Intake(
     var arm: Arm,
 ) : SubsystemBase() {
+
+    init{
+        defaultCommand = IdleIntake(this)
+    }
 
     private val intakeMotor = CANSparkMax(
         intake.driveMotorId,
@@ -64,7 +69,7 @@ class Intake(
     var intakePercentage: Double
         get() = intakeMotor.get()
         set(value) {
-            deployMotor.set(value)
+            intakeMotor.set(value)
         }
     val limitSwitch = DigitalInput(
         intake.limitSwitch.intakeLimitSwitch

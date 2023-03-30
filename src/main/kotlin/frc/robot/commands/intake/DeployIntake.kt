@@ -1,24 +1,47 @@
 package frc.robot.commands.intake
 
+import edu.wpi.first.wpilibj2.command.CommandBase
+import frc.kyberlib.command.Game
+import frc.robot.RobotContainer
+import frc.robot.constants.intake
 import frc.robot.subsystems.Intake
 import frc.robot.utils.GamePiece
 
 class DeployIntake(
     intake: Intake,
-    gamePiece: GamePiece,
-    intakePercentage: Double
+    states: IntakeStates,
+    intakePercentage: Double,
+    val robotContainer: RobotContainer
 ) : SetIntakePosition(
     intake,
-    gamePiece.deployAngle,
-    gamePiece.cubeArmAngle,
+    states.deployAngle,
+    states.cubeArmAngle,
     intakePercentage
 ) {
-    constructor(
-        intake: Intake,
-        gamePiece: GamePiece
-    ) : this(
-        intake,
-        gamePiece,
-        0.0
-    )
+
+    fun init(){
+        addRequirements(intake)
+    }
+
+    override fun execute(){
+        intake.setDeployAngle(deployAngle)
+        when (robotContainer.wantedObject) {
+            GamePiece.cone -> {
+                intake.setModeAngle(0.0)
+            }
+            GamePiece.cube -> {
+                intake.setModeAngle(2.88)
+            }
+            else -> {
+                intake.setModeAngle(0.0)
+            }
+        }
+        intake.intakePercentage = 0.5
+
+    }
+
+    override fun end(interrupted: Boolean){
+
+    }
+
 }

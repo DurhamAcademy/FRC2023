@@ -12,7 +12,7 @@ open class SetIntakePosition(
     /** cube arm angle in radians */
     val cubeArmAngle: Double,
     /** intake speed in percent */
-    val intakePercentage: Double
+    val intakePercentage: Double,
 ) : CommandBase() {
     constructor(
         robotContainer: RobotContainer,

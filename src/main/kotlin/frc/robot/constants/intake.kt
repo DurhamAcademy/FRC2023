@@ -1,7 +1,6 @@
 package frc.robot.constants
 
 import edu.wpi.first.math.util.Units
-
 object intake {
     const val driveMotorId = 48
     const val driveMotorLimit = 0
