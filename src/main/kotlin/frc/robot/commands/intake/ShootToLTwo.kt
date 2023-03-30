@@ -16,6 +16,7 @@ class ShootToLTwo(
     }
 
     override fun execute(){
+        intake.setDeployAngle(1.0)
         intake.intakePercentage = 0.8
 
     }
