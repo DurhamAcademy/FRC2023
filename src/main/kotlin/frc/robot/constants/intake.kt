@@ -21,11 +21,11 @@ object deployMotor {
     const val velocityTolerance = 0.0
     const val id = 49
     const val inverted = true
-    const val maxVelocity = 3.0
-    const val maxAcceleration = 2.0
+    const val maxVelocity = 12.0
+    const val maxAcceleration = 18.0
     const val kP = 4.0
     const val kI = 0.0
-    const val kD = 0.0
+    const val kD = 0.01
 
     const val kS = 0.0
     const val kG = 0.0
@@ -41,11 +41,11 @@ object deployMotor {
         const val id = 0
         const val inverted = true
         const val gearRatio = 1 / 30
-        const val maxVelocity = 3.0
-        const val maxAcceleration = 1.0
+        const val maxVelocity = 16.0
+        const val maxAcceleration = 32.0
         const val kP = 3.05
         const val kI = 0.0
-        const val kD = 0.0
+        const val kD = 0.01
 
         const val kS = 0.0
         const val kG = 0.0

@@ -17,7 +17,7 @@ class PhotonCameraWrapper {
     var validPoseCount = 0UL
 
     val canTrustPose: Boolean
-        get() = validPoseCount > 100UL
+        get() = validPoseCount.toDouble() > 100UL.toDouble()
 
     val percentage: Double
         get() = validPoseCount.toDouble() / 100.0

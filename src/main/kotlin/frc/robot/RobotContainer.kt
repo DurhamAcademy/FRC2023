@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -30,6 +31,7 @@ import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.intake.DeployIntake
+import frc.robot.commands.intake.IdleIntake
 import frc.robot.commands.intake.IntakeEject
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -48,6 +50,7 @@ import frc.robot.utils.GamePiece.*
 import frc.robot.utils.Slider
 import java.awt.Color
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.cos
 import kotlin.math.sin
 import edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance as commandSchedulerInstance
@@ -67,7 +70,7 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val intake = Intake(arm)
+    val intake = Intake(arm, { wantedObject })
     val elevator = Elevator(this@RobotContainer, arm, this.intake)
 
 
@@ -213,6 +216,16 @@ class RobotContainer {
 //                                )
 //                            )
                     )
+
+                ledColor
+                    .onTrue(InstantCommand({
+                        wantedObject = when (wantedObject) {
+                            cone -> cube
+                            cube -> cone
+                            else -> cone
+                        }
+                    }))
+
                 alignClosestHPS
                     .whileTrue(
                         goToHumanPlayerStation(
@@ -289,7 +302,7 @@ class RobotContainer {
                     .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
 
                 intakeGroundIntake
-                    .whileTrue(DeployIntake(intake, this@RobotContainer))
+                    .whileTrue(DeployIntake(intake, this@RobotContainer, { wantedObject }))
 
                 intakeEject
                     .whileTrue(IntakeEject(intake, this@RobotContainer))
@@ -345,10 +358,10 @@ class RobotContainer {
     var fullAuto = false
     var fullAutoObject: GamePiece = none
 
-    val wantedObject: GamePiece
+    var wantedObject: GamePiece = none
         get() =
             if (fullAuto) fullAutoObject
-            else smartDashboardSelector.placementSide.asObject
+            else field
 
     val leds = KLEDStrip(9, count).apply {
         val coral = Color(255, 93, 115)
@@ -449,7 +462,7 @@ class RobotContainer {
             return@AnimationCustom List<Color>(len) { i ->
                 if (i >= index) color else Color.black
             }
-        }, { !drivetrain.canTrustPose && lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue })
+        }, { false && !drivetrain.canTrustPose && (lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue) })
 
 
         val body = KLEDRegion(
@@ -474,8 +487,21 @@ class RobotContainer {
                 elevator.motorPid.reset(elevator.height)
             })
                 .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
-                .andThen(Commands.waitUntil { arm.armPosition > -3 * PI / 4 }) // move the arm to horizontal
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)))
+                .andThen(
+                    Commands.waitUntil { arm.armPosition > -3 * PI / 4 }
+                ) // move the arm to horizontal\
+                .andThen(Commands.run({
+                    intake.setDeployAngle(0.0)
+                    intake.setModeAngle(0.0)
+                    intake.intakePercentage = 0.0
+                })
+                    .until {
+                        intake.deployPosition.absoluteValue < 0.1
+                    }
+                )
+                .andThen(IdleIntake(intake, { none }))
+                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true))
+                    )
 
 
             if (autoChooser.selected != null) {

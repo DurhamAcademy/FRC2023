@@ -3,10 +3,10 @@ package frc.robot.commands.intake
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.subsystems.Intake
 import frc.robot.utils.GamePiece
-import kotlin.math.PI
 
 class IdleIntake (
     private val intake: Intake,
+    val gamePiece: () -> GamePiece,
 ) : CommandBase() {
 
     init{
@@ -14,24 +14,28 @@ class IdleIntake (
     }
 
     override fun execute() {
-        when (GamePiece.cone) {
+        when (gamePiece()) {
             //SWAPPED
-            GamePiece.cone -> {
-                intake.intakePercentage = -0.1
+            GamePiece.cube -> {
+                intake.intakePercentage = -0.15
                 intake.modeVoltage = -3.0
                 intake.setDeployAngle(0.3)
-                intake.setModeAngle(2.0)
+                intake.setModeAngle(2.25)
 
             }
-            GamePiece.cube -> {
-                intake.intakePercentage = -0.1
+
+            GamePiece.cone -> {
+                intake.intakePercentage = -0.15
                 intake.modeVoltage = -3.0
                 intake.setDeployAngle(0.3)
-                intake.setModeAngle(0.0)
+                intake.setModeAngle(0.3)
             }
+
             else -> {
-                intake.setDeployAngle(PI * 2 - 1.047)
-                intake.setModeAngle(2.45)
+                intake.intakePercentage = -0.15
+                intake.modeVoltage = -3.0
+                intake.setDeployAngle(0.3)
+                intake.setModeAngle(0.3)
             }
         }
     }

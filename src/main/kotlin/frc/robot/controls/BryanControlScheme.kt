@@ -18,7 +18,7 @@ class BryanControlScheme(
     override val placeLvl2 = xbox.b()
     override val placeLvl3 = xbox.y()
 
-//    override val ledColor = xbox.povLeft()
+    override val ledColor = xbox.povLeft()
 
     //    override val stopIntake = xbox.povUp()
     override val throwObject: Trigger = xbox.rightBumper()
