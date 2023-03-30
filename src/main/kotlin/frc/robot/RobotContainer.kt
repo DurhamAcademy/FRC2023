@@ -30,6 +30,7 @@ import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.intake.DeployIntake
+import frc.robot.commands.intake.IdleIntake
 import frc.robot.commands.intake.IntakeEject
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -48,6 +49,7 @@ import frc.robot.utils.GamePiece.*
 import frc.robot.utils.Slider
 import java.awt.Color
 import kotlin.math.PI
+import kotlin.math.absoluteValue
 import kotlin.math.cos
 import kotlin.math.sin
 import edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance as commandSchedulerInstance
@@ -484,8 +486,21 @@ class RobotContainer {
                 elevator.motorPid.reset(elevator.height)
             })
                 .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
-                .andThen(Commands.waitUntil { arm.armPosition > -3 * PI / 4 }) // move the arm to horizontal
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)))
+                .andThen(
+                    Commands.waitUntil { arm.armPosition > -3 * PI / 4 }
+                ) // move the arm to horizontal\
+                .andThen(Commands.run({
+                    intake.setDeployAngle(0.0)
+                    intake.setModeAngle(0.0)
+                    intake.intakePercentage = 0.0
+                })
+                    .until {
+                        intake.deployPosition.absoluteValue < 0.1
+                    }
+                )
+                .andThen(IdleIntake(intake, { none }))
+                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true))
+                    )
 
 
             if (autoChooser.selected != null) {
