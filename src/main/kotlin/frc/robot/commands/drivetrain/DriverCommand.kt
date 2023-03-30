@@ -28,7 +28,7 @@ class DriverCommand(
     }
 
     override fun execute() {
-        val alianceMulitplier = when (Game.alliance) {
+        val allianceMulitplier = when (Game.alliance) {
             DriverStation.Alliance.Invalid -> 1.0
             else -> Game.alliance.xMul
         }
@@ -37,10 +37,10 @@ class DriverCommand(
         drivetrain.drive(
             ChassisSpeeds(
                 vec.x * Constants.powerPercent *
-                        alianceMulitplier * (if (drivetrain.invertx.getBoolean(false)) -1 else 1)
+                        allianceMulitplier * (if (drivetrain.invertx.getBoolean(false)) -1 else 1)
                         * controlScheme.speedMutiplier,
                 vec.y * Constants.powerPercent *
-                        alianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1)
+                        allianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1)
                         * controlScheme.speedMutiplier,
                 if(nearestStation()) {
                     rotationPid.calculate(drivetrain.estimatedPose2d.rotation.radians,

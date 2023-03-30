@@ -15,10 +15,6 @@ class ZeroElevatorAndIdle(
             addRequirements(arm)
     }
 
-    override fun initialize() {
-        println("Zeroing Elevator")
-    }
-
     override fun execute() {
         elevator.zeroElevator = true
         if (armZero)

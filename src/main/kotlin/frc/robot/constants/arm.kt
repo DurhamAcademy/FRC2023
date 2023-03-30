@@ -11,7 +11,7 @@ object arm {
         const val inverted = true
         const val gearRatio = 1 / 152.65
         const val maxVelocity = 2.0
-        const val maxAcceleration = 1.0
+        const val maxAcceleration = 1.2
         const val kP = 3.0
         const val kI = 0.0
         const val kD = 0.5
