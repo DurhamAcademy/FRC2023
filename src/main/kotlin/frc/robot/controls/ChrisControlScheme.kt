@@ -29,7 +29,7 @@ class ChrisControlScheme(
     override val alignClosestHPS: Trigger = xbox.b()
 
     override val decreaseEncoderAngle: Trigger = xbox.povLeft()
-    override val rotateTo180: Trigger = xbox.povUp()
     override val increaseEncoderAngle: Trigger = xbox.povRight()
     override val lockSwerveModulesCircle: Trigger = xbox.rightBumper()
+    override val rotateTo180: Trigger = xbox.rightTrigger()
 }
