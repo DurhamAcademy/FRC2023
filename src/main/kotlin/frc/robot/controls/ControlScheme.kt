@@ -59,4 +59,6 @@ abstract class ControlScheme {
     open val throwObject: Trigger = Trigger { false }
 
     open val lockSwerveModulesCircle: Trigger = Trigger { false }
+
+    open val rotateTo180: Trigger = Trigger { false }
 }

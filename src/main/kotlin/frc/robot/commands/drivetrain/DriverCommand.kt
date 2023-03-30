@@ -17,7 +17,7 @@ import kotlin.math.PI
 class DriverCommand(
     var drivetrain: Drivetrain,
     var controlScheme: ControlScheme,
-    var nearestStation: Boolean,
+    var nearestStation: () -> Boolean,
 ) : CommandBase() {
     private val rotationPid = ProfiledPIDController(1.0, 0.0, 0.0, TrapezoidProfile.Constraints(2*PI, 4*PI)).apply {
         enableContinuousInput(-PI, PI)
@@ -42,7 +42,7 @@ class DriverCommand(
                 vec.y * Constants.powerPercent *
                         alianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1)
                         * controlScheme.speedMutiplier,
-                if(nearestStation) {
+                if(nearestStation()) {
                     rotationPid.calculate(drivetrain.estimatedPose2d.rotation.radians,
                          Nearest180.findNearest180(drivetrain)
                     ) // desired radians

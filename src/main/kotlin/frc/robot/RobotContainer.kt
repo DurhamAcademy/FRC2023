@@ -30,6 +30,7 @@ import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
+import frc.robot.commands.drivetrain.rotateTo180
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
@@ -60,6 +61,7 @@ class RobotContainer {
     val smartDashboardSelector = DashboardSelector()
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
+    var rotateTo180 = false
 
     val drivetrain = Drivetrain(
         controlScheme0,
@@ -177,6 +179,11 @@ class RobotContainer {
                                 }
                             }
                         )
+                    )
+
+                rotateTo180
+                    .whileTrue(
+                        rotateTo180(this@RobotContainer)
                     )
 
                 selectGridUp
