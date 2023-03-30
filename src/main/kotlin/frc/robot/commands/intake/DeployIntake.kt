@@ -28,7 +28,7 @@ class DeployIntake(
             GamePiece.cone -> {
                 intake.modeVoltage = -3.0
                 intake.setDeployAngle(PI * 2 - 1.4)
-                intake.setModeAngle(0.3)
+                intake.setModeAngle(0.1)
             }
 
             else -> {

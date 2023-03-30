@@ -4,7 +4,6 @@ Wrap all auto commands (in robotcontainer) with timeout for 14.5 sec, lock wheel
 Lock wheels should require the drivetrain and stop movement so we don't try to move with wheels locked
 Make sure auto command gets canceled going into teleop and that wheels can unlock properly
  */
-import NoVisionAuto
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -30,7 +29,10 @@ import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
-import frc.robot.commands.intake.*
+import frc.robot.commands.intake.DeployIntake
+import frc.robot.commands.intake.IdleIntake
+import frc.robot.commands.intake.IntakeEject
+import frc.robot.commands.intake.ShootToLTwo
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
@@ -48,7 +50,6 @@ import frc.robot.utils.GamePiece.*
 import frc.robot.utils.Slider
 import java.awt.Color
 import kotlin.math.PI
-import kotlin.math.absoluteValue
 import kotlin.math.cos
 import kotlin.math.sin
 import edu.wpi.first.wpilibj2.command.CommandScheduler.getInstance as commandSchedulerInstance
@@ -479,33 +480,37 @@ class RobotContainer {
         )
         this += body
     }
-
+    var startedIntakePosition = intake.deployPosition
     val auto: Command
         get() {
-            var c = (Commands.runOnce({ // assume the elevator is starting from the top.
+            var c = Commands.runOnce({ // assume the elevator is starting from the top.
                 if (!elevator.hasLimitBeenPressed) {
                     println("RESET ELEVATOR")
                     elevator.height = frc.robot.constants.elevator.limits.topLimit
                 }
                 elevator.setpoint = frc.robot.constants.elevator.limits.topLimit
                 elevator.motorPid.reset(elevator.height)
-            })
-                .andThen(Commands.runOnce({ arm.setArmPosition(-PI / 2) }))
+                startedIntakePosition = intake.deployPosition
+            }, elevator)
                 .andThen(
-                    Commands.waitUntil { arm.armPosition > -3 * PI / 4 }
-                ) // move the arm to horizontal\
-                .andThen(Commands.run({
-                    intake.setDeployAngle(0.0)
-                    intake.setModeAngle(0.0)
-                    intake.intakePercentage = 0.0
-                })
-                    .until {
-                        intake.deployPosition.absoluteValue < 0.1
-                    }
+                    Commands.runOnce({ arm.setArmPosition(-PI / 2) }, arm)
+                        .andThen(
+                            Commands.waitUntil({ arm.armPosition > -2.75 * PI / 4 })
+                        )
+                        .deadlineWith(
+                            Commands.run({
+                                intake.setDeployAngle(startedIntakePosition)
+                                intake.setModeAngle(0.0)
+                                intake.intakePercentage = 0.0
+                            }, intake)
+                        )
+                    // move the arm to horizontal\
                 )
-                .andThen(IdleIntake(intake, { none }))
-                .andThen(SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true))
-                    )
+                .andThen(
+                    SetSubsystemPosition(elevator, arm, drivetrain, { IOLevel.Idle }, { wantedObject }, true)
+                        .andThen(ZeroElevatorAndIdle(elevator, arm, true))
+                        .deadlineWith(IdleIntake(intake) { none })
+                )
 
 
             if (autoChooser.selected != null) {

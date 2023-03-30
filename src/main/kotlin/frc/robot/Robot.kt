@@ -1,14 +1,9 @@
 package frc.robot
 
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.kyberlib.command.Game
-import frc.kyberlib.math.units.extensions.seconds
-import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.intake.ZeroModeMotor
-import frc.robot.constants.intake
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -18,7 +13,6 @@ import frc.robot.constants.intake
  * project.
  */
 class Robot : TimedRobot() {
-    @Suppress("unused")
     lateinit var robotContainer: RobotContainer
 
     override fun robotInit() {
@@ -38,9 +32,16 @@ class Robot : TimedRobot() {
 //        }
     }
 
+    override fun teleopInit() {
+        ZeroModeMotor(robotContainer.intake).schedule()
+    }
+
     var auto: Command? = null
+    var defaultCommandHolder: Command? = null
 
     override fun autonomousInit() {
+        defaultCommandHolder = robotContainer.intake.defaultCommand
+        robotContainer.intake.defaultCommand = null
         auto = robotContainer.auto
 //        auto = Commands.runOnce({ robotContainer.arm.setArmPosition(-PI /2) }) // move the arm to horizontal
 //                .andThen(Commands.waitUntil { robotContainer.arm.armPID.atGoal() })
@@ -50,9 +51,12 @@ class Robot : TimedRobot() {
 
     override fun autonomousExit() {
         auto?.cancel()
+
+        robotContainer.intake.defaultCommand = defaultCommandHolder
+        defaultCommandHolder = robotContainer.intake.defaultCommand
     }
 
     override fun disabledExit() {
-        ZeroModeMotor(robotContainer.intake).schedule()
+//        ZeroModeMotor(robotContainer.intake).schedule()
     }
 }
