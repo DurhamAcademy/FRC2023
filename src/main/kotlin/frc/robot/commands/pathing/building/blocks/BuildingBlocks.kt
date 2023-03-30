@@ -212,15 +212,15 @@ object BuildingBlocks {
                 if (drivetrain.estimatedPose2d.y < clearDown + .25 && (drivetrain.estimatedPose2d.x - (xCenter + (4.27 * -alliance().xMul))).absoluteValue < (robotLength / 2.0) + 0.25) {
                     xPID.setConstraints(
                         TrapezoidProfile.Constraints(
-                            0.2,
-                            drivetrainConstraints.maxAcceleration
+                            drivetrainConstraints.maxAutonomousVelocity,
+                            drivetrainConstraints.maxAutonomousAcceleration
                         )
                     )
                 } else {
                     xPID.setConstraints(
                         TrapezoidProfile.Constraints(
-                            10.0,
-                            drivetrainConstraints.maxAcceleration
+                            drivetrainConstraints.maxAutonomousVelocity,
+                            drivetrainConstraints.maxAutonomousAcceleration
                         )
                     )
                 }
@@ -363,15 +363,15 @@ object BuildingBlocks {
                 else if (arm.armPosition.absoluteValue > 0.5) {
                     rotPid.setConstraints(
                         TrapezoidProfile.Constraints(
-                            PI / 2,
-                            drivetrainConstraints.maxAngularAcceleration * 0.25
+                            drivetrainConstraints.maxAutonomousAngularVelocity,
+                            drivetrainConstraints.maxAutonomousAngularAcceleration
                         )
                     )
                 } else {
                     rotPid.setConstraints(
                         TrapezoidProfile.Constraints(
-                            PI / 2,
-                            drivetrainConstraints.maxAcceleration
+                            drivetrainConstraints.maxAutonomousAngularVelocity,
+                            drivetrainConstraints.maxAutonomousAcceleration
                         )
                     )
                 }

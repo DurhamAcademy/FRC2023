@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.kyberlib.command.Game
 import frc.kyberlib.lighting.KLEDRegion
 import frc.kyberlib.lighting.KLEDStrip
@@ -212,6 +213,16 @@ class RobotContainer {
 //                                )
 //                            )
                     )
+
+                ledColor
+                    .onTrue(InstantCommand({
+                        wantedObject = when (wantedObject) {
+                            cone -> cube
+                            cube -> cone
+                            else -> cone
+                        }
+                    }))
+
                 alignClosestHPS
                     .whileTrue(
                         goToHumanPlayerStation(
@@ -344,10 +355,10 @@ class RobotContainer {
     var fullAuto = false
     var fullAutoObject: GamePiece = none
 
-    val wantedObject: GamePiece
+    var wantedObject: GamePiece = none
         get() =
             if (fullAuto) fullAutoObject
-            else smartDashboardSelector.placementSide.asObject
+            else field
 
     val leds = KLEDStrip(9, count).apply {
         val coral = Color(255, 93, 115)
@@ -448,7 +459,7 @@ class RobotContainer {
             return@AnimationCustom List<Color>(len) { i ->
                 if (i >= index) color else Color.black
             }
-        }, { !drivetrain.canTrustPose && lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue })
+        }, { false && !drivetrain.canTrustPose && (lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue) })
 
 
         val body = KLEDRegion(
