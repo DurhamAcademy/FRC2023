@@ -25,4 +25,6 @@ class BryanControlScheme(
     override val intakeGroundIntake = xbox.povUp()
     override val intakeEject = xbox.a()
 
+    override val shootToLTwo: Trigger = xbox.back()
+    override val shootToLThree: Trigger = xbox.start()
 }

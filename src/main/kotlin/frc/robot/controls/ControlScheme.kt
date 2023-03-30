@@ -61,4 +61,6 @@ abstract class ControlScheme {
     open val lockSwerveModulesCircle: Trigger = Trigger { false }
     open val intakeGroundIntake: Trigger = Trigger { false }
     open val intakeEject: Trigger = Trigger { false }
+    open val shootToLTwo: Trigger = Trigger { false }
+    open val shootToLThree: Trigger = Trigger { false }
 }
