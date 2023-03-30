@@ -4,6 +4,7 @@ Wrap all auto commands (in robotcontainer) with timeout for 14.5 sec, lock wheel
 Lock wheels should require the drivetrain and stop movement so we don't try to move with wheels locked
 Make sure auto command gets canceled going into teleop and that wheels can unlock properly
  */
+import NoVisionAuto
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -493,6 +494,7 @@ class RobotContainer {
         addOption("Place And Balance", AutoPlaceAndBalance(this@RobotContainer))
         addOption("Place and Taxi farthest from judges", TaxiAndSomethingOrOther(this@RobotContainer))
         addOption("Place Cone Only (Backup)", OnlyPlaceConeAuto(this@RobotContainer))
+        addOption("No Vision Auto", NoVisionAuto(this@RobotContainer))
     }
 
     // shuffleboard auto chooser
