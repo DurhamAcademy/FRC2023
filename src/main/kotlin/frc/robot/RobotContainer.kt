@@ -29,6 +29,7 @@ import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.intake.DeployIntake
+import frc.robot.commands.intake.IntakeEject
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
@@ -288,6 +289,9 @@ class RobotContainer {
 
                 intakeGroundIntake
                     .whileTrue(DeployIntake(intake, this@RobotContainer))
+
+                intakeEject
+                    .whileTrue(IntakeEject(intake, this@RobotContainer))
             }
         }
     }
