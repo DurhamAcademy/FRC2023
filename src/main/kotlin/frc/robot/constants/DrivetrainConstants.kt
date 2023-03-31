@@ -2,7 +2,7 @@ package frc.robot.constants
 
 import kotlin.math.PI
 
-object drivetrain {
+object DrivetrainConstants {
     const val maxAcceleration = 48.0
     const val maxAngularAcceleration = 5.0 * 2 * PI
 

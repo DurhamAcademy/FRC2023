@@ -16,7 +16,7 @@ import kotlin.math.PI
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
 import kotlin.math.max
-import frc.robot.constants.drivetrain as drivetrainConstants
+import frc.robot.constants.DrivetrainConstants as drivetrainConstants
 
 val Pose2d.flipped: Pose2d
     get() = Pose2d(
@@ -51,8 +51,8 @@ open class MoveToPosition(
     private val tolerancerpos: Double = 0.01,
     private val tolerancervel: Double = 0.1,
     private val snapMode: Boolean = false,
-    private val maxPosSpeed: Double = 3.0,
-    private val maxRotSpeed: Double = PI / 2.0,
+    maxPosSpeed: Double = 3.0,
+    maxRotSpeed: Double = PI / 2.0,
 ) : CommandBase() {
     constructor(drivetrain: Drivetrain, x: Double = 0.0, y: Double = 0.0, angle: Double = 0.0, maxPosSpeed: Double = 3.0,
                 maxRotSpeed: Double = PI / 2.0,) : this(
@@ -100,7 +100,7 @@ open class MoveToPosition(
 //        .entry
 
     private val xPIDController = ProfiledPIDController(
-        Companion.xP, 0.0, 0.05, TrapezoidProfile.Constraints(
+        xP, 0.0, 0.05, TrapezoidProfile.Constraints(
             maxPosSpeed,
             max(drivetrainConstants.maxAutonomousVelocity, drivetrainConstants.maxAutonomousAcceleration)
         )
@@ -109,7 +109,7 @@ open class MoveToPosition(
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     private val yPIDController = ProfiledPIDController(
-        Companion.yP, 0.0, 0.05, TrapezoidProfile.Constraints(
+        yP, 0.0, 0.05, TrapezoidProfile.Constraints(
             maxPosSpeed,
             max(drivetrainConstants.maxAutonomousVelocity, drivetrainConstants.maxAutonomousAcceleration)
         )
@@ -118,7 +118,7 @@ open class MoveToPosition(
         it.setTolerance(toleranceppos, tolerancepvel)
     }
     private val rPIDController = ProfiledPIDController(
-        Companion.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
+        rP, 0.0, 0.0, TrapezoidProfile.Constraints(
             maxRotSpeed,
             max(drivetrainConstants.maxAutonomousAngularVelocity, drivetrainConstants.maxAutonomousAngularAcceleration)
         )

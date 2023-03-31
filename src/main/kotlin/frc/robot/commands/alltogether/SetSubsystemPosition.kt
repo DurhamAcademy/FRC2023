@@ -34,7 +34,7 @@ class SetSubsystemPosition(
 
     val topLimit = FieldConstants.heightLimit
     val bottomLimit = 0.1
-    val armLength = frc.robot.constants.arm.length
+    val armLength = frc.robot.constants.ArmConstants.length
     var goalArmPosition = 0.0
     var goalElevatorPosition = 0.0
 

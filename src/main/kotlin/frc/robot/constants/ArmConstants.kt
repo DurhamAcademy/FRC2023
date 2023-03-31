@@ -2,8 +2,8 @@ package frc.robot.constants
 
 import edu.wpi.first.math.util.Units
 
-object arm {
-    object motor {
+object ArmConstants {
+    object Motor {
         const val positionTolerance = 0.08
         const val velocityTolerance = 0.05
         const val id = 34
@@ -22,7 +22,7 @@ object arm {
         const val kA = 0.08093
     }
 
-    object encoder {
+    object Encoder {
         const val id = 18
         const val offset = -57.29 + 6.5 + 2.0//-76.15 + 17 + 25 - 5 - 5 + 77//-87.49
         const val inverted = true

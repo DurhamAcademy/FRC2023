@@ -86,7 +86,7 @@ fun main() {
     // angularVelocity
     println("\nvel test")
     val exampleMoveLoc = PolarPose(1.meters, 0.degrees, 0.degrees)
-    val polarVel = PolarVelocity(-1.metersPerSecond, 2.radiansPerSecond, 10.radiansPerSecond)
+    val polarVel = PolarVelocity((-1).metersPerSecond, 2.radiansPerSecond, 10.radiansPerSecond)
     println(polarVel.cartesian(exampleMoveLoc))
     val cartVel = ChassisSpeeds(-1.0, 2.0, 10.0)
     println(cartVel.polar(exampleMoveLoc))

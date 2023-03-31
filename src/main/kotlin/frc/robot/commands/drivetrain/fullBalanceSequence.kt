@@ -2,7 +2,7 @@ package frc.robot.commands.drivetrain
 
 /*
 fun fullBalanceSequence(
-    drivetrain: Drivetrain,
+    drivetrain: DrivetrainConstants,
     fromCenter: Boolean = false,
 ): Command {
     var state: Int = 0 // 0 = start, 1 = get on balance, 2 = balance

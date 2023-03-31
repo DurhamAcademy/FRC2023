@@ -8,7 +8,7 @@ import java.awt.Color
 
 class AnimationLightsaber(val color: Color, transparency: Boolean = false, condition: () -> Boolean = { true }) :
     LEDAnimation(condition, transparency) {
-    var startTime = -1.seconds
+    var startTime = (-1).seconds
     var lastUpdate = Game.time
 
     private fun flicker(t: Time): Double {

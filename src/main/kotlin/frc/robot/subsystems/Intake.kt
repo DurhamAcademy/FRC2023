@@ -7,10 +7,9 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type.kDutyCycle
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units.rotationsToRadians
-import edu.wpi.first.wpilibj.DigitalInput
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.robot.ShuffleboardCommon
 import frc.robot.commands.intake.IdleIntake
 import frc.robot.constants.intake
 import frc.robot.utils.GamePiece
@@ -18,7 +17,7 @@ import kotlin.math.PI
 
 class Intake(
     var arm: Arm,
-    val wantedObject: () -> GamePiece
+    wantedObject: () -> GamePiece
 ) : SubsystemBase() {
 
     init{
@@ -72,9 +71,6 @@ class Intake(
         set(value) {
             intakeMotor.set(value)
         }
-    val limitSwitch = DigitalInput(
-        intake.limitSwitch.intakeLimitSwitch
-    )
 
     val deployPID = ProfiledPIDController(
         intake.deployMotor.kP,
@@ -107,27 +103,19 @@ class Intake(
         )
     }
 
-    val limitSwitchPressed: Boolean
-        get() = !limitSwitch.get()
-
-    //@TODO Setter
-
-    val tab = Shuffleboard.getTab("Intake")
-    val driveMotorCurrent = tab.add("Motor Current jerguewf", 0.0)
+    val tab = ShuffleboardCommon.mainTab
+    val driveMotorCurrent = tab.add("Drive Motor Current", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
-    val modeMotorCurrent = tab.add("Motor Current lajshg", 0.0)
+    val modeMotorCurrent = tab.add("Mode Motor Current", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
-    val systemMotorCurrent = tab.add("Motor Current ais;hljk", 0.0)
+    val systemMotorCurrent = tab.add("System Motor Current", 0.0)
         .withWidget("Number Bar")
         .withProperties(mapOf("min" to 0.0, "max" to 40.0))
         .entry
-
-    val voltage: Double
-        get() = modeMotor.busVoltage
 
     private var modePositionSetpoint: Double = 0.0
 
@@ -139,9 +127,6 @@ class Intake(
         get() = rotationsToRadians(modeEncoder.position)
 
     var modeVoltage = 0.0 // voltage while zeroing
-
-    val modeCurrent
-        get() = modeMotor.outputCurrent
 
     override fun periodic() {
         driveMotorCurrent.setDouble(intakeMotor.outputCurrent)

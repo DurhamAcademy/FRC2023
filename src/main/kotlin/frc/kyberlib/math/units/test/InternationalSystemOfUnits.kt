@@ -18,6 +18,7 @@ package frc.kyberlib.math.units.test
 
 import java.io.File
 import java.io.Serializable
+import kotlin.math.abs
 
 /**
  * Created by kunal on 8/6/17.
@@ -104,7 +105,7 @@ data class Dimension(
             .joinToString(separator = "") { (unit, power) -> unit + power }
 
         val denominatorString = denominator
-            .map { (unit, power) -> unit to Math.abs(power) }
+            .map { (unit, power) -> unit to abs(power) }
             .joinToString(separator = "") { (unit, power) -> unit + power }
 
         (numeratorString + if (denominatorString.isNotEmpty()) "_per_$denominatorString" else "")

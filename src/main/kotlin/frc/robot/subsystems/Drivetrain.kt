@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
+import edu.wpi.first.networktables.GenericEntry
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
@@ -19,12 +20,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
 import frc.robot.PhotonCameraWrapper
 import frc.robot.RobotContainer
+import frc.robot.ShuffleboardCommon
 import frc.robot.commands.drivetrain.DriverCommand
 import frc.robot.constants.Constants
-import frc.robot.constants.drivetrain
+import frc.robot.constants.DrivetrainConstants
 import frc.robot.controls.ControlScheme
 import kotlin.math.PI
 
+@Suppress("DEPRECATION")
 class Drivetrain(
     controlScheme: ControlScheme,
     val cameraWrappers: List<PhotonCameraWrapper>,
@@ -32,25 +35,25 @@ class Drivetrain(
 ) : SubsystemBase() {
 
     init {
-        defaultCommand = DriverCommand(this, controlScheme, { robotContainer.rotateTo180 })
+        defaultCommand = DriverCommand(this, controlScheme) { robotContainer.rotateTo180 }
     }
 
     private val swerveTab = getTab("Swerve Diagnostics")
 
-    //private PowerDistribution PDP = new PowerDistribution();
-    private val xSpeedEntry = swerveTab.add("xBox xSpeed", 0)
+    //    private PowerDistribution PDP = new PowerDistribution();
+    private val xSpeedEntry = ShuffleboardCommon.driveTab.add("xBox xSpeed", 0)
         .entry
-    private val ySpeedEntry = swerveTab.add("xBox ySpeed", 0)
+    private val ySpeedEntry = ShuffleboardCommon.driveTab.add("xBox ySpeed", 0)
         .entry
-    private val rotEntry = swerveTab.add("xBox rot", 0)
+    private val rotEntry = ShuffleboardCommon.driveTab.add("xBox rot", 0)
         .entry
-    val invertx = swerveTab.add("invert x", false)
+    val invertX: GenericEntry = ShuffleboardCommon.driveTab.add("invert x", false)
         .withWidget(BuiltInWidgets.kToggleButton)
         .entry
-    val inverty = swerveTab.add("invert y", false)
+    val invertY: GenericEntry = ShuffleboardCommon.driveTab.add("invert y", false)
         .withWidget(BuiltInWidgets.kToggleButton)
         .entry
-    val invertrot = swerveTab.add("invert rot", false)
+    val invertRot: GenericEntry = ShuffleboardCommon.driveTab.add("invert rot", false)
         .withWidget(BuiltInWidgets.kToggleButton)
         .entry
     private val frontLeft = SwerveModule( // front right
@@ -109,7 +112,7 @@ class Drivetrain(
 
     private val f2d = Field2d()
 
-    val Idrc = getTab("drivetrain")
+    val Idrc = ShuffleboardCommon.driveTab
 
     // pose shuffleboard stuff (using the field 2d widget)
     val poseEstimator = SwerveDrivePoseEstimator(
@@ -251,9 +254,9 @@ class Drivetrain(
     private var simQueuedForce = Transform2d()
 
 
-    val xSlewRateLimiter = SlewRateLimiter(drivetrain.maxAcceleration)
-    val ySlewRateLimiter = SlewRateLimiter(drivetrain.maxAcceleration)
-    val rotSlewRateLimiter = SlewRateLimiter(drivetrain.maxAngularAcceleration)
+    val xSlewRateLimiter = SlewRateLimiter(DrivetrainConstants.maxAcceleration)
+    val ySlewRateLimiter = SlewRateLimiter(DrivetrainConstants.maxAcceleration)
+    val rotSlewRateLimiter = SlewRateLimiter(DrivetrainConstants.maxAngularAcceleration)
 
     /**
      * drive the robot using the specified chassis speeds

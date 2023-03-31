@@ -32,11 +32,11 @@ class BalanceDrive(
     val heading: Rotation2d
         get() = drivetrain.estimatedPose2d.rotation
 
-    var phaseStart = Timer.getFPGATimestamp()
+    private var phaseStart = Timer.getFPGATimestamp()
     val phaseTime: Double
         get() = Timer.getFPGATimestamp() - phaseStart
 
-    var phase = Phase.Getup
+    private var phase = Phase.Getup
 
     override fun initialize() {
         phaseStart = Timer.getFPGATimestamp()

@@ -18,8 +18,9 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.RobotContainer
+import frc.robot.ShuffleboardCommon
 import frc.robot.commands.alltogether.IOLevel
-import frc.robot.constants.arm
+import frc.robot.constants.ArmConstants
 import frc.robot.constants.elevator
 import frc.robot.constants.elevator.elevatorMotor.tolerance.positionTolerance
 import frc.robot.utils.GamePiece
@@ -162,7 +163,7 @@ class Elevator(
 
     private var lastVel = 0.0
     private var lastTime = 0.0
-    val tab = Shuffleboard.getTab("elevator")
+    val tab = ShuffleboardCommon.shooterTab
     val heightEntry = tab.add("Height", 0.0)
         .withWidget(BuiltInWidgets.kNumberSlider)
         .withProperties(
@@ -187,17 +188,14 @@ class Elevator(
         .entry
     var zeroElevator = false
     val overHeight
-        get() = height > (inchesToMeters(76.0) - (arm.length * cos(armController.armPosition)))
+        get() = height > (inchesToMeters(76.0) - (ArmConstants.length * cos(armController.armPosition)))
 
     override fun periodic() {
         SmartDashboard.putNumber("elevator Setpoint", setpoint)
         SmartDashboard.putString("elevcmd", this.currentCommand?.name ?: "NONE")
         currentHeightEntry.setDouble(this.height)
-        // set the setpoint to the height entry
-//        if (Constants.fullDSControl)
-//            setpoint = heightEntry.getDouble(elevator.limits.bottomLimit)
-        // set motor voltage
 
+        // set motor voltage
         if (zeroElevator) {
             setMotorVoltage(
                 -1.5
@@ -231,11 +229,7 @@ class Elevator(
 
         SmartDashboard.putBoolean("LIMIT", limitSwitch.get())
 
-//        setMotorVoltage(voltageSetEntry.getDouble(0.0))
-
         // check if its in teleop
-//        if (RobotController.getUserButton()) setMotorVoltage(0.0)
-//        else setMotorVoltage(12.0.coerceAtMost(RoboRioSim.getVInVoltage()))
         if (limitSwitch.get() != lastLimitSwitch) {
             this.height = elevator.limits.bottomLimit
             println("LIMIT PRESSED: ${limitSwitch.get()}")

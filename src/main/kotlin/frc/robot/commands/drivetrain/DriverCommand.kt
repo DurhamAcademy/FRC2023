@@ -38,10 +38,10 @@ class DriverCommand(
         drivetrain.drive(
             ChassisSpeeds(
                 vec.x * Constants.powerPercent *
-                        allianceMulitplier * (if (drivetrain.invertx.getBoolean(false)) -1 else 1)
+                        allianceMulitplier * (if (drivetrain.invertX.getBoolean(false)) -1 else 1)
                         * controlScheme.speedMutiplier,
                 vec.y * Constants.powerPercent *
-                        allianceMulitplier * (if (drivetrain.inverty.getBoolean(false)) -1 else 1)
+                        allianceMulitplier * (if (drivetrain.invertY.getBoolean(false)) -1 else 1)
                         * controlScheme.speedMutiplier,
                 if(nearestStation()) {
                     rotationPid.calculate(drivetrain.estimatedPose2d.rotation.radians,
@@ -50,7 +50,7 @@ class DriverCommand(
                 }
                 else{
                     -controlScheme.rotation * 2 * Math.PI *
-                            Constants.powerPercent * .5 * (if (drivetrain.invertrot.getBoolean(false)) -1 else 1) * controlScheme.speedMutiplier
+                            Constants.powerPercent * .5 * (if (drivetrain.invertRot.getBoolean(false)) -1 else 1) * controlScheme.speedMutiplier
                 }
             ).slewLimited(drivetrain.xSlewRateLimiter, drivetrain.ySlewRateLimiter, drivetrain.rotSlewRateLimiter),
             true,

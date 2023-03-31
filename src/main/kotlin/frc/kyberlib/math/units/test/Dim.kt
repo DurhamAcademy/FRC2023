@@ -28,7 +28,7 @@ open class Dim {
 
     override fun toString(): String {
         val string = StringBuilder()
-        powerMap.forEach { unit, power -> if (power > 1) string.append("$unit^$power") }
+        powerMap.forEach { (unit, power) -> if (power > 1) string.append("$unit^$power") }
         return string.toString()
     }
 

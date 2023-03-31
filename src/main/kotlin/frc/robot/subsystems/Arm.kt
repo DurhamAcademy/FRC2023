@@ -1,7 +1,5 @@
 package frc.robot.subsystems
 
-//import frc.robot.utils.armFeedforward
-//import frc.robot.utils.createArmSystemPlant
 import com.ctre.phoenix.sensors.AbsoluteSensorRange
 import com.ctre.phoenix.sensors.CANCoder
 import com.revrobotics.CANSparkMax
@@ -10,7 +8,6 @@ import edu.wpi.first.math.controller.ArmFeedforward
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.wpilibj.Preferences
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
@@ -18,21 +15,18 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.kyberlib.command.Game
-import frc.robot.commands.alltogether.IOLevel
-import frc.robot.constants.arm
-import frc.robot.utils.GamePiece
+import frc.robot.constants.ArmConstants
 import java.lang.Math.PI
 import java.lang.Math.toRadians
-import kotlin.math.absoluteValue
 
 class Arm : SubsystemBase() {
-    val armMotor = CANSparkMax(
-        arm.motor.id,
+    private val armMotor = CANSparkMax(
+        ArmConstants.Motor.id,
         CANSparkMaxLowLevel.MotorType.kBrushless
     ).apply {
         restoreFactoryDefaults()
-        setSmartCurrentLimit(arm.motor.currentLimit)
-        inverted = arm.motor.inverted
+        setSmartCurrentLimit(ArmConstants.Motor.currentLimit)
+        inverted = ArmConstants.Motor.inverted
         this.serialNumber
         setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10)
         setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 255)
@@ -41,57 +35,42 @@ class Arm : SubsystemBase() {
         setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus4, 255)
         setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus6, 255)
     }
-    val simArmSystem = SingleJointedArmSim(
+    private val simArmSystem = SingleJointedArmSim(
         DCMotor.getNEO(1),
-        arm.motor.gearRatio,
-        arm.momentOfInertia * 0.001,
-        arm.length * 0.5,
-        arm.minAngle,
-        arm.maxAngle,
+        ArmConstants.Motor.gearRatio,
+        ArmConstants.momentOfInertia * 0.001,
+        ArmConstants.length * 0.5,
+        ArmConstants.minAngle,
+        ArmConstants.maxAngle,
         true
     )
 
-    val armEncoder = CANCoder(arm.encoder.id).apply {
+    private val armEncoder = CANCoder(ArmConstants.Encoder.id).apply {
         configFactoryDefault()
         configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180)
-        configMagnetOffset(-arm.encoder.offset)
-        configSensorDirection(arm.encoder.inverted)
+        configMagnetOffset(-ArmConstants.Encoder.offset)
+        configSensorDirection(ArmConstants.Encoder.inverted)
     }
-    val armPID = ProfiledPIDController(
-        arm.motor.kP,
-        arm.motor.kI,
-        arm.motor.kD,
+    private val armPID = ProfiledPIDController(
+        ArmConstants.Motor.kP,
+        ArmConstants.Motor.kI,
+        ArmConstants.Motor.kD,
         TrapezoidProfile.Constraints(
-            arm.motor.maxVelocity,
-            arm.motor.maxAcceleration
+            ArmConstants.Motor.maxVelocity,
+            ArmConstants.Motor.maxAcceleration
         )
     ).apply {
         setTolerance(
-            arm.motor.positionTolerance,
-            arm.motor.velocityTolerance
+            ArmConstants.Motor.positionTolerance,
+            ArmConstants.Motor.velocityTolerance
         )
     }
-    var armFeedForward = ArmFeedforward(
-        arm.motor.kS,
-        arm.motor.kG,
-        arm.motor.kV,
-        arm.motor.kA
+    private var armFeedForward = ArmFeedforward(
+        ArmConstants.Motor.kS,
+        ArmConstants.Motor.kG,
+        ArmConstants.Motor.kV,
+        ArmConstants.Motor.kA
     )
-    var armOffset = Preferences.getDouble("armOffset", 0.0).apply {
-        this@Arm.armEncoder
-            .configMagnetOffset(-this + arm.encoder.offset)
-
-    }
-        set(value) {
-            field = value
-            if (Preferences.containsKey("armOffset")) {
-                Preferences.setDouble("armOffset", value)
-            } else {
-                Preferences.initDouble("armOffset", value)
-            }
-            this@Arm.armEncoder
-                .configMagnetOffset(-value + arm.encoder.offset)
-        }
 
     /**
      * @return angle in radians. 0 is upright, -pi/2 is horizontal where the arm
@@ -101,12 +80,10 @@ class Arm : SubsystemBase() {
     val armPosition: Double
         get() = if (RobotBase.isSimulation()) armPID.setpoint.position//simArmSystem.angleRads
         else toRadians(armEncoder.absolutePosition)
-    val armVelocity: Double
-        get() = toRadians(armEncoder.velocity)
     private var armSetpoint: Double? = null
 
-    var lastVoltage = 0.0
-    fun setArmVoltage(voltage: Double) {
+    private var lastVoltage = 0.0
+    private fun setArmVoltage(voltage: Double) {
         if (Game.sim) simArmSystem.setInputVoltage(voltage)
         else
             if (lastVoltage != voltage) {
@@ -115,25 +92,20 @@ class Arm : SubsystemBase() {
             }
     }
 
-    fun reset() {
-        armPID.reset(armPosition)
-        println("RESET")
-    }
-
     /**
      * @param position angle in radians. 0 is upright, -pi/2 is horizontal over
      * our intake.
      */
     fun setArmPosition(position: Double) {
         armSetpoint = position.coerceIn(
-            arm.minAngle,
-            arm.maxAngle
+            ArmConstants.minAngle,
+            ArmConstants.maxAngle
         )
     }
 
     // shuffleboard
-    val armTab = Shuffleboard.getTab("Arm")
-    val voltageEntry = armTab.add("Arm Motor Voltage", 0.0)
+    private val armTab = Shuffleboard.getTab("ArmConstants")
+    private val voltageEntry = armTab.add("ArmConstants Motor Voltage", 0.0)
         .withWidget(BuiltInWidgets.kVoltageView)
         .withProperties(
             mapOf("min" to -12.0, "max" to 12.0)
@@ -142,19 +114,19 @@ class Arm : SubsystemBase() {
         .withSize(4, 2)
         .entry
 
-    val positionEntry = armTab.add("Position", 0.0)
+    private val positionEntry = armTab.add("Position", 0.0)
         .withWidget(BuiltInWidgets.kDial)
         .withProperties(
-            mapOf("min" to arm.minAngle, "max" to arm.maxAngle)
+            mapOf("min" to ArmConstants.minAngle, "max" to ArmConstants.maxAngle)
         )
         .withPosition(2, 2)
         .withSize(4, 4)
         .entry
 
-    val currentSetpointEntry = armTab.add("Current Setpoint", 0.0)
+    private val currentSetpointEntry = armTab.add("Current Setpoint", 0.0)
         .withWidget(BuiltInWidgets.kDial)
         .withProperties(
-            mapOf("min" to arm.minAngle, "max" to arm.maxAngle)
+            mapOf("min" to ArmConstants.minAngle, "max" to ArmConstants.maxAngle)
         )
         .withPosition(2, 6)
         .withSize(4, 4)
@@ -189,16 +161,5 @@ class Arm : SubsystemBase() {
     override fun simulationPeriodic() {
         simArmSystem.update(0.02)
     }
-
-    fun isAtPosition(ioLevel: IOLevel, gamePiece: GamePiece) =
-        when (gamePiece) {
-            GamePiece.cone -> (armPosition - ioLevel.coneArmRotation.radians).absoluteValue < (arm.motor.positionTolerance / 2)
-                    && armPID.atGoal()
-
-            GamePiece.cube -> (armPosition - ioLevel.cubeArmRotation.radians).absoluteValue < (arm.motor.positionTolerance / 2)
-                    && armPID.atGoal()
-
-            else -> armPID.atGoal()
-        }
 
 }

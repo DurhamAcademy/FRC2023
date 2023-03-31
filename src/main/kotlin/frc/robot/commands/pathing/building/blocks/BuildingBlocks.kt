@@ -21,12 +21,12 @@ import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementSide
 import frc.robot.utils.xMul
 import kotlin.math.*
+import frc.robot.constants.DrivetrainConstants as drivetrainConstraints
 import frc.robot.constants.RobotProportions.length as robotLength
 import frc.robot.constants.RobotProportions.width as robotWidth
-import frc.robot.constants.drivetrain as drivetrainConstraints
 
 object BuildingBlocks {
-    val robotDiagRadius = hypot(robotLength / 2.0, robotWidth / 2.0) + 0.1
+    private val robotDiagRadius = hypot(robotLength / 2.0, robotWidth / 2.0) + 0.1
 
     /**
      * Variables
@@ -247,13 +247,6 @@ object BuildingBlocks {
         crossinline side: () -> PlacementSide,
         crossinline alliance: () -> Alliance = { Game.alliance },
     ): Command {
-        val correctStartingPos: () -> Boolean = {
-            when (alliance()) {
-                Red -> drivetrain.estimatedPose2d.x > 8
-                Blue -> drivetrain.estimatedPose2d.x < 8
-                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-            }
-        }
         val upperYValue = clearUp
         val lowerYValue = clearDown
         val chargeLimit: () -> Double = { xCenter + (((robotLength / 2.0) + 5.38) * -alliance().xMul) }
@@ -286,7 +279,6 @@ object BuildingBlocks {
             else if (abs(upperYValue - drivetrain.estimatedPose2d.y) > abs(lowerYValue - drivetrain.estimatedPose2d.y)) lowerYValue
             else upperYValue
         }
-//        if(correctStartingPos()){
         return MoveToPosition(
             drivetrain,
             { _, _, _ ->
@@ -305,8 +297,6 @@ object BuildingBlocks {
                 )
             }
         )
-//        }
-//        else return InstantCommand()
     }
 
     inline fun goToPlacementPoint(
@@ -333,13 +323,6 @@ object BuildingBlocks {
         crossinline alliance: () -> Alliance = { Game.alliance },
         endAtAlignment: Boolean = false,
     ): Command {
-        val correctStartingPos: () -> Boolean = {
-            when (alliance()) {
-                Red -> drivetrain.estimatedPose2d.x < 8
-                Blue -> drivetrain.estimatedPose2d.x > 8
-                Invalid -> throw IllegalArgumentException("Alliance is not Blue or Red")
-            }
-        }
         val placementY: () -> Double = {
             slider().fieldYValue
         }
@@ -355,7 +338,6 @@ object BuildingBlocks {
                     -if (!isClose(null) || endAtAlignment) ((HumanPlayerSlider.offsetDistance ?: 0.0) + altOffset)
                     else (HumanPlayerSlider.offsetDistance ?: altOffset)) * alliance().xMul)
         }
-//        if(correctStartingPos()){
         return MoveToPosition(
             drivetrain,
             { xPid, yPid, rotPid ->
@@ -386,8 +368,6 @@ object BuildingBlocks {
                 )
             }
         )
-//        }
-//        else return InstantCommand()
     }
 
     inline fun goToPickupZone(

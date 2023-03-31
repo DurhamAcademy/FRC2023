@@ -11,7 +11,6 @@ import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.balance.AutoBalance
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks
-import frc.robot.constants.drivetrain
 import frc.robot.utils.GamePiece
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
@@ -25,21 +24,27 @@ class AutoPlaceAndBalance(
             pathRed(robotContainer),
             ConditionalCommand(
                 pathBlue(robotContainer),
-                PrintCommand("No alliance"),
-                { Game.alliance == DriverStation.Alliance.Blue }
-            ),
-            { Game.alliance == DriverStation.Alliance.Red }
-        )
+                PrintCommand("No alliance")
+            ) { Game.alliance == DriverStation.Alliance.Blue }
+        ) { Game.alliance == DriverStation.Alliance.Red }
     }
 
-    private fun pathRed(robotContainer: RobotContainer): Command {
-        return BuildingBlocks.goToPlacementPoint(robotContainer.drivetrain, robotContainer.arm, IOLevel.High, PlacementGroup.Middle, PlacementSide.CloseCone)
-            .deadlineWith(SetSubsystemPosition(
-                robotContainer,
-                { IOLevel.High },
-                { GamePiece.cone },
-                true
-            ))
+    private fun pathRed(robotContainer: RobotContainer): Command =
+        BuildingBlocks.goToPlacementPoint(
+            robotContainer.drivetrain,
+            robotContainer.arm,
+            IOLevel.High,
+            PlacementGroup.Middle,
+            PlacementSide.CloseCone
+        )
+            .deadlineWith(
+                SetSubsystemPosition(
+                    robotContainer,
+                    { IOLevel.High },
+                    { GamePiece.cone },
+                    true
+                )
+            )
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,
@@ -71,7 +76,6 @@ class AutoPlaceAndBalance(
                     )
             )
             .andThen(AutoBalance(robotContainer.drivetrain))
-    }
 
     private fun pathBlue(robotContainer: RobotContainer): Command {
         return BuildingBlocks.goToPlacementPoint(robotContainer.drivetrain, robotContainer.arm, IOLevel.High, PlacementGroup.Middle, PlacementSide.CloseCone)

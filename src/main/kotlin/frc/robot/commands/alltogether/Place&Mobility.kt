@@ -2,14 +2,14 @@ package frc.robot.commands.alltogether
 /*
 
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.robot.subsystems.Arm
-import frc.robot.subsystems.Drivetrain
+import frc.robot.subsystems.ArmConstants
+import frc.robot.subsystems.DrivetrainConstants
 import frc.robot.subsystems.Elevator
 import frc.robot.subsystems.Manipulator
 
 class `Place&Mobility`(
-    drivetrain: Drivetrain,
-    arm: Arm,
+    drivetrain: DrivetrainConstants,
+    arm: ArmConstants,
     elevator: Elevator,
     manipulator: Manipulator,
 ):

@@ -12,9 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -41,7 +40,6 @@ import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
 import frc.robot.commands.pathing.*
 import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToHumanPlayerStation
-import frc.robot.commands.pathing.building.blocks.BuildingBlocks.goToPlacementPoint
 import frc.robot.constants.Field2dLayout
 import frc.robot.constants.leds.count
 import frc.robot.controls.BryanControlScheme
@@ -51,6 +49,7 @@ import frc.robot.subsystems.*
 import frc.robot.utils.GamePiece
 import frc.robot.utils.GamePiece.*
 import frc.robot.utils.Slider
+import frc.robot.utils.grid.PlacementLevel
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.cos
@@ -61,7 +60,7 @@ class RobotContainer {
     val controlScheme0: ControlScheme = ChrisControlScheme(0)
     val controlScheme1: ControlScheme = BryanControlScheme(1)
 
-    val smartDashboardSelector = DashboardSelector()
+//    val smartDashboardSelector = DashboardSelector()
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
     var rotateTo180 = false
@@ -73,9 +72,10 @@ class RobotContainer {
     )
     val manipulator = Manipulator()
     val arm = Arm()
-    val intake = Intake(arm, { wantedObject })
+    val intake = Intake(arm) { wantedObject }
     val elevator = Elevator(this@RobotContainer, arm, this.intake)
 
+    val pdp: PowerDistribution = PowerDistribution()
 
     init {
         arrayOf(controlScheme0, controlScheme1).forEachIndexed { i, it ->
@@ -132,7 +132,7 @@ class RobotContainer {
 //                    .onFalse(SetManipulatorSpeed(manipulator, 0.1))
 
                 throwObject
-                    .whileTrue(Throw(manipulator, { wantedObject }) { smartDashboardSelector.placementLevel })
+                    .whileTrue(Throw(manipulator, { wantedObject }) { PlacementLevel.Level3 })
                     .onFalse(SetManipulatorSpeed(manipulator, 0.0))
 
                 spinIntakeIn
@@ -184,24 +184,24 @@ class RobotContainer {
                         )
                     )
 
-                selectGridUp
-                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
-                selectGridDown
-                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, -1))
-                selectGridLeft
-                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
-                selectGridRight
-                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
+//                selectGridUp
+//                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
+//                selectGridDown
+//                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, -1))
+//                selectGridLeft
+//                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(1, 0))
+//                selectGridRight
+//                    .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(-1, 0))
 
                 confirmGridSelection
-                    .whileTrue(
-                        goToPlacementPoint(
-                            drivetrain,
-                            arm,
-                            { smartDashboardSelector.placementLevel.ioLevel },
-                            { smartDashboardSelector.placementPosition },
-                            { smartDashboardSelector.placementSide },
-                        )
+//                    .whileTrue(
+//                        goToPlacementPoint(
+//                            drivetrain,
+//                            arm,
+//                            { smartDashboardSelector.placementLevel.ioLevel },
+//                            { smartDashboardSelector.placementPosition },
+//                            { smartDashboardSelector.placementSide },
+//                        )
 //                            .deadlineWith(
 //                                SetSubsystemPosition(
 //                                    elevator, arm,
@@ -218,7 +218,7 @@ class RobotContainer {
 //                                    { smartDashboardSelector.placementSide.asObject },
 //                                )
 //                            )
-                    )
+//                    )
 
                 ledColor
                     .onTrue(InstantCommand({
@@ -241,7 +241,7 @@ class RobotContainer {
                                 elevator, arm,
                                 drivetrain,
                                 { IOLevel.Idle },
-                                { smartDashboardSelector.placementSide.asObject },
+                                { wantedObject },
                             )
                         )
                             .andThen(
@@ -249,7 +249,7 @@ class RobotContainer {
                                     elevator, arm,
                                     drivetrain,
                                     { IOLevel.HumanPlayerSlider },
-                                    { smartDashboardSelector.placementSide.asObject },
+                                    { wantedObject },
                                     stopAtEnd = true
                                 )
                                     .andThen(
@@ -257,7 +257,7 @@ class RobotContainer {
                                             elevator, arm,
                                             drivetrain,
                                             { IOLevel.HumanPlayerSlider },
-                                            { smartDashboardSelector.placementSide.asObject },
+                                            { wantedObject },
                                             stopAtEnd = false
                                         ).withTimeout(1.0)
                                     )
@@ -272,14 +272,14 @@ class RobotContainer {
                                     .deadlineWith(
                                         ManipulatorIO(
                                             manipulator,
-                                            { smartDashboardSelector.placementSide.asObject },
+                                            { wantedObject },
                                             { IOLevel.HumanPlayerSlider }
                                         )
                                     )
                                     .andThen(
                                         ManipulatorIO(
                                             manipulator,
-                                            { smartDashboardSelector.placementSide.asObject },
+                                            { wantedObject },
                                             { IOLevel.HumanPlayerSlider }
                                         )
                                     )
@@ -288,7 +288,7 @@ class RobotContainer {
                                     elevator, arm,
                                     drivetrain,
                                     { IOLevel.Idle },
-                                    { smartDashboardSelector.placementSide.asObject },
+                                    { wantedObject },
                                     stopAtEnd = true
                                 ).deadlineWith(
                                     goToHumanPlayerStation(
@@ -305,7 +305,7 @@ class RobotContainer {
                     .whileTrue(DriveCommand(drivetrain, rotation = { 0.01 }))
 
                 intakeGroundIntake
-                    .whileTrue(DeployIntake(intake, this@RobotContainer, { wantedObject }))
+                    .whileTrue(DeployIntake(intake, this@RobotContainer) { wantedObject })
 
                 intakeEject
                     .whileTrue(IntakeEject(intake, this@RobotContainer))
@@ -505,7 +505,7 @@ class RobotContainer {
                 .andThen(
                     Commands.runOnce({ arm.setArmPosition(-PI / 2) }, arm)
                         .andThen(
-                            Commands.waitUntil({ arm.armPosition > -2.75 * PI / 4 })
+                            Commands.waitUntil { arm.armPosition > -2.75 * PI / 4 }
                         )
                         .deadlineWith(
                             Commands.run({
@@ -542,11 +542,8 @@ class RobotContainer {
         addOption("No Vision Auto", NoVisionAuto(this@RobotContainer))
     }
 
-    // shuffleboard auto chooser
-    private val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
-
     @Suppress("unused")
-    val autoChooserWidget: ComplexWidget = autoChooserTab.add("Autonomous", autoChooser)
+    val autoChooserWidget: ComplexWidget = ShuffleboardCommon.mainTab.add("Autonomous", autoChooser)
     val armFieldPosition: FieldObject2d = drivetrain.field2d.getObject("arm")
 
 //    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
@@ -562,12 +559,12 @@ class RobotContainer {
 
     fun update() {
         leds.update()
-        smartDashboardSelector.update()
+//        smartDashboardSelector.update()
 
         // send subsystems to SmartDashboard
-        SmartDashboard.putData("Drivetrain/sendable", drivetrain)
+        SmartDashboard.putData("DrivetrainConstants/sendable", drivetrain)
         SmartDashboard.putData("elevator/sendable", elevator)
-        SmartDashboard.putData("Arm/sendable", arm)
+        SmartDashboard.putData("ArmConstants/sendable", arm)
         SmartDashboard.putData("Manipulator/sendable", manipulator)
 
         // put arm angle onto the simulation field by using trig to get the x
