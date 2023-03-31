@@ -308,7 +308,13 @@ class RobotContainer {
                     .whileTrue(DeployIntake(intake, this@RobotContainer, { wantedObject }))
 
                 intakeEject
-                    .whileTrue(IntakeEject(intake, this@RobotContainer))
+                    .whileTrue(
+                        IntakeEject(intake, true)
+                    )
+                    .onFalse(
+                        IntakeEject(intake, true)
+                            .withTimeout(0.2)
+                    )
 
                 shootToLTwo
                     .whileTrue(ShootToLTwo(intake, this@RobotContainer))

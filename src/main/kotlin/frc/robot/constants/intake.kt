@@ -17,8 +17,8 @@ object intake {
 //turns whole intake
 object deployMotor {
     const val pidOnRio = true
-    const val positionTolerance = 0.0
-    const val velocityTolerance = 0.0
+    const val positionTolerance = 0.1
+    const val velocityTolerance = 0.2
     const val id = 49
     const val inverted = true
     const val maxVelocity = 12.0
@@ -36,8 +36,8 @@ object deployMotor {
     //switches in between cone and cube
     object modeMotor {
         val pidOnRio = true
-        const val positionTolerance = 0.0
-        const val velocityTolerance = 0.0
+        const val positionTolerance = 0.05
+        const val velocityTolerance = 0.1
         const val id = 0
         const val inverted = true
         const val gearRatio = 1 / 30
