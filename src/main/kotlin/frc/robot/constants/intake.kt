@@ -25,7 +25,7 @@ object deployMotor {
     const val maxAcceleration = 18.0
     const val kP = 4.0
     const val kI = 0.0
-    const val kD = 0.01
+    const val kD = 0.05
 
     const val kS = 0.0
     const val kG = 0.0
@@ -45,7 +45,7 @@ object deployMotor {
         const val maxAcceleration = 32.0
         const val kP = 3.05
         const val kI = 0.0
-        const val kD = 0.01
+        const val kD = 0.035
 
         const val kS = 0.0
         const val kG = 0.0

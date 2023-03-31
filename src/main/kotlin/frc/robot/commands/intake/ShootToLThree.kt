@@ -16,7 +16,9 @@ class ShootToLThree(
     }
 
     override fun execute(){
-        intake.setDeployAngle(1.0)
+        //intake.setDeployAngle(-1.0)
+        intake.intakePercentage = -0.15
+        intake.setModeAngle(0.5)
         intake.intakePercentage = 1.0
 
     }

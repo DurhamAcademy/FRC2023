@@ -44,7 +44,7 @@ class AutoBalance(private val drivetrain: Drivetrain) : CommandBase() {
             DriverStation.Alliance.Invalid -> 0.0
         }
 
-        if (timer.hasElapsed(0.3)) {
+        if (timer.hasElapsed(0.6)) {
             drivetrain.drive(
                 ChassisSpeeds(-balancePid.calculate(MathUtil.applyDeadband(xTilt, .03), 0.0), 0.0, 0.0),
                 true

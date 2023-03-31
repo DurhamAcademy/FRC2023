@@ -66,7 +66,7 @@ object Constants {
     const val driveKV = 2.2335
     const val driveKA = 0.34271
 
-    const val ANGLE_P = 4.1487 //fixme pid
+    const val ANGLE_P = 4.1487
     const val ANGLE_I = 0.0
     const val ANGLE_D = .14002
 

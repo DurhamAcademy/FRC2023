@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -28,6 +30,7 @@ import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
+import frc.robot.commands.drivetrain.RotateTo180
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.intake.DeployIntake
 import frc.robot.commands.intake.IdleIntake
@@ -61,6 +64,7 @@ class RobotContainer {
     val smartDashboardSelector = DashboardSelector()
 
     var cameraWrapper: PhotonCameraWrapper = PhotonCameraWrapper()
+    var rotateTo180 = false
 
     val drivetrain = Drivetrain(
         controlScheme0,
@@ -311,6 +315,9 @@ class RobotContainer {
 
                 shootToLThree
                     .whileTrue(ShootToLTwo(intake, this@RobotContainer))
+
+                snapTo180
+                    .whileTrue(RotateTo180(this@RobotContainer))
             }
         }
     }
@@ -467,7 +474,10 @@ class RobotContainer {
             return@AnimationCustom List<Color>(len) { i ->
                 if (i >= index) color else Color.black
             }
-        }, { false && !drivetrain.canTrustPose && (lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue) })
+        }, {
+            @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
+            false && !drivetrain.canTrustPose && (lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue)
+        })
 
 
         val body = KLEDRegion(
@@ -533,10 +543,11 @@ class RobotContainer {
     }
 
     // shuffleboard auto chooser
-    val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
-    val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
+    private val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
 
-    val armFieldPosition = drivetrain.field2d.getObject("arm")
+    @Suppress("unused")
+    val autoChooserWidget: ComplexWidget = autoChooserTab.add("Autonomous", autoChooser)
+    val armFieldPosition: FieldObject2d = drivetrain.field2d.getObject("arm")
 
 //    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
 //    val autoChoice = DriveTab.add("Autonomous", autoChooser)

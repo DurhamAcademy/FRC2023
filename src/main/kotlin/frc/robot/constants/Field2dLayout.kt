@@ -2,7 +2,6 @@ package frc.robot.constants
 
 import edu.wpi.first.math.geometry.Translation2d
 
-@Suppress("unused") //TODO: Remove this suppression
 object Field2dLayout {
     const val xCenter = 8.28
 

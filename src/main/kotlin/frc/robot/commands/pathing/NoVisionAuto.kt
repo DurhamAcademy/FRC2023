@@ -21,8 +21,9 @@ class NoVisionAuto(
             robotContainer,
             { IOLevel.High },
             { GamePiece.cone },
-            true
+            false
         )
+        .withTimeout(3.0)
             .andThen(
                 Throw(
                     robotContainer.manipulator,
