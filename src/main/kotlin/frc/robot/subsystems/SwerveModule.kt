@@ -1,6 +1,9 @@
 package frc.robot.subsystems
 
-import com.ctre.phoenix.motorcontrol.*
+import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration
+import com.ctre.phoenix.motorcontrol.StatusFrame
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import com.ctre.phoenix.sensors.AbsoluteSensorRange
 import com.ctre.phoenix.sensors.CANCoder
@@ -221,6 +224,8 @@ class SwerveModule(
     override fun periodic() {
         move()
         SmartDashboard.putNumber("$mname Encoder", turnEncoder.absolutePosition)
+
+        this.stateEntry.setDouble(setpoint.speedMetersPerSecond)
 
         // simulate motor velocity based on motor percent output
 //        val dt = Timer.getFPGATimestamp() - lastPeriodicTime

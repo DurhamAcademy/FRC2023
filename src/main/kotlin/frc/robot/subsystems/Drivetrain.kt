@@ -311,10 +311,6 @@ class Drivetrain(
             xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
             ySpeedEntry.setDouble(chassisSpeeds.vyMetersPerSecond)
             rotEntry.setDouble(chassisSpeeds.omegaRadiansPerSecond)
-            //fixme: move the following to swerve module periodic
-            modules.forEachIndexed { i, module ->
-                module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
-            }
         } else {
             val newChassisSpeeds = kinematics.toChassisSpeeds(*swerveModuleStates)
             // add the chassis speeds to the sim pose with dt = 0.02
