@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
@@ -314,8 +316,8 @@ class RobotContainer {
                 shootToLThree
                     .whileTrue(ShootToLTwo(intake, this@RobotContainer))
 
-//                snapTo180
-//                    .whileTrue(RotateTo180(this@RobotContainer))
+                snapTo180
+                    .whileTrue(RotateTo180(this@RobotContainer))
             }
         }
     }
@@ -472,7 +474,10 @@ class RobotContainer {
             return@AnimationCustom List<Color>(len) { i ->
                 if (i >= index) color else Color.black
             }
-        }, { false && !drivetrain.canTrustPose && (lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue) })
+        }, {
+            @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
+            false && !drivetrain.canTrustPose && (lightStatus != TeleopFMSRed || lightStatus != TeleopFMSBlue)
+        })
 
 
         val body = KLEDRegion(
@@ -538,10 +543,11 @@ class RobotContainer {
     }
 
     // shuffleboard auto chooser
-    val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
-    val autoChooserWidget = autoChooserTab.add("Autonomous", autoChooser)
+    private val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
 
-    val armFieldPosition = drivetrain.field2d.getObject("arm")
+    @Suppress("unused")
+    val autoChooserWidget: ComplexWidget = autoChooserTab.add("Autonomous", autoChooser)
+    val armFieldPosition: FieldObject2d = drivetrain.field2d.getObject("arm")
 
 //    val DriveTab: ShuffleboardTab = Shuffleboard.getTab("DriveTab")
 //    val autoChoice = DriveTab.add("Autonomous", autoChooser)
