@@ -23,7 +23,7 @@ import frc.robot.commands.drivetrain.DriverCommand
 import frc.robot.constants.Constants
 import frc.robot.constants.drivetrain
 import frc.robot.controls.ControlScheme
-import java.lang.Math.PI
+import kotlin.math.PI
 
 class Drivetrain(
     controlScheme: ControlScheme,
@@ -295,12 +295,15 @@ class Drivetrain(
             chassisSpeedsField,
             rotAxis
         )
+
+        val currentChassisSpeeds = kinematics.toChassisSpeeds(*swerveModuleStates)
+
         SwerveDriveKinematics.desaturateWheelSpeeds(
-            swerveModuleStates,
-            chassisSpeedsField,
-            4.0,
-            2.0,
-            2 * PI
+            /* moduleStates = */ swerveModuleStates,
+            /* currentChassisSpeed = */ currentChassisSpeeds,
+            /* attainableMaxModuleSpeedMetersPerSecond = */ 4.0,
+            /* attainableMaxTranslationalSpeedMetersPerSecond = */ 4.0,
+            /* attainableMaxRotationalVelocityRadiansPerSecond = */ PI,
         )
 
         if (Game.real) {
