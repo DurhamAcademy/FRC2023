@@ -60,7 +60,7 @@ abstract class ControlScheme {
 
     open val lockSwerveModulesCircle: Trigger = Trigger { false }
 
-    open val rotateTo180: Trigger = Trigger { false }
+    //open val snapTo180: Trigger = Trigger { false }
 
     open val intakeGroundIntake: Trigger = Trigger { false }
     open val intakeEject: Trigger = Trigger { false }

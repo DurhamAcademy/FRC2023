@@ -34,7 +34,12 @@ class AutoPlaceAndBalance(
 
     private fun pathRed(robotContainer: RobotContainer): Command {
         return BuildingBlocks.goToPlacementPoint(robotContainer.drivetrain, robotContainer.arm, IOLevel.High, PlacementGroup.Middle, PlacementSide.CloseCone)
-            .withTimeout(1.0)
+            .deadlineWith(SetSubsystemPosition(
+                robotContainer,
+                { IOLevel.High },
+                { GamePiece.cone },
+                true
+            ))
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,
@@ -49,6 +54,7 @@ class AutoPlaceAndBalance(
                     { GamePiece.cone },
                     { PlacementLevel.Level3 }).withTimeout(0.75)
             ) // shoot cube
+            .withTimeout(4.0)
             .andThen(
                 MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0, maxPosSpeed = 3.7)
                     .andThen(
@@ -69,9 +75,12 @@ class AutoPlaceAndBalance(
 
     private fun pathBlue(robotContainer: RobotContainer): Command {
         return BuildingBlocks.goToPlacementPoint(robotContainer.drivetrain, robotContainer.arm, IOLevel.High, PlacementGroup.Middle, PlacementSide.CloseCone)
-            .withTimeout(
-            1.0
-        )
+            .deadlineWith(SetSubsystemPosition(
+                robotContainer,
+                { IOLevel.High },
+                { GamePiece.cone },
+                true
+            ))
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,
@@ -86,6 +95,7 @@ class AutoPlaceAndBalance(
                     { GamePiece.cone },
                     { PlacementLevel.Level3 }).withTimeout(0.5)
             ) // shoot cube
+            .withTimeout(4.0)
             .andThen(
                 MoveToPosition(robotContainer.drivetrain,  1.95/*16.52 - 14.4*/, 2.72, 0.0,
                     maxPosSpeed = 3.7

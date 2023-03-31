@@ -51,6 +51,7 @@ class TaxiAndSomethingOrOther(
                 )
                     .withTimeout(0.75)
             ) // shoot cube
+            .withTimeout(7.0)
             .andThen(
                 MoveToPosition(
                     robotContainer.drivetrain,

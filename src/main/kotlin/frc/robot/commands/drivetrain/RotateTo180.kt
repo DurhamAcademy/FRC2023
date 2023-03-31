@@ -1,11 +1,9 @@
 package frc.robot.commands.drivetrain
 
-import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.robot.RobotContainer
 
-class rotateTo180(
+class RotateTo180(
     val robotContainer: RobotContainer,
 ) : CommandBase() {
     override fun execute() {

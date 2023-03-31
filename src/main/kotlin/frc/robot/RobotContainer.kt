@@ -28,7 +28,7 @@ import frc.robot.RobotContainer.LightStatus.*
 import frc.robot.commands.alltogether.IOLevel
 import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
-import frc.robot.commands.drivetrain.rotateTo180
+import frc.robot.commands.drivetrain.RotateTo180
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
 import frc.robot.commands.intake.DeployIntake
 import frc.robot.commands.intake.IdleIntake
@@ -182,11 +182,6 @@ class RobotContainer {
                         )
                     )
 
-                rotateTo180
-                    .whileTrue(
-                        rotateTo180(this@RobotContainer)
-                    )
-
                 selectGridUp
                     .onTrue(this@RobotContainer.smartDashboardSelector.moveCommand(0, 1))
                 selectGridDown
@@ -318,6 +313,9 @@ class RobotContainer {
 
                 shootToLThree
                     .whileTrue(ShootToLTwo(intake, this@RobotContainer))
+
+//                snapTo180
+//                    .whileTrue(RotateTo180(this@RobotContainer))
             }
         }
     }
