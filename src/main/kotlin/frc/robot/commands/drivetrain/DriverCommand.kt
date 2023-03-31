@@ -4,7 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
-import edu.wpi.first.math.util.Units
+import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.kyberlib.command.Game
@@ -45,7 +45,7 @@ class DriverCommand(
                         * controlScheme.speedMutiplier,
                 if(nearestStation()) {
                     rotationPid.calculate(drivetrain.estimatedPose2d.rotation.radians,
-                        Units.degreesToRadians(findNearest180(drivetrain.estimatedPose2d.rotation.degrees))
+                        degreesToRadians(findNearest180(drivetrain.estimatedPose2d.rotation.degrees))
                     ) // desired radians
                 }
                 else{
