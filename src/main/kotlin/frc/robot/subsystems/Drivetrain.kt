@@ -10,8 +10,8 @@ import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics
-import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.Timer
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard.getTab
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
@@ -23,7 +23,7 @@ import frc.robot.commands.drivetrain.DriverCommand
 import frc.robot.constants.Constants
 import frc.robot.constants.drivetrain
 import frc.robot.controls.ControlScheme
-import java.lang.Math.PI
+import kotlin.math.PI
 
 class Drivetrain(
     controlScheme: ControlScheme,
@@ -32,7 +32,7 @@ class Drivetrain(
 ) : SubsystemBase() {
 
     init {
-        defaultCommand = DriverCommand(this, controlScheme)
+        defaultCommand = DriverCommand(this, controlScheme, { robotContainer.rotateTo180 })
     }
 
     private val swerveTab = getTab("Swerve Diagnostics")
@@ -45,15 +45,15 @@ class Drivetrain(
     private val rotEntry = swerveTab.add("xBox rot", 0)
         .entry
     val invertx = swerveTab.add("invert x", false)
-        .withWidget("Toggle Button")
+        .withWidget(BuiltInWidgets.kToggleButton)
         .entry
     val inverty = swerveTab.add("invert y", false)
-        .withWidget("Toggle Button")
+        .withWidget(BuiltInWidgets.kToggleButton)
         .entry
     val invertrot = swerveTab.add("invert rot", false)
-        .withWidget("Toggle Button")
+        .withWidget(BuiltInWidgets.kToggleButton)
         .entry
-    val frontLeft = SwerveModule( // front right
+    private val frontLeft = SwerveModule( // front right
         Constants.FLDriveMotorId,
         Constants.FLTurnMotorId,
         Constants.FLTurnEncoderId,
@@ -64,7 +64,7 @@ class Drivetrain(
             Constants.MODULE_DISTANCE_Y / 2
         )
     )
-    val frontRight = SwerveModule( // backleft
+    private val frontRight = SwerveModule( // backleft
         Constants.FRDriveMotorId,
         Constants.FRTurnMotorId,
         Constants.FRTurnEncoderId,
@@ -75,7 +75,7 @@ class Drivetrain(
             -Constants.MODULE_DISTANCE_Y / 2
         )
     )
-    val backLeft = SwerveModule(
+    private val backLeft = SwerveModule(
         Constants.BLDriveMotorId,
         Constants.BLTurnMotorId,
         Constants.BLTurnEncoderId,
@@ -86,7 +86,7 @@ class Drivetrain(
         ),
         angleZero = Constants.BLZeroAngle,
     )
-    val backRight = SwerveModule(
+    private val backRight = SwerveModule(
         Constants.BRDriveMotorId,
         Constants.BRTurnMotorId,
         Constants.BRTurnEncoderId,
@@ -99,7 +99,7 @@ class Drivetrain(
         angleZero = Constants.BRZeroAngle,
     )
     val modules = listOf(frontLeft, frontRight, backLeft, backRight)
-    val kinematics = SwerveDriveKinematics(
+    private val kinematics = SwerveDriveKinematics(
         *modules.map { it.location }.toTypedArray()
     )
 
@@ -167,17 +167,17 @@ class Drivetrain(
         this.robotPose = estimatedPose2d
     }
 
-    val gyroPitchWidget = Idrc.add("Gyro Pitch", 0.0)
+    private val gyroPitchWidget = Idrc.add("Gyro Pitch", 0.0)
         .withWidget("Gryo")
         .withProperties(mapOf("min" to -180.0, "max" to 180.0))
         .withSize(2, 2)
         .entry
-    val gyroYawWidget = Idrc.add("Gyro Yaw", 0.0)
+    private val gyroYawWidget = Idrc.add("Gyro Yaw", 0.0)
         .withWidget("Gryo")
         .withProperties(mapOf("min" to -180.0, "max" to 180.0))
         .withSize(2, 2)
         .entry
-    val gyroRollWidget = Idrc.add("Gyro Roll", 0.0)
+    private val gyroRollWidget = Idrc.add("Gyro Roll", 0.0)
         .withWidget("Gryo")
         .withProperties(mapOf("min" to -180.0, "max" to 180.0))
         .withSize(2, 2)
@@ -227,28 +227,9 @@ class Drivetrain(
         SmartDashboard.putNumber("uptime", gyro.upTime.toDouble())
         SmartDashboard.putNumber("posex", poseEstimator.estimatedPosition.translation.x)
         SmartDashboard.putNumber("posey", poseEstimator.estimatedPosition.translation.y)
-//        cameraWrappers[0].getEstimatedGlobalPose(poseEstimator.estimatedPosition).ifPresent {
-//            SmartDashboard.putNumber("poseyCamera", it.estimatedPose.translation.y)
-//            SmartDashboard.putNumber("posexCamera", it.estimatedPose.translation.x)
-//        }
-
-
-//        gyroEntry.setDouble(gyro.yaw)
-//        odometry.update(
-//            Rotation2d.fromDegrees(gyro.yaw),
-//            modules.map { it.position.toSwerveModulePosition() }.toTypedArray()
-//        )
 
         if (Game.sim) {
             val vel = estimatedVelocity
-//            simEstimatedPose2d =
-//                Pose2d(
-//                    Translation2d(
-//                        simEstimatedPose2d.x + (vel.translation.x * 0.02 * 0.01) + simQueuedForce.translation.x,
-//                        simEstimatedPose2d.y + (vel.translation.y * 0.02 * 0.01) + simQueuedForce.translation.y
-//                    ),
-//                    Rotation2d(simEstimatedPose2d.rotation.radians + (vel.rotation.radians * 0.02 * 0.01) + simQueuedForce.rotation.radians)
-//                )
             simEstimatedPose2d = simEstimatedPose2d + (vel * 0.02 * 0.01) + simQueuedForce
             simQueuedForce = Transform2d()
         }
@@ -295,12 +276,15 @@ class Drivetrain(
             chassisSpeedsField,
             rotAxis
         )
+
+        val currentChassisSpeeds = kinematics.toChassisSpeeds(*swerveModuleStates)
+
         SwerveDriveKinematics.desaturateWheelSpeeds(
-            swerveModuleStates,
-            chassisSpeedsField,
-            4.0,
-            2.0,
-            2 * PI
+            /* moduleStates = */ swerveModuleStates,
+            /* currentChassisSpeed = */ currentChassisSpeeds,
+            /* attainableMaxModuleSpeedMetersPerSecond = */ 4.0,
+            /* attainableMaxTranslationalSpeedMetersPerSecond = */ 4.0,
+            /* attainableMaxRotationalVelocityRadiansPerSecond = */ PI,
         )
 
         if (Game.real) {
@@ -311,10 +295,6 @@ class Drivetrain(
             xSpeedEntry.setDouble(chassisSpeeds.vxMetersPerSecond)
             ySpeedEntry.setDouble(chassisSpeeds.vyMetersPerSecond)
             rotEntry.setDouble(chassisSpeeds.omegaRadiansPerSecond)
-            //fixme: move the following to swerve module periodic
-            modules.forEachIndexed { i, module ->
-                module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
-            }
         } else {
             val newChassisSpeeds = kinematics.toChassisSpeeds(*swerveModuleStates)
             // add the chassis speeds to the sim pose with dt = 0.02
@@ -354,39 +334,6 @@ class Drivetrain(
         modules.forEachIndexed { i, module ->
             module.stateEntry.setDouble(swerveModuleStates[i].speedMetersPerSecond)
         }
-    }
-
-    inline var swerveModuleStates: List<SwerveModuleState>
-        get() = this.modules.map { it.currentPosition }
-        set(value) = value.forEachIndexed { i, it ->
-            modules[i].setpoint = it
-        }
-    var powerSaveMode: Int = 0
-        set(value) {
-            field = value
-            if (value == 0) {
-                modules.forEach { it.powerSaveMode = false }
-            } else {
-                modules.forEachIndexed { i, module ->
-                    module.powerSaveMode = i < value
-                    // only enable power save mode for the first n modules
-                }
-            }
-        }
-
-    /**
-     * Zeroes the heading of the robot
-     */
-    fun zeroHeading() {
-        poseEstimator.resetPosition(
-            Rotation2d.fromDegrees(gyro.yaw),
-            modules.map { it.swerveModulePosition }
-                .toTypedArray(),
-            Pose2d(
-                poseEstimator.estimatedPosition.translation,
-                Rotation2d()
-            )
-        )
     }
 
     inline val canTrustPose: Boolean

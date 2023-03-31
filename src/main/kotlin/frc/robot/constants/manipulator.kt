@@ -11,18 +11,10 @@ object manipulator {
     const val rightSolenoidReverse = 2
     const val manipulatorCurrentLimit = 70.0
 
-    val wristToObj = Units.inchesToMeters(8.0)
     const val confidenceThreshold = 0.75
 
     object Colors {
         val purpleCube = Color(0.19, 0.07, 0.77)
         val yellowCone = Color(0.95, 0.77, 0.06)
-    }
-
-    object Speeds {
-        const val intake = 0.5
-        const val outtake = -0.5
-        const val stop = 0.0
-        const val idle = 0.1
     }
 }

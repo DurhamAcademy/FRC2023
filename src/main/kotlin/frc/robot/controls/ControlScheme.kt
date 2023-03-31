@@ -28,8 +28,6 @@ abstract class ControlScheme {
 
     open val spinIntakeIn: Trigger = Trigger { false }
     open val spinIntakeOut: Trigger = Trigger { false }
-    open val stopIntake: Trigger = Trigger { false }
-
 
     open val moveToClosestHPSAxis: Trigger = Trigger { false }
     open val moveToClosestScoreStationAxis: Trigger = Trigger { false }
@@ -47,8 +45,6 @@ abstract class ControlScheme {
 
     open val alignClosestHPS: Trigger = Trigger { false }
 
-    open val overrideAlignmentSafety: Trigger = Trigger { false }
-
     open val selectGridUp: Trigger = Trigger { false }
     open val selectGridDown: Trigger = Trigger { false }
     open val selectGridLeft: Trigger = Trigger { false }
@@ -59,4 +55,12 @@ abstract class ControlScheme {
     open val throwObject: Trigger = Trigger { false }
 
     open val lockSwerveModulesCircle: Trigger = Trigger { false }
+
+    open val snapTo180: Trigger = Trigger { false }
+
+    open val intakeGroundIntake: Trigger = Trigger { false }
+    open val intakeEject: Trigger = Trigger { false }
+    open val shootToLTwo: Trigger = Trigger { false }
+    open val shootToLThree: Trigger = Trigger { false }
+
 }
