@@ -107,8 +107,6 @@ class Drivetrain(
         configFactoryDefault()
     }
 
-    private val f2d = Field2d()
-
     val Idrc = getTab("drivetrain")
 
     // pose shuffleboard stuff (using the field 2d widget)
@@ -120,12 +118,13 @@ class Drivetrain(
         }.toTypedArray(),
         Pose2d(),
         VecBuilder.fill(0.1, 0.1, 0.1),
-        VecBuilder.fill(1.8, 1.8, 1.8)
+        VecBuilder.fill(1.8, 1.8, 3.1)
     )
 
     @Deprecated("Use estimatedPose2d instead, this is only for internal drivetrain use")
     var simEstimatedPose2d: Pose2d = Pose2d()
 
+    @Suppress("DEPRECATION")
     inline val estimatedPose2d: Pose2d
         get() = if (!Game.sim) {
             poseEstimator.estimatedPosition
@@ -230,6 +229,7 @@ class Drivetrain(
 
         if (Game.sim) {
             val vel = estimatedVelocity
+            @Suppress("DEPRECATION")
             simEstimatedPose2d = simEstimatedPose2d + (vel * 0.02 * 0.01) + simQueuedForce
             simQueuedForce = Transform2d()
         }

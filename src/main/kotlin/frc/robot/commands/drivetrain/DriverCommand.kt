@@ -8,7 +8,10 @@ import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.kyberlib.command.Game
+import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Constants
+import frc.robot.constants.drivetrain.maxAutonomousAngularAcceleration
+import frc.robot.constants.drivetrain.maxAutonomousAngularVelocity
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.slewLimited
@@ -20,15 +23,25 @@ class DriverCommand(
     var controlScheme: ControlScheme,
     var nearestStation: () -> Boolean,
 ) : CommandBase() {
-    private val rotationPid = ProfiledPIDController(1.0, 0.0, 0.0, TrapezoidProfile.Constraints(2*PI, 4*PI)).apply {
+    private val rotationPid = ProfiledPIDController(
+        MoveToPosition.rP, 0.0, 0.0, TrapezoidProfile.Constraints(
+            maxAutonomousAngularVelocity, maxAutonomousAngularAcceleration
+        )
+    ).apply {
         enableContinuousInput(-PI, PI)
+
     }
+    var lastNearestStation = nearestStation()
 
     init {
         addRequirements(drivetrain)
     }
 
     override fun execute() {
+        if (nearestStation() != lastNearestStation) {
+            lastNearestStation = nearestStation()
+            rotationPid.reset(drivetrain.estimatedPose2d.rotation.radians)
+        }
         val allianceMulitplier = when (Game.alliance) {
             DriverStation.Alliance.Invalid -> 1.0
             else -> Game.alliance.xMul
