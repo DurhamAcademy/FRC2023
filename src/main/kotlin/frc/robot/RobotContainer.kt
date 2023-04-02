@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Blue
 import edu.wpi.first.wpilibj.DriverStation.Alliance.Red
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
@@ -32,10 +34,7 @@ import frc.robot.commands.alltogether.SetSubsystemPosition
 import frc.robot.commands.drivetrain.DriveCommand
 import frc.robot.commands.drivetrain.RotateTo180
 import frc.robot.commands.elevator.ZeroElevatorAndIdle
-import frc.robot.commands.intake.DeployIntake
-import frc.robot.commands.intake.IdleIntake
-import frc.robot.commands.intake.IntakeEject
-import frc.robot.commands.intake.ShootToLTwo
+import frc.robot.commands.intake.*
 import frc.robot.commands.manipulator.ManipulatorIO
 import frc.robot.commands.manipulator.SetManipulatorSpeed
 import frc.robot.commands.manipulator.Throw
@@ -76,6 +75,7 @@ class RobotContainer {
     val intake = Intake(arm, { wantedObject })
     val elevator = Elevator(this@RobotContainer, arm, this.intake)
 
+    val pdh = PowerDistribution(1, PowerDistribution.ModuleType.kRev)
 
     init {
         arrayOf(controlScheme0, controlScheme1).forEachIndexed { i, it ->
@@ -318,6 +318,12 @@ class RobotContainer {
 
                 snapTo180
                     .whileTrue(RotateTo180(this@RobotContainer))
+
+                zeroIntake
+                    .whileTrue(ZeroModeMotor(this@RobotContainer))
+
+//                balanceIOLevel
+//                    .whileTrue(SetSubsystemPosition(this@RobotContainer, { IOLevel.Balance }, { GamePiece.cone }, true))
             }
         }
     }
@@ -545,6 +551,10 @@ class RobotContainer {
     // shuffleboard auto chooser
     private val autoChooserTab: ShuffleboardTab = Shuffleboard.getTab("Autonomous")
 
+    val cameraTurnOffChooser = autoChooserTab.add("PowerToggle", true)
+        .withWidget(BuiltInWidgets.kToggleButton)
+        .entry
+
     @Suppress("unused")
     val autoChooserWidget: ComplexWidget = autoChooserTab.add("Autonomous", autoChooser)
     val armFieldPosition: FieldObject2d = drivetrain.field2d.getObject("arm")
@@ -563,6 +573,8 @@ class RobotContainer {
     fun update() {
         leds.update()
         smartDashboardSelector.update()
+
+        pdh.switchableChannel = cameraTurnOffChooser.getBoolean(true)
 
         // send subsystems to SmartDashboard
         SmartDashboard.putData("Drivetrain/sendable", drivetrain)

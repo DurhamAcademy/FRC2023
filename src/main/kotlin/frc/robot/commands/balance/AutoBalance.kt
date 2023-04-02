@@ -50,7 +50,7 @@ class AutoBalance(private val drivetrain: Drivetrain) : CommandBase() {
                 true
             )
         } else {
-            drivetrain.drive(ChassisSpeeds(2.0 * speedMul, 0.0, 0.0), true)
+            drivetrain.drive(ChassisSpeeds(3.0 * speedMul, 0.0, 0.0), true)
         }
 
 

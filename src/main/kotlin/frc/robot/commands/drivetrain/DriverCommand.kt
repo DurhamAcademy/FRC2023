@@ -8,7 +8,9 @@ import edu.wpi.first.math.util.Units.degreesToRadians
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.kyberlib.command.Game
+import frc.robot.commands.pathing.MoveToPosition
 import frc.robot.constants.Constants
+import frc.robot.constants.drivetrain.maxVelocity
 import frc.robot.controls.ControlScheme
 import frc.robot.subsystems.Drivetrain
 import frc.robot.subsystems.slewLimited
@@ -20,7 +22,7 @@ class DriverCommand(
     var controlScheme: ControlScheme,
     var nearestStation: () -> Boolean,
 ) : CommandBase() {
-    private val rotationPid = ProfiledPIDController(1.0, 0.0, 0.0, TrapezoidProfile.Constraints(2*PI, 4*PI)).apply {
+    private val rotationPid = ProfiledPIDController(MoveToPosition.rP, 0.0, 0.0, TrapezoidProfile.Constraints(2*PI, 4*PI)).apply {
         enableContinuousInput(-PI, PI)
     }
 
@@ -34,7 +36,7 @@ class DriverCommand(
             else -> Game.alliance.xMul
         }
         val vec = Translation2d(-controlScheme.forward, -controlScheme.strafe)
-            .times(3.5)
+            .times(maxVelocity)
         drivetrain.drive(
             ChassisSpeeds(
                 vec.x * Constants.powerPercent *
@@ -52,7 +54,7 @@ class DriverCommand(
                     -controlScheme.rotation * 2 * Math.PI *
                             Constants.powerPercent * .5 * (if (drivetrain.invertrot.getBoolean(false)) -1 else 1) * controlScheme.speedMutiplier
                 }
-            ).slewLimited(drivetrain.xSlewRateLimiter, drivetrain.ySlewRateLimiter, drivetrain.rotSlewRateLimiter),
+            ),//.slewLimited(drivetrain.xSlewRateLimiter, drivetrain.ySlewRateLimiter, drivetrain.rotSlewRateLimiter),
             true,
             Translation2d() // chris wants in the middle
         )

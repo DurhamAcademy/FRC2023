@@ -8,11 +8,9 @@ fun findNearest180(
     // for example, if the input is 0, the output will be 0, if the input is 179, the output will be 180, if the input
     // is -179, the output will be 180 etc.
     val nearest180 = currentAngle % 360
-    return if (nearest180 > 180) {
-        nearest180 - 360
-    } else if (nearest180 < -180) {
-        nearest180 + 360
+    return if (nearest180 >= 90 || nearest180<=-90) {
+        180.0
     } else {
-        nearest180
+        0.0
     }
 }
