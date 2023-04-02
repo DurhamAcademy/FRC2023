@@ -32,7 +32,7 @@ class ChrisControlScheme(
     override val increaseEncoderAngle: Trigger = xbox.povRight()
     override val lockSwerveModulesCircle: Trigger = xbox.rightBumper()
 
-    //override val snapTo180: Trigger = xbox.rightTrigger()
+    override val snapTo180: Trigger = xbox.leftTrigger()
     override val zeroIntake: Trigger = xbox.povUp()
 //    override val balanceIOLevel: Trigger = xbox.povDown()
 }
