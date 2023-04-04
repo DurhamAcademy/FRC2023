@@ -20,7 +20,7 @@ class DriveCommand(
     override fun execute() {
         drivetrain.drive(
             ChassisSpeeds(x(), y(), rotation()),
-            true,
+            isFieldOriented,
             Translation2d(0.0, 0.0)
         )
     }
@@ -28,7 +28,7 @@ class DriveCommand(
     override fun end(interrupted: Boolean) {
         drivetrain.drive(
             ChassisSpeeds(0.0, 0.0, 0.0),
-            true,
+            isFieldOriented,
             Translation2d(0.0, 0.0)
         )
     }

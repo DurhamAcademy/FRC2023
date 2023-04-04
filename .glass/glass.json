@@ -22,18 +22,19 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Autonomous/Autonomous": "String Chooser",
+      "/SmartDashboard/Arm/sendable": "Subsystem",
       "/SmartDashboard/Drivetrain/sendable": "Subsystem",
       "/SmartDashboard/FIELD": "Field2d",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/elevcmd": "Subsystem"
+      "/SmartDashboard/Manipulator/sendable": "Subsystem",
+      "/SmartDashboard/elevator/sendable": "Subsystem",
+      "/SmartDashboard/elevcmd": "Subsystem",
+      "/SmartDashboard/field": "Field2d",
+      "/SmartDashboard/huhhh": "Subsystem"
     },
     "windows": {
       "/FMSInfo": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/FIELD": {
         "window": {
           "visible": true
         }
@@ -47,6 +48,18 @@
         "bottom": 544,
         "height": 8.013679504394531,
         "image": "C:\\Users\\frc\\PathWeaver\\Games\\2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/field": {
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "C:\\Users\\frc\\IdeaProjects\\FRC2023\\field\\2023-field.png",
         "left": 46,
         "right": 1088,
         "top": 36,
@@ -81,7 +94,7 @@
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT4)",
+    "mode": "Client (NT3)",
     "serverTeam": "6502"
   },
   "Plots": {
@@ -133,7 +146,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

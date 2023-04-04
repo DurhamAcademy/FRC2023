@@ -16,6 +16,7 @@ import frc.robot.utils.GamePiece
 import frc.robot.utils.grid.PlacementGroup
 import frc.robot.utils.grid.PlacementLevel
 import frc.robot.utils.grid.PlacementSide
+import java.lang.Exception
 
 class AutoPlaceAndBalance(
     private val robotContainer: RobotContainer,
@@ -52,25 +53,31 @@ class AutoPlaceAndBalance(
                 Throw(
                     robotContainer.manipulator,
                     { GamePiece.cone },
-                    { PlacementLevel.Level3 }).withTimeout(0.75)
+                    { PlacementLevel.Level3 })
+                    .withTimeout(0.5)
             ) // shoot cube
             .withTimeout(4.0)
             .andThen(
-                MoveToPosition(robotContainer.drivetrain, 14.4, 2.72, 180.0, maxPosSpeed = 3.7)
+                MoveToPosition(robotContainer.drivetrain,
+                    14.4, 2.72, 180.0,
+                    maxPosSpeed = 3.7
+                )
                     .andThen(
-                        MoveToPosition(
-                            robotContainer.drivetrain,
-                            (13.34 - 0.5),
-                            2.72,
-                            180.0,
+                        MoveToPosition(robotContainer.drivetrain,
+                            (13.34 - 0.5), 2.72, 180.0,
                             maxPosSpeed = 3.7
                         ).withTimeout(4.0)
                     )
-                    .alongWith(
+                    .deadlineWith(
                         SetSubsystemPosition(robotContainer, { IOLevel.Balance }, { GamePiece.cone }, true)
                     )
             )
-            .andThen(AutoBalance(robotContainer.drivetrain))
+            .andThen(
+                AutoBalance(robotContainer.drivetrain)
+                    .deadlineWith(
+                        SetSubsystemPosition(robotContainer, { IOLevel.Balance }, { GamePiece.cone }, true)
+                    )
+            )
     }
 
     private fun pathBlue(robotContainer: RobotContainer): Command {
@@ -80,7 +87,8 @@ class AutoPlaceAndBalance(
                 { IOLevel.High },
                 { GamePiece.cone },
                 true
-            ))
+            )
+            )
             .andThen(
                 SetSubsystemPosition(
                     robotContainer,
@@ -103,13 +111,17 @@ class AutoPlaceAndBalance(
                     .andThen(
                         MoveToPosition(robotContainer.drivetrain, 16.52 - (13.34 - 0.5), 2.72, 0.0,
                             maxPosSpeed = 3.7
-                        )
-                            .withTimeout(4.0)
+                        ).withTimeout(4.0)
                     )
-                    .alongWith(
+                    .deadlineWith(
                         SetSubsystemPosition(robotContainer, { IOLevel.Balance }, { GamePiece.cone }, true)
                     )
             )
-            .andThen(AutoBalance(robotContainer.drivetrain))
+            .andThen(
+                AutoBalance(robotContainer.drivetrain)
+                    .deadlineWith(
+                        SetSubsystemPosition(robotContainer, { IOLevel.Balance }, { GamePiece.cone }, true)
+                    )
+            )
     }
 }

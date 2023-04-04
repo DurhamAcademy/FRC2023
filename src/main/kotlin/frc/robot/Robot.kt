@@ -33,7 +33,7 @@ class Robot : TimedRobot() {
     }
 
     override fun teleopInit() {
-        ZeroModeMotor(robotContainer.intake).schedule()
+        ZeroModeMotor(robotContainer).schedule()
     }
 
     var auto: Command? = null

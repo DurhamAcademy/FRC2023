@@ -11,7 +11,7 @@ class ChrisControlScheme(
     override val xbox = CommandXboxController(xboxNum)
 
     override val speedMutiplier: Double
-        get() = (1.0 - (0.8*(round(xbox.rightTriggerAxis * 3)/3.0)))
+        get() = (1.0 - (0.3 * (round(xbox.rightTriggerAxis * 3) / 3.0)))
             .coerceIn(0.0, 1.0)
 
     override val rotation: Double
@@ -31,5 +31,8 @@ class ChrisControlScheme(
     override val decreaseEncoderAngle: Trigger = xbox.povLeft()
     override val increaseEncoderAngle: Trigger = xbox.povRight()
     override val lockSwerveModulesCircle: Trigger = xbox.rightBumper()
-//    override val snapTo180: Trigger = xbox.rightTrigger()
+
+    override val snapTo180: Trigger = xbox.leftTrigger()
+    override val zeroIntake: Trigger = xbox.povUp()
+//    override val balanceIOLevel: Trigger = xbox.povDown()
 }

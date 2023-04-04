@@ -32,6 +32,7 @@ val Pose2d.flipped: Pose2d
 //fun safePrint(vararg message: String, separator: String = "") {
 //    message.joinToString {  }
 //}
+
 open class MoveToPosition(
     private val drivetrain: Drivetrain,
     /**
@@ -46,7 +47,7 @@ open class MoveToPosition(
      * The desired velocity of the robot (in meters per second)
      */
     private val velocity: Transform2d = Transform2d(),
-    private val toleranceppos: Double = 0.02,
+    private val toleranceppos: Double = 0.075,
     private val tolerancepvel: Double = 0.1,
     private val tolerancerpos: Double = 0.01,
     private val tolerancervel: Double = 0.1,
@@ -143,6 +144,12 @@ open class MoveToPosition(
         rPIDController.reset(drivetrain.estimatedPose2d.rotation.radians, drivetrain.estimatedVelocity.rotation.radians)
 
         visualization.pose = pose(xPIDController, yPIDController, rPIDController)
+
+        val current = drivetrain.estimatedPose2d
+        val desired = pose(xPIDController, yPIDController, rPIDController)
+        if (desired.translation.getDistance(current.translation) > 8.0) {
+            print("Unable to path")
+        }
     }
 
     // on command start and every time the command is executed, calculate the
