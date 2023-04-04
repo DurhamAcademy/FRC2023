@@ -7,7 +7,7 @@ abstract class ControlScheme {
     abstract val xbox: CommandXboxController?
 
     open val speedMutiplier: Double
-        get() = 0.0
+        get() = 1.0
 
     open val rotation: Double
         get() = 0.0
@@ -62,5 +62,7 @@ abstract class ControlScheme {
     open val intakeEject: Trigger = Trigger { false }
     open val shootToLTwo: Trigger = Trigger { false }
     open val shootToLThree: Trigger = Trigger { false }
+    open val zeroIntake: Trigger = Trigger { false }
+//    open val balanceIOLevel: Trigger = Trigger { false }
 
 }

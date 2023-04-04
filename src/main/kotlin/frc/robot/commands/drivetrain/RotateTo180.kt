@@ -6,9 +6,10 @@ import frc.robot.RobotContainer
 class RotateTo180(
     val robotContainer: RobotContainer,
 ) : CommandBase() {
-    override fun execute() {
+    override fun initialize() {
         robotContainer.rotateTo180 = true
     }
+
     override fun end(interrupted: Boolean) {
         robotContainer.rotateTo180 = false
     }
