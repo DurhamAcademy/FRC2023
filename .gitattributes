@@ -1,0 +1,9 @@
+vendordeps/** linguist-vendored
+
+SysId/** linguist-generated
+field/** linguist-generated
+characterization/** linguist-generated
+.pathplanner/** linguist-generated
+.glass/** linguist-generated
+
+*.json linguist-generated
